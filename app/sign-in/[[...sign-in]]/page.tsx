@@ -1,6 +1,37 @@
 import { SignIn } from '@clerk/nextjs';
 
 export default function SignInPage() {
+  const publishableKey = process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY;
+
+  // Fallback if Clerk not configured
+  if (!publishableKey) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-950 via-slate-900 to-blue-950">
+        <div className="w-full max-w-md px-4 text-center">
+          <div className="w-20 h-20 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-2xl mx-auto mb-6 flex items-center justify-center shadow-lg">
+            <svg className="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8h2a2 2 0 012 2v6a2 2 0 01-2 2h-2v4l-4-4H9a1.994 1.994 0 01-1.414-.586m0 0L11 14h4a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2v4l.586-.586z" />
+            </svg>
+          </div>
+          <h1 className="text-4xl font-bold mb-3 bg-gradient-to-r from-blue-400 to-cyan-400 bg-clip-text text-transparent">
+            Welcome Back
+          </h1>
+          <p className="text-slate-400 text-lg mb-6">
+            Sign in to your account
+          </p>
+          <div className="bg-amber-900/30 border border-amber-700 rounded-lg p-4 mb-6">
+            <p className="text-amber-300 text-sm">
+              Authentication is currently being configured. Please check back shortly.
+            </p>
+          </div>
+          <a href="/" className="text-blue-400 hover:text-blue-300 underline">
+            Return to Home
+          </a>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-950 via-slate-900 to-blue-950">
       <div className="w-full max-w-md px-4">

@@ -16,8 +16,22 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const publishableKey = process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY;
+
+  // In production build without env vars, render without Clerk
+  if (!publishableKey) {
+    return (
+      <html lang="en" className="dark">
+        <body className={`${inter.className} bg-slate-950 text-slate-100 antialiased`}>
+          {children}
+        </body>
+      </html>
+    );
+  }
+
   return (
     <ClerkProvider
+      publishableKey={publishableKey}
       signInUrl="/sign-in"
       signUpUrl="/sign-up"
       signInFallbackRedirectUrl="/situations"
