@@ -1,0 +1,210 @@
+@import "tailwindcss";
+
+@theme {
+  /* BehindTheProtocol Premium Professional Palette */
+  
+  /* Core neutral base - deep charcoal, not black */
+  --color-background: oklch(15% 0.015 250);
+  --color-foreground: oklch(97% 0.005 250);
+  
+  /* Card surfaces - subtle elevation */
+  --color-card: oklch(18% 0.015 250);
+  --color-card-foreground: oklch(97% 0.005 250);
+  
+  /* Primary - refined deep blue, serious and trustworthy */
+  --color-primary: oklch(48% 0.12 250);
+  --color-primary-foreground: oklch(98% 0.005 250);
+  
+  /* Secondary - muted slate, professional alternative */
+  --color-secondary: oklch(35% 0.02 250);
+  --color-secondary-foreground: oklch(97% 0.005 250);
+  
+  /* Muted - subtle gray for secondary content */
+  --color-muted: oklch(45% 0.02 250);
+  --color-muted-foreground: oklch(70% 0.015 250);
+  
+  /* Accent - teal/cyan for actions, calm but visible */
+  --color-accent: oklch(55% 0.10 210);
+  --color-accent-foreground: oklch(98% 0.005 250);
+  
+  /* Destructive - muted red, not urgent */
+  --color-destructive: oklch(55% 0.15 25);
+  --color-destructive-foreground: oklch(98% 0.005 250);
+  
+  /* Borders - subtle, professional */
+  --color-border: oklch(30% 0.02 250);
+  --color-input: oklch(25% 0.02 250);
+  --color-ring: oklch(48% 0.12 250);
+  
+  /* Semantic Colors - Professional Context */
+  
+  /* Success - muted emerald/green, calm confirmation */
+  --color-emerald-success: oklch(60% 0.12 170);
+  
+  /* Warning - amber, not alarming */
+  --color-amber-warning: oklch(75% 0.12 85);
+  
+  /* Info - calm blue, informational */
+  --color-blue-info: oklch(65% 0.10 240);
+  
+  /* Urgent - muted rose, professional attention */
+  --color-rose-urgent: oklch(62% 0.14 350);
+  
+  /* Accent Colors - Sub pops of专业 color */
+  
+  /* Teal accent for primary actions */
+  --color-teal-accent: oklch(55% 0.10 210);
+  
+  /* Indigo accent for secondary actions */
+  --color-indigo-accent: oklch(55% 0.14 265);
+  
+  /* Slate accent for tertiary elements */
+  --color-slate-accent: oklch(50% 0.08 250);
+}
+
+/* Base styles */
+* {
+  border-color: var(--color-border);
+}
+
+body {
+  background-color: var(--color-background);
+  color: var(--color-foreground);
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Custom utility classes */
+.glass-card {
+  background-color: rgba(18, 18, 18, 0.7);
+  backdrop-filter: blur(12px);
+  border: 1px solid var(--color-border);
+  border-radius: 0.75rem;
+}
+
+.text-gradient {
+  background: linear-gradient(to right, oklch(60% 0.12 250), oklch(60% 0.14 210));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Primary button - professional blue */
+.btn-primary {
+  background-color: oklch(48% 0.12 250);
+  color: oklch(98% 0.005 250);
+  font-weight: 500;
+  padding: 0.6rem 1.2rem;
+  border-radius: 0.5rem;
+  transition: background-color 0.15s ease, transform 0.15s ease;
+  border: none;
+}
+
+.btn-primary:hover {
+  background-color: oklch(53% 0.12 250);
+  transform: translateY(-1px);
+}
+
+.btn-primary:active {
+  transform: translateY(0);
+}
+
+/* Secondary button - neutral slate */
+.btn-secondary {
+  background-color: oklch(35% 0.02 250);
+  color: oklch(97% 0.005 250);
+  font-weight: 500;
+  padding: 0.6rem 1.2rem;
+  border-radius: 0.5rem;
+  border: 1px solid var(--color-border);
+  transition: background-color 0.15s ease, border-color 0.15s ease;
+}
+
+.btn-secondary:hover {
+  background-color: oklch(40% 0.02 250);
+  border-color: oklch(45% 0.02 250);
+}
+
+/* Accent button - teal for emphasis */
+.btn-accent {
+  background-color: oklch(55% 0.10 210);
+  color: oklch(98% 0.005 250);
+  font-weight: 500;
+  padding: 0.6rem 1.2rem;
+  border-radius: 0.5rem;
+  transition: background-color 0.15s ease, transform 0.15s ease;
+  border: none;
+}
+
+.btn-accent:hover {
+  background-color: oklch(60% 0.10 210);
+  transform: translateY(-1px);
+}
+
+/* Input fields - professional */
+.input-field {
+  background-color: oklch(20% 0.02 250);
+  border-color: var(--color-border);
+  border-radius: 0.5rem;
+  padding: 0.75rem 1rem;
+  color: var(--color-foreground);
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.input-field::placeholder {
+  color: var(--color-muted-foreground);
+}
+
+.input-field:focus {
+  border-color: oklch(48% 0.12 250);
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(75, 85, 99, 0.3);
+}
+
+/* Custom scrollbar - subtle */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: oklch(15% 0.015 250);
+}
+
+::-webkit-scrollbar-thumb {
+  background: oklch(35% 0.02 250);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: oklch(45% 0.02 250);
+}
+
+/* Subtle animations */
+@keyframes fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in {
+  animation: fade-in 0.3s ease-out;
+}
+
+/* Selection color */
+::selection {
+  background-color: oklch(55% 0.10 210);
+  color: oklch(98% 0.005 250);
+}
+
+/* Focus visible */
+:focus-visible {
+  outline: 2px solid oklch(48% 0.12 250);
+  outline-offset: 2px;
+}

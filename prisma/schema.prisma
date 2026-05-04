@@ -1,0 +1,1212 @@
+// Behind the Protocol Database Schema
+// Closed-Loop Execution Intelligence System
+// 
+// Architecture: Intelligence Realm + Opportunity Realm + Trust Translation Engine
+// 
+// RULES:
+// - NO social metrics (no counts, rankings, leaderboards)
+// - NO UI exposure of trust vector
+// - Complete anonymity for Intelligence Realm
+// - Brokered allocation for Opportunity Realm
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ==================== CORE USER SYSTEM ====================
+
+model User {
+  id                    String    @id @default(cuid())
+  clerkId               String?   @unique
+  
+  // Identity - Anonymous publicly, verified internally
+  handle                String    @unique // User-chosen anonymous handle
+  
+  // Role & Company Type
+  userRole              String    // organization, operator, admin
+  roleCategory          String    // cra, crc, pi, sub-i, regulatory, data_mgmt, quality, operations, site_coordinator, ctm, other
+  companyCategory       String    // cro, site, sponsor, vendor, academic, other
+  
+  // Verification System
+  verificationStatus    String    @default("Pending") // Pending, Approved, Rejected
+  verificationMethod    String?   // email, linkedin, manual
+  linkedinUrl           String?   // Required for verification
+  verifiedBy            String?   // Admin user ID who approved
+  verifiedAt            DateTime?
+  rejectionReason       String?   // If rejected
+  
+  // Email Verification
+  email                 String?
+  emailVerified         Boolean   @default(false)
+  
+  // Moderation
+  trustScore            Int       @default(100) // 0-100 for moderation (100 = trusted)
+  isSuspended           Boolean   @default(false)
+  suspensionReason      String?
+  
+  // Founding Member
+  isFoundingOperator    Boolean   @default(false) // First 500 verified operators
+  
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+  
+  // Relations - NEW Architecture
+  contributions         Contribution[]
+  interactions          Interaction[]
+  trustVector           TrustVector?
+  capabilityIdentity    CapabilityIdentity?
+  
+  // Relations - Workforce Exchange
+  operatorProfile       OperatorProfile?
+  jobPostings           JobPosting[]
+  opportunityMatches    OpportunityMatch[]
+  
+  // Relations - Messaging
+  sentMessages          Message[]  @relation("SentMessages")
+  receivedMessages      Message[]  @relation("ReceivedMessages")
+  
+  // Relations - Admin
+  verifiedUsers         User[]     @relation("VerifiedBy")
+  verifiedByAdmin       User?      @relation("VerifiedBy", fields: [verifiedBy], references: [id])
+  createdHires          Hire[]
+  createdFeeRecords     FeeRecord[]
+  
+  // Relations - Outcomes
+  contributionOutcomes  ContributionOutcome[]
+  hireOutcomes          HireOutcome[]
+  contributorHealthFlag ContributorHealthFlag?
+  followUps             ContributionFollowUp[]
+}
+
+// ==================== INTELLIGENCE REALM ====================
+
+// Contribution - Core content unit (replaces Signal)
+// Supports multiple contribution types for structured intelligence
+model Contribution {
+  id                String   @id @default(cuid())
+  userId            String?
+  
+  // Contribution Type
+  contributionType  String   // situation, pattern, solution, question, insight
+  
+  // Core Content
+  title             String
+  description       String   // Main content (auto-redacted)
+  originalContent   String?  // Before redaction (for audit only)
+  
+  // Structured Classification
+  therapeuticArea   String   // Oncology, Rare Disease, Device, CNS, Cardiovascular, Infectious Disease, Other
+  trialPhase        String   // Phase 1, Phase 2, Phase 3, Phase 4, Multi-phase
+  issueCategory     String   // Enrollment, Protocol burden, Sponsor expectations, Data integrity, Regulatory, Operational, Staffing, Other
+  siteCountRange    String?  // 1-10, 11-50, 51-100, 100+
+  geographicScope   String?  // Single site, Multi-site US, Multi-site Global
+  
+  // Urgency and Resolution
+  urgencyLevel      String   @default("Normal") // Normal, Needs Advice, Urgent, Critical
+  resolutionStatus  String   @default("Unresolved") // Unresolved, In Progress, Resolved, Avoided
+  
+  // Hidden Field Extraction (for pattern matching, not displayed)
+  extractedPatterns Json?    // Auto-extracted patterns
+  relatedContext    Json?    // Related context (hidden from UI)
+  
+  // Correlation Risk (internal only)
+  correlationRisk   Float    @default(0.0) // 0-1 score
+  riskFactors       Json?    // Risk factor breakdown
+  
+  // Redaction
+  redactionLog      Json?    // Log of redactions applied
+  redactionCount    Int      @default(0)
+  
+  // Moderation
+  isFlagged         Boolean  @default(false)
+  flagReason        String?
+  isModerated       Boolean  @default(false)
+  moderatedBy       String?
+  moderatedAt       DateTime?
+  moderationAction  String?  // removed, approved, warning_issued
+  
+  // Visibility
+  isHidden          Boolean  @default(false) // Hidden for review
+  
+
+  // ==================== TRANSLATION ENGINE FIELDS ====================
+  
+  // Suppressed Signal Detection
+  suppressedSignalType String?  // NOT_ESCALATED, ESCALATED_IGNORED, NORMALIZED_WORKAROUND, FEAR_OF_PUSHBACK, SPONSOR_PRESSURE, CRO_PRESSURE, SITE_SILENCE, UNKNOWN
+  
+  // Emotional Signal Extraction
+  emotionalSignalType  String?  // OVERLOAD, FRUSTRATION, RESIGNATION, SILENCED, ESCALATION_FEAR, UNKNOWN
+  
+  // Workaround Detection
+  workaroundPresent    Boolean  @default(false)
+  workaroundType       String?  // PROCESS_SKIP, DATA_SHORTCUT, OFF_LABEL_PROCEDURE, UNOFFICIAL_TOOL, MANUAL_WORKAROUND, UNKNOWN
+  
+  // System Mismatch Detection
+  systemOfRecordMismatch Boolean @default(false)
+  officialRealityGap    Float   @default(0.0) // 0-1 score
+  
+  // Decision Distance
+  decisionDistanceLevel String? // LOW, MEDIUM, HIGH, CRITICAL
+  
+  // Burden Detection
+  burdenAbsorber    String?  // SITE, PATIENT, OPERATOR, SPONSOR, CRO, UNKNOWN
+  burdenType        String?  // TIME, COMPLEXITY, EMOTIONAL, FINANCIAL, OPERATIONAL, UNKNOWN
+  
+  // Invisible Work Classification
+  invisibleWorkType String?  // COORDINATION, COMMUNICATION, DOCUMENTATION, TRAINING, TROUBLESHOOTING, ADVOCACY, UNKNOWN
+  
+  // Risk & Impact Prediction
+  likelyDownstreamRisk   String?  // NONE, LOW, MEDIUM, HIGH, CRITICAL
+  escalationPattern      String?  // NONE, LOCAL, REGIONAL, GLOBAL, ESCALATING
+  patientImpactPotential String?  // NONE, LOW, MEDIUM, HIGH, CRITICAL
+  operationalDebtLevel   Float    @default(0.0) // 0-1 score
+  
+  // Economic Value
+  economicValuePotential  Float    @default(0.0) // 0-1 score
+  microOpportunityEligible Boolean  @default(false)
+  
+  // Drift Indicators
+  driftIndicatorsJson     Json?    // Array of detected drift signals
+  
+  // Failure Trajectory Prediction
+  failureTrajectoryPrediction String? // NONE, LIKELY_ESCALATION, HIGH_RISK_ESCALATION
+  
+  // Signal Quality & Maturity
+  signalQualityScore    String?  // HIGH, MEDIUM, LOW
+  patternMaturity       String?  // EMERGING, REPEATING, ESTABLISHED
+  
+  // Predictive Summary
+  predictiveSummary     String?  // AI-generated summary of likely outcomes
+  
+  // Confidence
+  confidenceScore       Float    @default(0.5) // 0-1 score
+
+  // Founder Override Controls (Priority 3)
+  forceIncludeFromPatterns Boolean  @default(false) // Admin override: force into pattern clustering regardless of SQS
+  forceExcludeFromPatterns Boolean  @default(false) // Admin override: exclude from pattern clustering
+  overridePatternLabel    String?  // Admin override: manually set a specific pattern name
+
+  // Relations
+  user              User?    @relation(fields: [userId], references: [id])
+  interactions      Interaction[]
+  outcomes          ContributionOutcome[]
+  followUps         ContributionFollowUp[]
+  executionSignal   ExecutionSignalExtraction?
+
+  
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  
+  @@index([contributionType])
+  @@index([therapeuticArea])
+  @@index([issueCategory])
+  @@index([resolutionStatus])
+  @@index([signalQualityScore])
+  @@index([patternMaturity])
+  @@index([suppressedSignalType])
+  @@index([emotionalSignalType])
+}
+
+// Interaction - Structured interactions on contributions
+// Maps to backend trust signals, NOT social metrics
+model Interaction {
+  id              String   @id @default(cuid())
+  contributionId  String
+  userId          String?
+  
+  // Structured Interaction Types
+  interactionType String   // SEEN_TOO, ACCURATE, SOLUTION_WORKED, SOLUTION_FAILED, DIFFERENT_CAUSE, ADD_CONTEXT
+  
+  // Weight (trust-based influence)
+  weight          Float    @default(1.0) // Multiplied by user's trust weight
+  
+  // Context (for ADD_CONTEXT type)
+  context         String?  // Brief context (auto-redacted)
+  originalContext String?  // Before redaction (audit only)
+  
+  // Correlation Risk
+  correlationRisk Float    @default(0.0)
+  
+  // Verification and founder controls (admin only)
+  isVerified      Boolean  @default(false)
+  displayStatus   String   @default("VISIBLE") // VISIBLE, PENDING_REVIEW, SUPPRESSED, BLOCKED
+  isSeeded        Boolean  @default(false) // Founder-added seed during private alpha
+  seededBy        String?
+  founderNote     String?
+  isHighValue     Boolean  @default(false)
+  escalatedToSafety Boolean @default(false)
+  
+  // Relations
+  contribution    Contribution @relation(fields: [contributionId], references: [id], onDelete: Cascade)
+  user            User?    @relation(fields: [userId], references: [id])
+  
+  createdAt       DateTime @default(now())
+  
+  @@unique([contributionId, userId, interactionType])
+  @@index([contributionId])
+  @@index([interactionType])
+}
+
+// ==================== TRUST TRANSLATION ENGINE ====================
+
+// TrustVector - Multi-dimensional trust calculation
+// STRICTLY HIDDEN FROM UI - used for matching only
+model TrustVector {
+  id                    String   @id @default(cuid())
+  userId                String   @unique
+  
+  // 9 Dimensions (0-1 scale)
+  quality               Float    @default(0.3)
+  reliability           Float    @default(0.3)
+  patternContribution   Float    @default(0.2)
+  solutionUtility       Float    @default(0.3)
+  recency               Float    @default(0.3)
+  peerConfidence        Float    @default(0.2)
+  outcomeReinforcement  Float    @default(0.2)
+  scarcity              Float    @default(0.2)
+  domainRelevance       Float    @default(0.5)
+  
+  // Calculated Overall (weighted combination)
+  overallWeight         Float    @default(0.3)
+  
+  // Priority Access
+  priorityAccess        Boolean  @default(false)
+  
+  // Tracking
+  lastCalculated        DateTime @default(now())
+  calculationVersion    Int      @default(1)
+  
+  // Relations
+  user                  User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  updatedAt             DateTime @updatedAt
+  
+  @@index([priorityAccess])
+}
+
+// CapabilityIdentity - Anonymized capability profile
+// STRICTLY SEPARATE FROM USER - for Opportunity Realm
+model CapabilityIdentity {
+  id                    String   @id @default(cuid())
+  userId                String   @unique
+  
+  // Anonymous Identifier
+  profileId             String   @unique // Generated anonymous ID for display
+  
+  // Capability Breakdown (derived from contributions, not raw content)
+  therapeuticAreas      Json?    // { "Oncology": 0.8, "Rare Disease": 0.6 }
+  trialPhases           Json?    // { "Phase 1": 0.5, "Phase 3": 0.9 }
+  issueExpertise        Json?    // { "Enrollment": 0.7, "Regulatory": 0.4 }
+  
+  // Reliability Metrics (internal only)
+  reliabilityScore      Float    @default(0.5)
+  responsivenessScore  Float    @default(0.5)
+  
+  // Generated Summary (for matching display only)
+  generatedSummary      String?  // "Experienced CRA with strong Phase 3 oncology background"
+  
+  // Availability
+  isAvailable           Boolean  @default(true)
+  availabilityNote      String?
+  
+  // Last Updated
+  lastUpdated           DateTime @default(now())
+  
+  // Relations
+  user                  User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  opportunityMatches    OpportunityMatch[]
+  
+  updatedAt             DateTime @updatedAt
+}
+
+// ==================== OPPORTUNITY REALM ====================
+
+// OpportunityMatch - Broker layer output
+// Organizations see CapabilityIdentity, NOT User
+model OpportunityMatch {
+  id                    String   @id @default(cuid())
+  jobPostingId          String
+  capabilityIdentityId  String
+  
+  // Match Details
+  matchScore            Float    @default(0.0) // 0-1
+  matchFactors          Json?    // Why this match was made
+  
+  // Correlation Risk (prevent re-identification)
+  correlationRisk       Float    @default(0.0)
+  correlationFactors    Json?
+  
+  // Status
+  status                String   @default("pending") // pending, viewed, accepted, rejected, expired
+  
+  // Timestamps
+  matchedAt             DateTime @default(now())
+  viewedAt              DateTime?
+  respondedAt           DateTime?
+  
+  // Relations
+  jobPosting            JobPosting @relation(fields: [jobPostingId], references: [id])
+  capabilityIdentity    CapabilityIdentity @relation(fields: [capabilityIdentityId], references: [id])
+  user                  User?    @relation(fields: [userId], references: [id])
+  userId                String?
+  
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+  
+  @@unique([jobPostingId, capabilityIdentityId])
+  @@index([status])
+}
+
+// JobPosting - Organizations posting opportunities
+model JobPosting {
+  id                String    @id @default(cuid())
+  creatorId         String?
+  
+  // Job Details
+  title             String
+  description       String
+  contractorType    String    // Independent Contractor (beta only)
+  requiredRole      String    // CRA, CRC, Study Coordinator, Site Lead, CTM, Regulatory Specialist, Data Entry, Operations, other
+  requiredSkills    String[]  // Array of required skills
+  experienceLevel   String    // Junior, Mid, Senior
+  duration          String    // 3 months, 6 months, 12 months, etc.
+  therapeuticArea   String
+  trialPhase        String    // Phase 1, Phase 2, Phase 3, Phase 4
+  location          String?   // or "Remote"
+  remoteCapable     Boolean   @default(false)
+  
+  // Organization Details
+  organizationType  String    // cro, site, sponsor, vendor, academic
+  
+  // Compensation
+  compensationBand  String?   // Optional: "$50-75/hr", "$75-100/hr", etc.
+  
+  // Status
+  status            String    @default("Open") // Open, Filled, Closed
+  priorityLevel     String    @default("Normal") // Normal, Urgent, Critical
+  
+  // Relations
+  creator           User?     @relation(fields: [creatorId], references: [id])
+  applications      Application[]
+  opportunityMatches OpportunityMatch[]
+  
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+  
+  @@index([status])
+}
+
+// Application - Operators applying to opportunities
+model Application {
+  id                String    @id @default(cuid())
+  jobPostingId      String
+  operatorId        String
+  
+  // Application Status
+  status            String    @default("Applied") // Applied, Under Review, Rejected, Hired
+  
+  // Application Content
+  message           String?   // Optional message from applicant
+  notes             String?   // Internal notes
+  
+  // Timestamps
+  appliedAt         DateTime  @default(now())
+  reviewedAt        DateTime?
+  reviewedBy        String?
+  updatedAt         DateTime  @updatedAt
+  
+  // Relations
+  jobPosting        JobPosting @relation(fields: [jobPostingId], references: [id], onDelete: Cascade)
+  operator          OperatorProfile @relation(fields: [operatorId], references: [id])
+  conversation      Conversation?
+  hire              Hire?
+  
+  @@unique([jobPostingId, operatorId])
+}
+
+// Operator Profile - Enhanced profile for operators
+model OperatorProfile {
+  id                String    @id @default(cuid())
+  userId            String    @unique
+  handle            String
+  
+  // Professional Details
+  role              String    // CRA, CRC, Study Coordinator, Site Lead, CTM, Regulatory Specialist, Data Entry, Operations, other
+  yearsExperience   Int
+  therapeuticAreas  String[]  // Oncology, Rare Disease, Device, etc.
+  trialPhases       String[]  // Phase 1, Phase 2, Phase 3, Phase 4
+  siteTypes         String[]  // Academic, Community, Private Practice
+  certifications    String[]  // CCRA, SOCRA, etc.
+  languages         String[]  // Language capabilities
+  location          String?
+  timezone          String?
+  
+  // Anonymous Company Context (for display without revealing identity)
+  roleTitle         String?   // Senior CRA, CRC, Study Manager, etc.
+  organizationType  String?   // Top Pharma, Mid-size Pharma, Biotech Sponsor, CRO, Site Network, Community Oncology Site, Academic Medical Center, Vendor
+  
+  // Availability
+  isAvailable       Boolean   @default(true)
+  availabilityNote  String?
+  minSites          Int       @default(1)
+  maxSites          Int       @default(5)
+  
+  // Preferences
+  travelWilling     Boolean   @default(true)
+  remoteCapable     Boolean   @default(false)
+  hourlyRate        String?   // Optional rate disclosure
+  
+  // Stats
+  successfulMatches Int       @default(0)
+  
+  // Relations
+  user              User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  applications      Application[]
+  
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+}
+
+// ==================== OUTCOMES (Feedback Loop) ====================
+
+// ContributionOutcome - Outcome of a contribution
+model ContributionOutcome {
+  id                String   @id @default(cuid())
+  contributionId    String
+  userId            String?
+  
+  // Outcome Type
+  outcomeType       String   // resolution, validation, feedback
+  outcomeData       String?  // What actually happened
+  
+  // Impact
+  wasHelpful        Boolean?
+  impactScore       Float    @default(0.0)
+  
+  // Relations
+  contribution      Contribution @relation(fields: [contributionId], references: [id], onDelete: Cascade)
+  user              User?    @relation(fields: [userId], references: [id])
+  
+  createdAt         DateTime @default(now())
+  
+  @@index([contributionId])
+}
+
+// HireOutcome - Outcome of a hire
+model HireOutcome {
+  id                String   @id @default(cuid())
+  hireId            String   @unique
+  userId            String?
+  
+  // Outcome
+  wasSuccessful     Boolean?
+  wouldRehire       Boolean?
+  feedback          String?
+  
+  // Performance Metrics (internal only)
+  performanceScore  Float?
+  
+  // Relations
+  hire              Hire     @relation(fields: [hireId], references: [id])
+  user              User?    @relation(fields: [userId], references: [id])
+  
+  createdAt         DateTime @default(now())
+}
+
+// Hire - Record of a successful hire
+model Hire {
+  id                String    @id @default(cuid())
+  applicationId     String    @unique
+  jobPostingId      String
+  operatorId        String
+  organizationId    String
+  
+  // Hire Details
+  hireDate          DateTime  @default(now())
+  compensationBand  String?   // Estimated compensation/contract value
+  contractDuration  String?   // Duration of contract
+  
+  // Fee Details (25% platform fee)
+  feePercentage     Float     @default(0.25)
+  estimatedFee      Float?    // Calculated fee amount
+  
+  // Who created the hire record
+  createdBy         String?
+  
+  // Relations
+  application       Application @relation(fields: [applicationId], references: [id])
+  feeRecord         FeeRecord?
+  creator           User?     @relation(fields: [createdBy], references: [id])
+  outcome           HireOutcome?
+  
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+}
+
+// Fee Record - Platform fee tracking
+model FeeRecord {
+  id                String    @id @default(cuid())
+  hireId            String    @unique
+  
+  // Fee Details
+  feePercentage     Float     @default(0.25) // 25% platform fee
+  estimatedCompensation Float? // Estimated contract value
+  feeOwed           Float?    // Calculated fee owed
+  
+  // Fee Status
+  status            String    @default("Fee Pending") // Fee Pending, Invoiced, Collected, Waived
+  
+  // Invoice Details
+  invoiceReference  String?
+  invoiceDate       DateTime?
+  
+  // Collection Details
+  collectedDate     DateTime?
+  collectedAmount   Float?
+  
+  // Waiver Details
+  waiverReason      String?
+  waivedBy          String?
+  waivedAt          DateTime?
+  
+  // Notes
+  notes             String?
+  
+  // Admin tracking
+  updatedBy         String?
+  
+  // Relations
+  hire              Hire      @relation(fields: [hireId], references: [id])
+  updater           User?     @relation(fields: [updatedBy], references: [id])
+  
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+}
+
+// ==================== MESSAGING ====================
+
+// Conversation - Message thread for a job application
+model Conversation {
+  id                String    @id @default(cuid())
+  applicationId     String    @unique
+  jobPostingId      String
+  
+  // Participants
+  organizationId    String
+  operatorId        String
+  
+  // Status
+  isBlocked         Boolean   @default(false)
+  blockedBy         String?
+  blockedReason     String?
+  
+  // Relations
+  application       Application @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+  messages          Message[]
+  
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+}
+
+// Message - Individual messages in a conversation
+model Message {
+  id                String    @id @default(cuid())
+  conversationId    String
+  senderId          String
+  recipientId       String
+  
+  // Content
+  content           String
+  originalContent   String?   // Before redaction
+  wasRedacted       Boolean   @default(false)
+  redactionReason   String?
+  
+  // Moderation
+  isFlagged         Boolean   @default(false)
+  flagReason        String?
+  isRemoved         Boolean   @default(false)
+  removedBy         String?
+  removedAt         DateTime?
+  
+  // Read Status
+  isRead            Boolean   @default(false)
+  readAt            DateTime?
+  
+  // Relations
+  conversation      Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  sender            User      @relation("SentMessages", fields: [senderId], references: [id])
+  recipient         User      @relation("ReceivedMessages", fields: [recipientId], references: [id])
+  
+  createdAt         DateTime  @default(now())
+}
+
+// ==================== AUDIT LOG ====================
+
+model AuditLog {
+  id                String    @id @default(cuid())
+  userId            String?
+  action            String    // USER_VERIFIED, CONTENT_FLAGGED, HIRE_CREATED, FEE_UPDATED, etc.
+  resourceType      String    // User, Contribution, Interaction, Application, Hire, FeeRecord, etc.
+  resourceId        String?
+  details           Json?     // Additional details as JSON
+  ipAddress         String?
+  userAgent         String?
+  
+  createdAt         DateTime  @default(now())
+}
+
+// ==================== NOTIFICATIONS (RETURN ENGINE) ====================
+
+// Notification - Generated by Return Engine for user re-engagement
+// Architecture: State-change notifications, NOT activity alerts
+// NO social mechanics - no public counts, no leaderboards
+model Notification {
+  id                String    @id @default(cuid())
+  userId            String    // Recipient
+  
+  // Classification
+  variantId         String    // e.g., "VAL-01", "EXP-02"
+  notificationClass String    // VALIDATION, EXPANSION, MOMENTUM, PRESSURE, OPPORTUNITY
+  priority          String    // P1, P2, P3
+  
+  // Content
+  copy              String    // Human-facing notification text
+  contextSnippet    String?   // Truncated post/opportunity context
+  
+  // Related entities (optional links)
+  relatedPostId         String?
+  relatedThreadId       String?
+  relatedOpportunityId  String?
+  relatedPatternId      String?
+  relatedMatchId        String?
+  
+  // State
+  read              Boolean   @default(false)
+  dismissed         Boolean   @default(false)
+  
+  // Delivery tracking
+  surfaces          String[]  // ["in_app", "email", "push"]
+  deliveredTo       String[]  // Surfaces actually delivered to
+  sentAt            DateTime?
+  
+  // Timing (anonymity-preserving)
+  createdAt         DateTime  @default(now())
+  scheduledFor      DateTime? // For batched notifications
+  
+  // Batching support
+  batchId           String?   // Group related notifications
+  batch             NotificationBatch? @relation(fields: [batchId], references: [id])
+  batchCount        Int       @default(1)
+  
+  // Indexes for common queries
+  @@index([userId])
+  @@index([userId, read])
+  @@index([notificationClass])
+  @@index([createdAt])
+  @@index([scheduledFor])
+}
+
+// NotificationBatch - Groups similar notifications for delivery
+model NotificationBatch {
+  id                String    @id @default(cuid())
+  userId            String
+  
+  // Batch details
+  variantId         String    // Primary variant for this batch
+  notificationClass String
+  count             Int       @default(1)
+  
+  // Related entities being batched
+  relatedIds        String[]  // Post IDs, opportunity IDs, etc.
+  
+  // State
+  status            String    @default("pending") // pending, sent, dismissed
+  scheduledFor      DateTime
+  
+  // Notifications in this batch
+  notifications     Notification[]
+  
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+  
+  @@index([userId])
+  @@index([scheduledFor])
+  @@index([status])
+}
+
+// UserNotificationSettings - Per-user notification preferences
+model UserNotificationSettings {
+  id                String    @id @default(cuid())
+  userId            String    @unique
+  
+  // Class-level preferences
+  validationEnabled   Boolean @default(true)
+  expansionEnabled    Boolean @default(true)
+  momentumEnabled     Boolean @default(true)
+  pressureEnabled     Boolean @default(true)
+  opportunityEnabled  Boolean @default(true)
+  
+  // Surface preferences
+  inAppEnabled      Boolean   @default(true)
+  emailEnabled      Boolean   @default(true)
+  pushEnabled       Boolean   @default(false)
+  
+  // Timing preferences
+  quietHoursStart   Int?      // Hour 0-23 (e.g., 22 for 10 PM)
+  quietHoursEnd     Int?      // Hour 0-23 (e.g., 7 for 7 AM)
+  timezone          String?   // User's timezone
+  
+  // Digest preferences
+  digestFrequency   String    @default("daily") // real_time, daily, weekly
+  digestTime        Int?      // Hour for digest delivery
+  
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+  
+  @@index([userId])
+}
+
+// ==================== FLAGGED CONTENT ====================
+
+model FlaggedContent {
+  id                String    @id @default(cuid())
+  contentType       String    // Contribution, Interaction, Message
+  contentId         String
+  reportedBy        String?
+  reason            String
+  description       String?
+  status            String    @default("Pending") // Pending, Reviewed, Resolved, Dismissed
+  reviewedBy        String?
+  reviewedAt        DateTime?
+  action            String?   // removed, warning_issued, dismissed
+  
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+}
+  // ==================== MICRO OPPORTUNITIES ====================
+
+  // MicroOpportunity - Short consult opportunities triggered by submissions
+  // 30-minute consults in $150-$300 range
+  model MicroOpportunity {
+    id                String    @id @default(cuid())
+    
+    // Source
+    contributionId    String    // The submission that triggered this opportunity
+    triggerReason     String    // high_severity, repeated_pattern, niche_expertise
+    
+    // Opportunity Details
+    title             String
+    description       String
+    issueType         String
+    therapeuticArea   String?
+    
+    // Compensation
+    estimatedMinutes  Int       @default(30)
+    minCompensation   Float     @default(150)
+    maxCompensation   Float     @default(300)
+    
+    // Matching
+    requiredExpertise String[]  // Tags for required expertise
+    matchedOperators  String[]  // User IDs of matched operators
+    interestedOperators String[] // User IDs who expressed interest
+    
+    // Status
+    status            String    @default("open") // open, matched, completed, closed
+    selectedOperator  String?   // User ID of selected operator
+    
+    // Fulfillment
+    completedAt       DateTime?
+    actualCompensation Float?
+    outcomeNotes      String?
+    
+    // Admin
+    createdBy         String?   // Admin user who created (null if auto-generated)
+    
+    createdAt         DateTime  @default(now())
+    updatedAt         DateTime  @updatedAt
+    
+    @@index([contributionId])
+    @@index([status])
+    @@index([issueType])
+  }
+
+  // MicroOpportunityInterest - Track operator interest in opportunities
+  model MicroOpportunityInterest {
+    id                String    @id @default(cuid())
+    opportunityId     String
+    userId            String
+    
+    // Interest Details
+    expressedAt       DateTime  @default(now())
+    message           String?   // Optional message from operator
+    
+    // Status
+    status            String    @default("pending") // pending, selected, declined, completed
+    
+    // Outcome
+    completedAt       DateTime?
+    compensation      Float?
+    
+    createdAt         DateTime  @default(now())
+    
+    @@unique([opportunityId, userId])
+    @@index([opportunityId])
+    @@index([userId])
+  }
+
+    // ==================== ANALYTICS & FOUNDER DASHBOARD ====================
+
+// AnalyticsEvent - Track all platform events for analytics
+model AnalyticsEvent {
+  id                String    @id @default(cuid())
+  anonymousUserId   String    // Anonymized user identifier (USR-XXXX format)
+  
+  // Event Classification
+  eventType         String    // signup_started, situation_submitted, etc.
+  eventCategory     String    // user, situation, engagement, micro_opportunity, marketplace, safety
+  objectType        String?   // User, Contribution, MicroOpportunity, etc.
+  objectId          String?   // ID of related object
+  
+  // Event Data
+  metadataJson      Json?     // Additional event metadata
+  
+  // Data Source - CRITICAL for separating real vs test/seeded data
+  dataSource        String    @default("REAL") // REAL, SEEDED, TEST, IMPORTED
+  
+  // Privacy-preserving timestamp
+  createdAtBucket   String    // Date bucket (e.g., "2024-01-15") instead of exact timestamp
+  createdAt         DateTime  @default(now())
+  
+  @@index([anonymousUserId])
+  @@index([eventType])
+  @@index([eventCategory])
+  @@index([createdAtBucket])
+  @@index([dataSource])
+}
+
+// UserMetrics - Aggregated user metrics for analytics
+model UserMetrics {
+  id                String    @id @default(cuid())
+  anonymousUserId   String    @unique // Anonymized user identifier (USR-XXXX, OPR-XXXX format)
+  
+  // Data Source - CRITICAL for separating real vs test/seeded data
+  dataSource        String    @default("REAL") // REAL, SEEDED, TEST, IMPORTED
+  
+  // Role & Status
+  roleType          String    // user, operator, organization, admin
+  verificationStatus String   @default("Pending") // Pending, Verified, Rejected
+  
+  // Time Buckets (privacy-preserving)
+  signupDateBucket  String?   // Signup date bucket
+  lastActiveBucket  String?   // Last active date bucket
+  
+  // Engagement Metrics
+  postCount         Int       @default(0)
+  interactionCount  Int       @default(0)
+  reflectionOpenCount Int     @default(0)
+  opportunityInviteCount Int  @default(0)
+  microConsultCount Int       @default(0)
+  
+  // Revenue Metrics (in cents for precision)
+  revenueGeneratedCents Int   @default(0)
+  
+  // Retention
+  retentionStatus   String    @default("new") // new, active, dormant, churned
+  
+  // Timestamps
+  updatedAt         DateTime  @updatedAt
+  
+  @@index([anonymousUserId])
+  @@index([roleType])
+  @@index([retentionStatus])
+  @@index([dataSource])
+}
+
+// AdminAccessLog - Audit log for admin dashboard access
+model AdminAccessLog {
+  id                String    @id @default(cuid())
+  adminUserId       String    // ID of admin user
+  
+  // Access Details
+  action            String    // view_analytics, view_user, investigate, export_data
+  reason            String?   // Required for sensitive actions
+  targetType        String?   // User, Contribution, MicroOpportunity
+  targetId          String?   // ID of accessed resource
+  fieldsAccessed    String[]  // List of fields viewed
+  
+  // Request Context
+  ipAddress         String?
+  userAgent         String?
+  
+  createdAt         DateTime  @default(now())
+  
+  @@index([adminUserId])
+  @@index([action])
+  @@index([createdAt])
+}
+
+// DailyMetrics - Aggregated daily platform metrics
+model DailyMetrics {
+  id                String    @id @default(cuid())
+  dateBucket        String    @unique // "2024-01-15"
+  
+  // Data Source - REAL, SEEDED, TEST, or IMPORTED
+  dataSource        String    @default("REAL")
+  
+  // Growth Metrics
+  totalUsers        Int       @default(0)
+  newUsers          Int       @default(0)
+  verifiedOperators Int       @default(0)
+  verifiedOrgs      Int       @default(0)
+  onboardingCompleted Int     @default(0)
+  
+  // Engagement Metrics
+  dau               Int       @default(0)
+  sessions          Int       @default(0)
+  notificationsSent Int       @default(0)
+  notificationsOpened Int     @default(0)
+  
+  // Contribution Metrics
+  postsCreated      Int       @default(0)
+  interactions      Int       @default(0)
+  reflectionsSent   Int       @default(0)
+  reflectionsOpened Int       @default(0)
+  
+  // Micro-Opportunity Metrics
+  microOppsCreated  Int       @default(0)
+  operatorInvites   Int       @default(0)
+  operatorInterests Int       @default(0)
+  consultsCompleted Int       @default(0)
+  
+  // Revenue (in cents)
+  gmvCents          Int       @default(0)
+  platformRevenueCents Int    @default(0)
+  operatorPayoutsCents Int    @default(0)
+  
+  // Safety Metrics
+  flaggedContent    Int       @default(0)
+  redactionsApplied Int       @default(0)
+  highRiskPosts     Int       @default(0)
+  
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+  
+  @@index([dateBucket])
+  @@index([dataSource])
+}
+
+// IdentityMap - RESTRICTED: Links anonymous IDs to real identities
+// CRITICAL: This model is NEVER queried by analytics dashboard
+// Only accessible via Trust & Safety panel with reason-logged access
+model IdentityMap {
+  id                String    @id @default(cuid())
+  
+  // The mapping between identities
+  realUserId        String    @unique  // Actual user ID from User table
+  anonymousUserId   String    @unique // The anonymized ID (USR-XXXX, OPR-XXXX, ORG-XXXX)
+  
+  // Encrypted mapping for additional security
+  encryptedMapping  String?   // Optional encrypted version of the mapping
+  
+  // Audit trail
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+  
+  // Access tracking
+  lastAccessedAt    DateTime?
+  accessCount       Int       @default(0)
+  
+  @@index([realUserId])
+  @@index([anonymousUserId])
+}
+
+// ==================== EXECUTION INTELLIGENCE INFRASTRUCTURE ====================
+
+// ExecutionSignalExtraction - Structured signal extracted from raw submission
+// This is the core Translation Engine output
+model ExecutionSignalExtraction {
+  id                String   @id @default(cuid())
+  contributionId    String   @unique
+  
+  // Signal Stage
+  signalStage       String   // EARLY, ACTIVE, FAILURE, OUTCOME
+  
+  // Workaround Detection
+  workaroundPresent Boolean  @default(false)
+  workaroundType    String?  // PROCESS_SKIP, DATA_SHORTCUT, OFF_LABEL_PROCEDURE, UNOFFICIAL_TOOL, MANUAL_WORKAROUND, UNKNOWN
+  
+  // Suppressed Signal
+  suppressedSignalType String?  // NOT_ESCALATED, ESCALATED_IGNORED, NORMALIZED_WORKAROUND, FEAR_OF_PUSHBACK, SPONSOR_PRESSURE, CRO_PRESSURE, SITE_SILENCE, UNKNOWN
+  
+  // Emotional Signal
+  emotionalSignalType  String?  // OVERLOAD, FRUSTRATION, RESIGNATION, SILENCED, ESCALATION_FEAR, UNKNOWN
+  
+  // Mismatch Detection
+  systemOfRecordMismatch Boolean @default(false)
+  officialRealityGap  Float    @default(0.0) // 0-1 score
+  
+  // Decision Distance
+  decisionDistanceLevel String? // LOW, MEDIUM, HIGH, CRITICAL
+  
+  // Burden Detection
+  burdenAbsorber    String?  // SITE, PATIENT, OPERATOR, SPONSOR, CRO, UNKNOWN
+  burdenType        String?  // TIME, COMPLEXITY, EMOTIONAL, FINANCIAL, OPERATIONAL, UNKNOWN
+  
+  // Invisible Work
+  invisibleWorkType String?  // COORDINATION, COMMUNICATION, DOCUMENTATION, TRAINING, TROUBLESHOOTING, ADVOCACY, UNKNOWN
+  
+  // Risk & Impact
+  likelyDownstreamRisk   String?  // NONE, LOW, MEDIUM, HIGH, CRITICAL
+  escalationPattern      String?  // NONE, LOCAL, REGIONAL, GLOBAL, ESCALATING
+  patientImpactPotential String?  // NONE, LOW, MEDIUM, HIGH, CRITICAL
+  operationalDebtLevel   Float    @default(0.0) // 0-1 score
+  
+  // Economic Value
+  economicValuePotential  Float    @default(0.0) // 0-1 score
+  microOpportunityEligible Boolean  @default(false)
+  
+  // Drift Indicators
+  driftIndicatorsJson     Json?    // Array of detected drift signals
+  
+  // Failure Trajectory
+  failureTrajectoryPrediction String? // NONE, LIKELY_ESCALATION, HIGH_RISK_ESCALATION
+  
+  // Signal Quality
+  signalQualityScore    String?  // HIGH, MEDIUM, LOW
+  
+  // Predictive Summary & Confidence
+  predictiveSummary     String?
+  confidenceScore       Float    @default(0.5) // 0-1 score
+  
+  // Metadata
+  extractionVersion     Int      @default(1)
+  
+  // Relations
+  contribution      Contribution @relation(fields: [contributionId], references: [id], onDelete: Cascade)
+  
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  
+  @@index([signalStage])
+  @@index([suppressedSignalType])
+  @@index([signalQualityScore])
+  @@index([workaroundPresent])
+  @@index([microOpportunityEligible])
+}
+
+// ContributionFollowUp - 7-14 Day Truth Loop
+// Validates predictions and builds longitudinal intelligence
+model ContributionFollowUp {
+  id                String    @id @default(cuid())
+  contributionId    String
+  userId            String?
+  
+  // Follow-up Type
+  followUpType      String    @default("truth_loop") // truth_loop, admin_initiated, self_reported
+  
+  // Status Change
+  statusChange      String    // stayed_manageable, got_worse, caused_delay_deviation_dropout, resolved
+  
+  // Context
+  notes             String?   // Optional additional context
+  
+  // Validation
+  validatedPrediction String?  // Which prediction this validates
+  
+  // Timing
+  daysSinceSubmission Int?     // Days between submission and follow-up
+  
+  // Relations
+  contribution      Contribution @relation(fields: [contributionId], references: [id], onDelete: Cascade)
+  user              User?     @relation(fields: [userId], references: [id])
+  
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+  
+  @@index([contributionId])
+  @@index([statusChange])
+  @@index([createdAt])
+}
+
+// FailurePathway - Causal chain tracking
+// Maps sequences: EARLY → ACTIVE → FAILURE → OUTCOME
+model FailurePathway {
+  id                String    @id @default(cuid())
+  
+  // Pathway Definition
+  pathwayType       String    // workaround_overload_deviation, suppression_escalation_failure, burden_burnout_turnover, drift_protocol_violation
+  stage             String    // EARLY, ACTIVE, FAILURE, OUTCOME
+  
+  // Contributing Signals
+  contributionIds   String[]  // IDs of contributions in this pathway
+  
+  // Detection
+  triggerSignals    Json?     // What triggered this pathway
+  intermediateSignals Json?   // Signals between stages
+  outcomeSignal     Json?     // Final outcome signal
+  
+  // Risk Assessment
+  pathwayRisk       Float     @default(0.0) // 0-1 overall risk score
+  confidenceScore   Float     @default(0.5) // 0-1 confidence in pathway
+  
+  // Status
+  isActive          Boolean   @default(true)
+  confirmedAt       DateTime?
+  
+  // Metadata
+  detectedAt        DateTime  @default(now())
+  
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+  
+  @@index([pathwayType])
+  @@index([stage])
+  @@index([isActive])
+  @@index([detectedAt])
+}
+
+// ContributorHealthFlag - Silence and behavior signals
+// Track high-signal contributors and inactivity drop-offs
+model ContributorHealthFlag {
+  id                String    @id @default(cuid())
+  userId            String    @unique
+  
+  // Contributor Signal Level
+  signalLevel       String    @default("normal") // high_signal, normal, low_signal, dormant
+  
+  // Activity Tracking
+  lastContributionAt DateTime?
+  contributionCount Int       @default(0)
+  avgSignalQuality  Float     @default(0.5) // Average SQS of contributions
+  
+  // Behavior Flags
+  isInactive        Boolean   @default(false)
+  inactivityDays    Int?
+  dropOffDetected   Boolean   @default(false)
+  dropOffDate       DateTime?
+  
+  // Engagement
+  followUpResponseRate Float  @default(0.0) // 0-1 rate of truth loop responses
+  reflectionOpenRate Float    @default(0.0) // 0-1 rate of reflection opens
+  
+  // Risk
+  churnRisk         Float     @default(0.0) // 0-1 risk of contributor churning
+  
+  // Admin
+  adminNoted        Boolean   @default(false)
+  adminNotes        String?
+  
+  // Relations
+  user              User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+  
+  @@index([signalLevel])
+  @@index([isInactive])
+  @@index([churnRisk])
+}

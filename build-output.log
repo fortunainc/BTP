@@ -1,0 +1,152 @@
+
+> behind-the-protocol@0.1.0 build
+> prisma generate && next build
+
+Loaded Prisma config from prisma.config.ts.
+
+Prisma schema loaded from prisma/schema.prisma.
+┌─────────────────────────────────────────────────────────┐
+│  Update available 7.2.0 -> 7.8.0                        │
+│  Run the following to update                            │
+│    npm i --save-dev prisma@latest                       │
+│    npm i @prisma/client@latest                          │
+└─────────────────────────────────────────────────────────┘
+
+✔ Generated Prisma Client (v7.2.0) to ./node_modules/@prisma/client in 268ms
+
+Start by importing your Prisma Client (See: https://pris.ly/d/importing-client)
+
+Tip: Need your database queries to be 1000x faster? Accelerate offers you that and more: https://pris.ly/tip-2-accelerate
+
+[@sentry/nextjs] DEPRECATION WARNING: disableLogger is deprecated and will be removed in a future version. Use webpack.treeshake.removeDebugLogging instead. (Not supported with Turbopack.)
+[@sentry/nextjs] DEPRECATION WARNING: automaticVercelMonitors is deprecated and will be removed in a future version. Use webpack.automaticVercelMonitors instead. (Not supported with Turbopack.)
+[@sentry/nextjs] DEPRECATION WARNING: reactComponentAnnotation is deprecated and will be removed in a future version. Use webpack.reactComponentAnnotation instead. (Not supported with Turbopack.)
+▲ Next.js 16.1.2 (Turbopack)
+- Environments: .env
+- Experiments (use with caution):
+  · clientTraceMetadata
+
+⚠ The "middleware" file convention is deprecated. Please use "proxy" instead. Learn more: https://nextjs.org/docs/messages/middleware-to-proxy
+  Creating an optimized production build ...
+[@sentry/nextjs] DEPRECATION WARNING: disableLogger is deprecated and will be removed in a future version. Use webpack.treeshake.removeDebugLogging instead. (Not supported with Turbopack.)
+[@sentry/nextjs] DEPRECATION WARNING: automaticVercelMonitors is deprecated and will be removed in a future version. Use webpack.automaticVercelMonitors instead. (Not supported with Turbopack.)
+[@sentry/nextjs] DEPRECATION WARNING: reactComponentAnnotation is deprecated and will be removed in a future version. Use webpack.reactComponentAnnotation instead. (Not supported with Turbopack.)
+✓ Compiled successfully in 11.0s
+  Running next.config.js provided runAfterProductionCompile ...
+✓ Completed runAfterProductionCompile in 279ms
+  Running TypeScript ...
+  Collecting page data using 1 worker ...
+  Generating static pages using 1 worker (0/72) ...
+  Generating static pages using 1 worker (18/72) 
+  Generating static pages using 1 worker (36/72) 
+  Generating static pages using 1 worker (54/72) 
+✓ Generating static pages using 1 worker (72/72) in 412.6ms
+  Finalizing page optimization ...
+
+Route (app)
+┌ ○ /
+├ ○ /_not-found
+├ ○ /admin/analytics
+├ ○ /admin/dashboard
+├ ○ /admin/hiring-fees
+├ ○ /admin/interactions
+├ ○ /admin/moderation
+├ ○ /admin/trust-safety
+├ ○ /admin/users
+├ ○ /admin/verifications
+├ ƒ /api/admin/analytics
+├ ƒ /api/admin/audit-logs
+├ ƒ /api/admin/fee-records/[id]
+├ ƒ /api/admin/flagged-content
+├ ƒ /api/admin/flagged-content/[id]/dismiss
+├ ƒ /api/admin/flagged-content/[id]/remove
+├ ƒ /api/admin/hires
+├ ƒ /api/admin/interactions
+├ ƒ /api/admin/interactions/[id]
+├ ƒ /api/admin/translation-queue
+├ ƒ /api/admin/trust-safety
+├ ƒ /api/admin/users
+├ ƒ /api/admin/users/[id]/status
+├ ƒ /api/admin/verifications
+├ ƒ /api/admin/verifications/[id]/approve
+├ ƒ /api/admin/verifications/[id]/reject
+├ ƒ /api/applications
+├ ƒ /api/applications/[id]
+├ ƒ /api/applications/[id]/hire
+├ ƒ /api/applications/my-applications
+├ ƒ /api/applications/organization-applications
+├ ƒ /api/auth/send-verification-code
+├ ƒ /api/auth/verify-code
+├ ƒ /api/conversations
+├ ƒ /api/conversations/[id]
+├ ƒ /api/conversations/[id]/messages
+├ ƒ /api/cron/scan-opportunities
+├ ƒ /api/fee-records
+├ ƒ /api/fee-records/[id]
+├ ƒ /api/hires
+├ ƒ /api/hires/[id]/outcome
+├ ƒ /api/insights/reflection/[id]
+├ ƒ /api/job-postings
+├ ƒ /api/job-postings/[id]
+├ ƒ /api/job-postings/my-postings
+├ ƒ /api/micro-opportunities
+├ ƒ /api/notifications
+├ ƒ /api/notifications/[id]
+├ ƒ /api/notifications/mark-all-read
+├ ƒ /api/notifications/settings
+├ ƒ /api/operator-profiles
+├ ƒ /api/operator/behavioral-signals
+├ ƒ /api/operator/capability-identity
+├ ƒ /api/operator/contribution-stats
+├ ƒ /api/operator/profile
+├ ƒ /api/opportunities
+├ ƒ /api/opportunities/[id]
+├ ƒ /api/opportunities/[id]/interest
+├ ƒ /api/patterns
+├ ƒ /api/situations
+├ ƒ /api/situations/[id]
+├ ƒ /api/situations/[id]/interact
+├ ƒ /api/situations/[id]/outcome
+├ ƒ /api/situations/[id]/patterns
+├ ƒ /api/situations/follow-up
+├ ƒ /api/situations/review
+├ ƒ /api/test-login
+├ ƒ /api/user/create
+├ ƒ /api/user/details
+├ ƒ /api/user/onboarding
+├ ƒ /api/user/send-verification-email
+├ ƒ /api/user/signal-metrics
+├ ƒ /api/user/verify-email
+├ ƒ /api/users
+├ ○ /dashboard
+├ ○ /demo
+├ ƒ /insights/reflection/[id]
+├ ○ /messages
+├ ƒ /messages/[id]
+├ ○ /notifications
+├ ○ /notifications/settings
+├ ○ /onboarding
+├ ○ /opportunities
+├ ƒ /opportunities/[id]
+├ ○ /privacy
+├ ○ /profile
+├ ƒ /sign-in/[[...sign-in]]
+├ ƒ /sign-up/[[...sign-up]]
+├ ○ /situations
+├ ƒ /situations/[id]
+├ ○ /situations/new
+├ ○ /workforce
+├ ƒ /workforce/apply/[id]
+├ ○ /workforce/manage-applications
+├ ○ /workforce/matches
+├ ○ /workforce/my-applications
+├ ○ /workforce/my-postings
+├ ○ /workforce/new
+└ ○ /workforce/profile
+
+
+ƒ Proxy (Middleware)
+
+○  (Static)   prerendered as static content
+ƒ  (Dynamic)  server-rendered on demand
+

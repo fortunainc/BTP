@@ -1,0 +1,49 @@
+
+> behind-the-protocol@0.1.0 dev
+> next dev
+
+[@sentry/nextjs] DEPRECATION WARNING: disableLogger is deprecated and will be removed in a future version. Use webpack.treeshake.removeDebugLogging instead. (Not supported with Turbopack.)
+[@sentry/nextjs] DEPRECATION WARNING: automaticVercelMonitors is deprecated and will be removed in a future version. Use webpack.automaticVercelMonitors instead. (Not supported with Turbopack.)
+[@sentry/nextjs] DEPRECATION WARNING: reactComponentAnnotation is deprecated and will be removed in a future version. Use webpack.reactComponentAnnotation instead. (Not supported with Turbopack.)
+⚠ Warning: Next.js inferred your workspace root, but it may not be correct.
+ We detected multiple lockfiles and selected the directory of /workspace/package-lock.json as the root directory.
+ To silence this warning, set `turbopack.root` in your Next.js config, or consider removing one of the lockfiles if it's not needed.
+   See https://nextjs.org/docs/app/api-reference/config/next-config-js/turbopack#root-directory for more information.
+ Detected additional lockfiles: 
+   * /workspace/cei-platform/package-lock.json
+
+▲ Next.js 16.1.2 (Turbopack)
+- Local:         http://localhost:3000
+- Network:       http://172.18.217.133:3000
+- Experiments (use with caution):
+  · clientTraceMetadata
+
+✓ Starting...
+Attention: Next.js now collects completely anonymous telemetry regarding usage.
+This information is used to shape Next.js' roadmap and prioritize features.
+You can learn more, including how to opt-out if you'd not like to participate in this anonymous program, by visiting the following URL:
+https://nextjs.org/telemetry
+
+⚠ The "middleware" file convention is deprecated. Please use "proxy" instead. Learn more: https://nextjs.org/docs/messages/middleware-to-proxy
+✓ Ready in 1589ms
+ GET /?password=5f5e92b0-ce67-4eaf-867f-674a25adbf86 200 in 3.4s (compile: 3.1s, proxy.ts: 62ms, render: 240ms)
+ GET /?hideControls=true&password=5f5e92b0-ce67-4eaf-867f-674a25adbf86 200 in 67ms (compile: 6ms, proxy.ts: 11ms, render: 50ms)
+ GET /?password=5f5e92b0-ce67-4eaf-867f-674a25adbf86 200 in 63ms (compile: 10ms, proxy.ts: 4ms, render: 49ms)
+ GET /?hideControls=true&password=5f5e92b0-ce67-4eaf-867f-674a25adbf86 200 in 48ms (compile: 3ms, proxy.ts: 4ms, render: 41ms)
+ GET /?password=5f5e92b0-ce67-4eaf-867f-674a25adbf86 200 in 44ms (compile: 3ms, proxy.ts: 4ms, render: 37ms)
+ GET /?hideControls=true&password=5f5e92b0-ce67-4eaf-867f-674a25adbf86 200 in 42ms (compile: 3ms, proxy.ts: 3ms, render: 36ms)
+ GET /?password=5f5e92b0-ce67-4eaf-867f-674a25adbf86 200 in 46ms (compile: 3ms, proxy.ts: 3ms, render: 41ms)
+ GET /?hideControls=true&password=5f5e92b0-ce67-4eaf-867f-674a25adbf86 200 in 62ms (compile: 4ms, proxy.ts: 5ms, render: 53ms)
+ GET /?password=5f5e92b0-ce67-4eaf-867f-674a25adbf86 200 in 50ms (compile: 3ms, proxy.ts: 4ms, render: 43ms)
+ GET /?hideControls=true&password=5f5e92b0-ce67-4eaf-867f-674a25adbf86 200 in 49ms (compile: 3ms, proxy.ts: 5ms, render: 41ms)
+ HEAD / 200 in 56ms (compile: 4ms, proxy.ts: 3ms, render: 49ms)
+ GET / 200 in 45ms (compile: 3ms, proxy.ts: 4ms, render: 38ms)
+ HEAD / 200 in 38ms (compile: 3ms, proxy.ts: 4ms, render: 31ms)
+ GET /?password=5f5e92b0-ce67-4eaf-867f-674a25adbf86 200 in 59ms (compile: 3ms, proxy.ts: 3ms, render: 53ms)
+ GET /?hideControls=true&password=5f5e92b0-ce67-4eaf-867f-674a25adbf86 200 in 141ms (compile: 4ms, proxy.ts: 3ms, render: 134ms)
+ GET /?password=5f5e92b0-ce67-4eaf-867f-674a25adbf86 200 in 58ms (compile: 3ms, proxy.ts: 4ms, render: 51ms)
+ GET /?hideControls=true&password=5f5e92b0-ce67-4eaf-867f-674a25adbf86 200 in 53ms (compile: 5ms, proxy.ts: 3ms, render: 45ms)
+[@sentry/nextjs] DEPRECATION WARNING: disableLogger is deprecated and will be removed in a future version. Use webpack.treeshake.removeDebugLogging instead. (Not supported with Turbopack.)
+[@sentry/nextjs] DEPRECATION WARNING: automaticVercelMonitors is deprecated and will be removed in a future version. Use webpack.automaticVercelMonitors instead. (Not supported with Turbopack.)
+[@sentry/nextjs] DEPRECATION WARNING: reactComponentAnnotation is deprecated and will be removed in a future version. Use webpack.reactComponentAnnotation instead. (Not supported with Turbopack.)
+[?25h

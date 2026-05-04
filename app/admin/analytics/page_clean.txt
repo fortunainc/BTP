@@ -1,0 +1,29 @@
+async function getAnalytics() {
+  const [totalUsers, topContributors] = await Promise.all([
+    prisma.user.count(),
+    prisma.user.findMany({
+      take: 10,
+      orderBy: { createdAt: 'desc' },
+      select: {
+        id: true,
+        firstName: true,
+        lastName: true,
+        createdAt: true,
+      },
+    }),
+  ]);
+
+  return {
+    totalUsers,
+    totalContributions: 0,
+    totalCreditsAwarded: 0,
+    avgQualityScore: 0,
+    topContributors: topContributors.map((u: any) => ({
+      ...u,
+      reputationScore: 0,
+      reputationTier: 'BRONZE',
+      approvedCount: 0,
+    })),
+    channelStats: [],
+  };
+}
