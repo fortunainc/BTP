@@ -27,9 +27,6 @@ const hasClerkKeys = !!process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY;
 // Force dynamic rendering to avoid static generation errors with Clerk
 export const dynamic = 'force-dynamic';
 
-// Check if Clerk keys are available
-const hasClerkKeys = !!process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY;
-
 // Fallback component for when Clerk is not configured
 function ClerkFallback() {
   return (
