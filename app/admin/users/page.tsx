@@ -22,6 +22,10 @@ type User = {
 };
 
 export default function AdminUsersPage() {
+  if (!hasClerkKeys) {
+    return <ClerkFallback />;
+  }
+
   const router = useRouter();
   const { user, isAdmin } = useAuth();
   const [users, setUsers] = useState<User[]>([]);

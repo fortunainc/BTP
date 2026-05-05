@@ -5,6 +5,11 @@ const nextConfig: NextConfig = {
   turbopack: {
     root: process.cwd(),
   },
+  // Disable static optimization for pages with Clerk hooks
+  // They will be rendered on the client side only
+  experimental: {
+    ssr: true,
+  },
 };
 
 export default withSentryConfig(nextConfig, {

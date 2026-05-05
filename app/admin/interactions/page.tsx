@@ -65,6 +65,10 @@ type DraftState = {
 };
 
 export default function FounderInteractionControlsPage() {
+  if (!hasClerkKeys) {
+    return <ClerkFallback />;
+  }
+
   const { isLoaded, isSignedIn } = useAuth();
   const { user } = useUser();
   const router = useRouter();

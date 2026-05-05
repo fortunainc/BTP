@@ -32,6 +32,10 @@ type HireRecord = {
 };
 
 export default function AdminHiringFeesPage() {
+  if (!hasClerkKeys) {
+    return <ClerkFallback />;
+  }
+
   const router = useRouter();
   const { user, isAdmin } = useAuth();
   const [hires, setHires] = useState<HireRecord[]>([]);

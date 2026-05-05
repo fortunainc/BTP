@@ -20,6 +20,10 @@ type UserWithProfile = {
 };
 
 export default function AdminVerificationsPage() {
+  if (!hasClerkKeys) {
+    return <ClerkFallback />;
+  }
+
   const router = useRouter();
   const { user, isAdmin } = useAuth();
   const [pendingUsers, setPendingUsers] = useState<UserWithProfile[]>([]);

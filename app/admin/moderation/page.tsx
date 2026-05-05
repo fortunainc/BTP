@@ -28,6 +28,10 @@ type AuditLog = {
 };
 
 export default function AdminModerationPage() {
+  if (!hasClerkKeys) {
+    return <ClerkFallback />;
+  }
+
   const router = useRouter();
   const { user, isAdmin } = useAuth();
   const [flaggedContent, setFlaggedContent] = useState<FlaggedContent[]>([]);
