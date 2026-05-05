@@ -51,7 +51,7 @@ export default function OnboardingPage() {
       return false;
     }
     
-    const linkedinRegex = /^https?:\/\/(www\.)?linkedin\.com\/in\/[\w-]+\/?$/;
+    const linkedinRegex = /^https?://(www.)?linkedin.com\/in\/[\w-]+\/?$/;
     if (!linkedinRegex.test(formData.linkedinUrl)) {
       setError('Please enter a valid LinkedIn URL (e.g., https://www.linkedin.com/in/username)');
       return false;
@@ -125,7 +125,7 @@ export default function OnboardingPage() {
       return;
     }
 
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const emailRegex = /^[^\s@]+@[^\s@]+.[^\s@]+$/;
     if (!emailRegex.test(email)) {
       setError('Please enter a valid email address');
       return;
