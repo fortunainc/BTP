@@ -4,12 +4,6 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/components/AuthContext';
 
-// Check if Clerk keys are available
-const hasClerkKeys = !!process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY;
-
-// Force dynamic rendering to avoid static generation errors with Clerk
-export const dynamic = 'force-dynamic';
-
 type HireRecord = {
   id: string;
   hireDate: string;
@@ -38,10 +32,6 @@ type HireRecord = {
 };
 
 export default function AdminHiringFeesPage() {
-  if (!hasClerkKeys) {
-    return <ClerkFallback />;
-  }
-
   const router = useRouter();
   const { user, isAdmin } = useAuth();
   const [hires, setHires] = useState<HireRecord[]>([]);
@@ -267,20 +257,6 @@ export default function AdminHiringFeesPage() {
             ))
           )}
         </div>
-      </div>
-    </div>
-  );
-}
-
-// Fallback component for when Clerk is not configured
-function ClerkFallback() {
-  return (
-    <div className="min-h-screen bg-slate-950 flex items-center justify-center p-4">
-      <div className="text-center">
-        <h1 className="text-2xl font-bold text-slate-100 mb-2">Authentication Configuration Required</h1>
-        <p className="text-slate-400">
-          Authentication is currently being configured. Please check back later or contact the administrator.
-        </p>
       </div>
     </div>
   );

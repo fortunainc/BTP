@@ -13,12 +13,6 @@ import { useAuth, useUser } from '@clerk/nextjs';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 
-// Check if Clerk keys are available
-const hasClerkKeys = !!process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY;
-
-// Force dynamic rendering to avoid static generation errors with Clerk
-export const dynamic = 'force-dynamic';
-
 const DISPLAY_STATUSES = ['PENDING_REVIEW', 'VISIBLE', 'SUPPRESSED', 'BLOCKED', 'ALL'];
 const MODERATABLE_STATUSES = ['PENDING_REVIEW', 'VISIBLE', 'SUPPRESSED', 'BLOCKED'];
 const INTERACTION_TYPES = [
@@ -71,10 +65,6 @@ type DraftState = {
 };
 
 export default function FounderInteractionControlsPage() {
-  if (!hasClerkKeys) {
-    return <ClerkFallback />;
-  }
-
   const { isLoaded, isSignedIn } = useAuth();
   const { user } = useUser();
   const router = useRouter();
@@ -596,20 +586,6 @@ function MetricCard({ label, value }: { label: string; value: number | string })
     <div className="bg-white rounded-lg shadow p-5">
       <p className="text-sm font-medium text-gray-500">{label}</p>
       <p className="mt-2 text-2xl font-bold text-gray-900">{typeof value === 'number' ? value.toLocaleString() : value}</p>
-    </div>
-  );
-}
-
-// Fallback component for when Clerk is not configured
-function ClerkFallback() {
-  return (
-    <div className="min-h-screen bg-slate-950 flex items-center justify-center p-4">
-      <div className="text-center">
-        <h1 className="text-2xl font-bold text-slate-100 mb-2">Authentication Configuration Required</h1>
-        <p className="text-slate-400">
-          Authentication is currently being configured. Please check back later or contact the administrator.
-        </p>
-      </div>
     </div>
   );
 }
