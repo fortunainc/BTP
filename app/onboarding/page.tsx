@@ -308,7 +308,7 @@ export default function OnboardingPage() {
 
             <div>
               <label className="block text-sm font-medium mb-2">
-                LinkedIn URL <span className="text-red-500">*</span>
+                LinkedIn URL <span className="text-slate-500 text-xs">(optional during alpha)</span>
               </label>
               <input
                 type="url"
@@ -345,7 +345,6 @@ export default function OnboardingPage() {
               className="w-full py-3 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-600 rounded-lg font-medium transition-colors"
             >
               {loading ? 'Saving...' : 'Continue'}
-            completing
             </button>
           </div>
         )}

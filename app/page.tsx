@@ -113,14 +113,19 @@ export default function HomePage() {
           </div>
 
           {loading ? (
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {[...Array(6)].map((_, i) => (
-                <div key={i} className="bg-slate-900 rounded-lg p-5 animate-pulse">
-                  <div className="h-4 bg-slate-800 rounded w-3/4 mb-3"></div>
-                  <div className="h-3 bg-slate-800 rounded w-full mb-2"></div>
-                  <div className="h-3 bg-slate-800 rounded w-2/3"></div>
-                </div>
-              ))}
+            <div className="text-center py-12 border border-dashed border-slate-800 rounded-lg">
+              <p className="text-slate-400">Loading situations...</p>
+            </div>
+          ) : situations.length === 0 ? (
+            <div className="text-center py-12 border border-dashed border-slate-700 rounded-lg">
+              <p className="text-slate-400 mb-2">No situations shared yet</p>
+              <p className="text-slate-500 text-sm mb-4">Be one of the first operators to share what's really happening behind the protocol</p>
+              <Link 
+                href="/situations/new"
+                className="inline-flex items-center gap-2 px-6 py-3 bg-cyan-600 text-white rounded-lg hover:bg-cyan-700 transition-colors"
+              >
+                Share a situation
+              </Link>
             </div>
           ) : (
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -132,22 +137,24 @@ export default function HomePage() {
         </section>
 
         {/* SECTION B: THIS KEEPS COMING UP (PATTERNS) */}
-        <section className="mb-12">
-          <div className="flex items-center gap-2 mb-6">
-            <TrendingUp className="w-5 h-5 text-amber-500" />
-            <h2 className="text-2xl font-bold">This keeps coming up</h2>
-          </div>
+        {!loading && patterns.length > 0 && (
+          <section className="mb-12">
+            <div className="flex items-center gap-2 mb-6">
+              <TrendingUp className="w-5 h-5 text-amber-500" />
+              <h2 className="text-2xl font-bold">This keeps coming up</h2>
+            </div>
 
-          <div className="grid md:grid-cols-2 gap-6">
-            {patterns.slice(0, 4).map((pattern) => (
-              <PatternCard 
-                key={pattern.patternId} 
-                pattern={pattern}
-                insight={insights[pattern.patternId]}
-              />
-            ))}
-          </div>
-        </section>
+            <div className="grid md:grid-cols-2 gap-6">
+              {patterns.slice(0, 4).map((pattern) => (
+                <PatternCard 
+                  key={pattern.patternId} 
+                  pattern={pattern}
+                  insight={insights[pattern.patternId]}
+                />
+              ))}
+            </div>
+          </section>
+        )}
 
         {/* SECTION C: UNRESOLVED PRESSURE */}
         {patterns.filter(p => p.resolutionStatus === 'unresolved').length > 0 && (
