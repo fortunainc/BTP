@@ -1,0 +1,116 @@
+
+> behind-the-protocol@0.1.0 build
+> prisma generate && next build
+
+Loaded Prisma config from prisma.config.ts.
+
+Prisma schema loaded from prisma/schema.prisma.
+
+✔ Generated Prisma Client (v7.2.0) to ./node_modules/@prisma/client in 256ms
+
+Start by importing your Prisma Client (See: https://pris.ly/d/importing-client)
+
+Tip: Need your database queries to be 1000x faster? Accelerate offers you that and more: https://pris.ly/tip-2-accelerate
+
+[@sentry/nextjs] DEPRECATION WARNING: disableLogger is deprecated and will be removed in a future version. Use webpack.treeshake.removeDebugLogging instead. (Not supported with Turbopack.)
+[@sentry/nextjs] DEPRECATION WARNING: automaticVercelMonitors is deprecated and will be removed in a future version. Use webpack.automaticVercelMonitors instead. (Not supported with Turbopack.)
+[@sentry/nextjs] DEPRECATION WARNING: reactComponentAnnotation is deprecated and will be removed in a future version. Use webpack.reactComponentAnnotation instead. (Not supported with Turbopack.)
+⚠ Warning: Next.js inferred your workspace root, but it may not be correct.
+ We detected multiple lockfiles and selected the directory of /workspace/package-lock.json as the root directory.
+ To silence this warning, set `turbopack.root` in your Next.js config, or consider removing one of the lockfiles if it's not needed.
+   See https://nextjs.org/docs/app/api-reference/config/next-config-js/turbopack#root-directory for more information.
+ Detected additional lockfiles: 
+   * /workspace/cei-platform/package-lock.json
+
+▲ Next.js 16.1.2 (Turbopack)
+- Experiments (use with caution):
+  · clientTraceMetadata
+
+⚠ The "middleware" file convention is deprecated. Please use "proxy" instead. Learn more: https://nextjs.org/docs/messages/middleware-to-proxy
+  Creating an optimized production build ...
+[@sentry/nextjs] DEPRECATION WARNING: disableLogger is deprecated and will be removed in a future version. Use webpack.treeshake.removeDebugLogging instead. (Not supported with Turbopack.)
+[@sentry/nextjs] DEPRECATION WARNING: automaticVercelMonitors is deprecated and will be removed in a future version. Use webpack.automaticVercelMonitors instead. (Not supported with Turbopack.)
+[@sentry/nextjs] DEPRECATION WARNING: reactComponentAnnotation is deprecated and will be removed in a future version. Use webpack.reactComponentAnnotation instead. (Not supported with Turbopack.)
+✓ Compiled successfully in 9.7s
+  Running next.config.js provided runAfterProductionCompile ...
+✓ Completed runAfterProductionCompile in 222ms
+  Running TypeScript ...
+  Collecting page data using 1 worker ...
+[Upstash Redis] The 'url' property is missing or undefined in your Redis config.
+[Upstash Redis] The 'token' property is missing or undefined in your Redis config.
+  Generating static pages using 1 worker (0/44) ...
+  Generating static pages using 1 worker (11/44) 
+  Generating static pages using 1 worker (22/44) 
+  Generating static pages using 1 worker (33/44) 
+✓ Generating static pages using 1 worker (44/44) in 473.9ms
+  Finalizing page optimization ...
+
+Route (app)
+┌ ○ /
+├ ○ /_not-found
+├ ○ /admin/dashboard
+├ ○ /admin/hiring-fees
+├ ○ /admin/moderation
+├ ○ /admin/users
+├ ○ /admin/verifications
+├ ƒ /api/admin/audit-logs
+├ ƒ /api/admin/fee-records/[id]
+├ ƒ /api/admin/flagged-content
+├ ƒ /api/admin/flagged-content/[id]/dismiss
+├ ƒ /api/admin/flagged-content/[id]/remove
+├ ƒ /api/admin/hires
+├ ƒ /api/admin/users
+├ ƒ /api/admin/users/[id]/status
+├ ƒ /api/admin/verifications
+├ ƒ /api/admin/verifications/[id]/approve
+├ ƒ /api/admin/verifications/[id]/reject
+├ ƒ /api/applications
+├ ƒ /api/applications/[id]
+├ ƒ /api/applications/my-applications
+├ ƒ /api/applications/organization-applications
+├ ƒ /api/auth/send-verification-code
+├ ƒ /api/auth/verify-code
+├ ƒ /api/conversations
+├ ƒ /api/conversations/[id]
+├ ƒ /api/conversations/[id]/messages
+├ ƒ /api/fee-records
+├ ƒ /api/fee-records/[id]
+├ ƒ /api/hires
+├ ƒ /api/job-postings
+├ ƒ /api/job-postings/[id]
+├ ƒ /api/job-postings/my-postings
+├ ƒ /api/operator-profiles
+├ ƒ /api/replies/[id]/vote
+├ ƒ /api/threads
+├ ƒ /api/threads/[id]
+├ ƒ /api/threads/[id]/replies
+├ ƒ /api/user/create
+├ ƒ /api/user/details
+├ ƒ /api/user/onboarding
+├ ƒ /api/user/send-verification-email
+├ ƒ /api/user/verify-email
+├ ƒ /api/users
+├ ○ /messages
+├ ƒ /messages/[id]
+├ ○ /onboarding
+├ ○ /privacy
+├ ƒ /sign-in/[[...sign-in]]
+├ ƒ /sign-up/[[...sign-up]]
+├ ○ /threads
+├ ƒ /threads/[id]
+├ ○ /threads/new
+├ ○ /workforce
+├ ƒ /workforce/apply/[id]
+├ ○ /workforce/manage-applications
+├ ○ /workforce/matches
+├ ○ /workforce/my-applications
+├ ○ /workforce/my-postings
+├ ○ /workforce/new
+└ ○ /workforce/profile
+
+
+ƒ Proxy (Middleware)
+
+○  (Static)   prerendered as static content
+ƒ  (Dynamic)  server-rendered on demand
+

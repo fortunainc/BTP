@@ -1,0 +1,809 @@
+=== npm run typecheck ===
+
+> behind-the-protocol@0.1.0 typecheck
+> tsc --noEmit
+
+=== npm run lint ===
+
+> behind-the-protocol@0.1.0 lint
+> eslint
+
+
+/workspace/cei-platform/app/admin/analytics/page.tsx
+   41:13  warning  Unexpected any. Specify a different type                                                                               @typescript-eslint/no-explicit-any
+   53:29  warning  Unexpected any. Specify a different type                                                                               @typescript-eslint/no-explicit-any
+   55:15  warning  Unexpected any. Specify a different type                                                                               @typescript-eslint/no-explicit-any
+   95:6   warning  React Hook useEffect has a missing dependency: 'fetchDashboardData'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+  303:44  warning  Unexpected any. Specify a different type                                                                               @typescript-eslint/no-explicit-any
+  328:42  warning  Unexpected any. Specify a different type                                                                               @typescript-eslint/no-explicit-any
+  377:49  warning  Unexpected any. Specify a different type                                                                               @typescript-eslint/no-explicit-any
+  421:55  warning  Unexpected any. Specify a different type                                                                               @typescript-eslint/no-explicit-any
+  492:46  warning  Unexpected any. Specify a different type                                                                               @typescript-eslint/no-explicit-any
+  524:54  warning  Unexpected any. Specify a different type                                                                               @typescript-eslint/no-explicit-any
+  536:56  warning  Unexpected any. Specify a different type                                                                               @typescript-eslint/no-explicit-any
+  557:61  warning  Unexpected any. Specify a different type                                                                               @typescript-eslint/no-explicit-any
+  611:38  warning  Unexpected any. Specify a different type                                                                               @typescript-eslint/no-explicit-any
+  616:6   warning  React Hook useEffect has a missing dependency: 'fetchUsers'. Either include it or remove the dependency array          react-hooks/exhaustive-deps
+  679:43  warning  Unexpected any. Specify a different type                                                                               @typescript-eslint/no-explicit-any
+  719:48  warning  Unexpected any. Specify a different type                                                                               @typescript-eslint/no-explicit-any
+  724:6   warning  React Hook useEffect has a missing dependency: 'fetchSafetyData'. Either include it or remove the dependency array     react-hooks/exhaustive-deps
+  753:40  warning  Unexpected any. Specify a different type                                                                               @typescript-eslint/no-explicit-any
+
+/workspace/cei-platform/app/admin/dashboard/page.tsx
+   8:3  warning  'TrendingUp' is defined but never used  @typescript-eslint/no-unused-vars
+  18:3  warning  'Clock' is defined but never used       @typescript-eslint/no-unused-vars
+  20:3  warning  'XCircle' is defined but never used     @typescript-eslint/no-unused-vars
+
+/workspace/cei-platform/app/admin/hiring-fees/page.tsx
+  36:11  warning  'user' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+/workspace/cei-platform/app/admin/interactions/page.tsx
+  108:6  warning  React Hook useEffect has a missing dependency: 'fetchInteractions'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+/workspace/cei-platform/app/admin/moderation/page.tsx
+  23:12  warning  Unexpected any. Specify a different type   @typescript-eslint/no-explicit-any
+  32:11  warning  'user' is assigned a value but never used  @typescript-eslint/no-unused-vars
+  83:54  warning  'contentId' is defined but never used      @typescript-eslint/no-unused-vars
+  83:73  warning  'contentType' is defined but never used    @typescript-eslint/no-unused-vars
+
+/workspace/cei-platform/app/admin/users/page.tsx
+  26:11  warning  'user' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+/workspace/cei-platform/app/admin/verifications/page.tsx
+   24:11  warning  'user' is assigned a value but never used                        @typescript-eslint/no-unused-vars
+  233:85  warning  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+
+/workspace/cei-platform/app/api/admin/analytics/route.ts
+   12:24  warning  'toWeekBucket' is defined but never used            @typescript-eslint/no-unused-vars
+   12:38  warning  'toMonthBucket' is defined but never used           @typescript-eslint/no-unused-vars
+   13:18  warning  'AnalyticsEvent' is defined but never used          @typescript-eslint/no-unused-vars
+   13:34  warning  'DailyMetrics' is defined but never used            @typescript-eslint/no-unused-vars
+   13:48  warning  'UserMetrics' is defined but never used             @typescript-eslint/no-unused-vars
+   16:9   warning  'MetricTotals' is defined but never used            @typescript-eslint/no-unused-vars
+   17:9   warning  'EventTotals' is defined but never used             @typescript-eslint/no-unused-vars
+  122:9   warning  'today' is assigned a value but never used          @typescript-eslint/no-unused-vars
+  756:36  warning  'dataSources' is defined but never used             @typescript-eslint/no-unused-vars
+  865:7   warning  'signals' is never reassigned. Use 'const' instead  prefer-const
+  931:30  warning  Unexpected any. Specify a different type            @typescript-eslint/no-explicit-any
+
+/workspace/cei-platform/app/api/admin/audit-logs/route.ts
+  1:10  warning  'NextRequest' is defined but never used  @typescript-eslint/no-unused-vars
+
+/workspace/cei-platform/app/api/admin/fee-records/[id]/route.ts
+   1:10  warning  'NextRequest' is defined but never used   @typescript-eslint/no-unused-vars
+  30:25  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  54:37  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/workspace/cei-platform/app/api/admin/flagged-content/[id]/dismiss/route.ts
+   1:10  warning  'NextRequest' is defined but never used   @typescript-eslint/no-unused-vars
+  28:42  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/workspace/cei-platform/app/api/admin/flagged-content/[id]/remove/route.ts
+  1:10  warning  'NextRequest' is defined but never used  @typescript-eslint/no-unused-vars
+
+/workspace/cei-platform/app/api/admin/hires/route.ts
+  1:10  warning  'NextRequest' is defined but never used  @typescript-eslint/no-unused-vars
+
+/workspace/cei-platform/app/api/admin/translation-queue/route.ts
+   27:11  warning  'adminUser' is assigned a value but never used     @typescript-eslint/no-unused-vars
+  221:9   warning  'contribution' is assigned a value but never used  @typescript-eslint/no-unused-vars
+  242:12  warning  Unexpected any. Specify a different type           @typescript-eslint/no-explicit-any
+
+/workspace/cei-platform/app/api/admin/trust-safety/route.ts
+  150:9  warning  'today' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+/workspace/cei-platform/app/api/admin/users/[id]/status/route.ts
+   1:10  warning  'NextRequest' is defined but never used   @typescript-eslint/no-unused-vars
+  46:53  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  46:79  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/workspace/cei-platform/app/api/admin/verifications/[id]/approve/route.ts
+  1:10  warning  'NextRequest' is defined but never used  @typescript-eslint/no-unused-vars
+
+/workspace/cei-platform/app/api/admin/verifications/[id]/reject/route.ts
+  1:10  warning  'NextRequest' is defined but never used  @typescript-eslint/no-unused-vars
+
+/workspace/cei-platform/app/api/applications/[id]/hire/route.ts
+  13:10  warning  'NextRequest' is defined but never used  @typescript-eslint/no-unused-vars
+
+/workspace/cei-platform/app/api/applications/[id]/route.ts
+    1:10  warning  'NextRequest' is defined but never used         @typescript-eslint/no-unused-vars
+    3:20  warning  'createApiResponse' is defined but never used   @typescript-eslint/no-unused-vars
+    5:10  warning  'InputSanitization' is defined but never used   @typescript-eslint/no-unused-vars
+  191:15  warning  'feeRecord' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+/workspace/cei-platform/app/api/applications/my-applications/route.ts
+  1:10  warning  'NextRequest' is defined but never used  @typescript-eslint/no-unused-vars
+
+/workspace/cei-platform/app/api/applications/organization-applications/route.ts
+  1:10  warning  'NextRequest' is defined but never used  @typescript-eslint/no-unused-vars
+
+/workspace/cei-platform/app/api/applications/route.ts
+    1:10  warning  'NextRequest' is defined but never used            @typescript-eslint/no-unused-vars
+    3:20  warning  'createApiResponse' is defined but never used      @typescript-eslint/no-unused-vars
+   26:18  warning  Unexpected any. Specify a different type           @typescript-eslint/no-explicit-any
+  159:11  warning  'conversation' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+/workspace/cei-platform/app/api/auth/verify-code/route.ts
+   5:10  warning  'prisma' is defined but never used        @typescript-eslint/no-unused-vars
+  87:23  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/workspace/cei-platform/app/api/conversations/[id]/messages/route.ts
+  1:10  warning  'NextRequest' is defined but never used        @typescript-eslint/no-unused-vars
+  3:20  warning  'createApiResponse' is defined but never used  @typescript-eslint/no-unused-vars
+
+/workspace/cei-platform/app/api/conversations/[id]/route.ts
+  1:10  warning  'NextRequest' is defined but never used  @typescript-eslint/no-unused-vars
+
+/workspace/cei-platform/app/api/conversations/route.ts
+  1:10  warning  'NextRequest' is defined but never used  @typescript-eslint/no-unused-vars
+
+/workspace/cei-platform/app/api/fee-records/[id]/route.ts
+    1:10  warning  'NextRequest' is defined but never used        @typescript-eslint/no-unused-vars
+    3:20  warning  'createApiResponse' is defined but never used  @typescript-eslint/no-unused-vars
+   10:41  warning  'user' is defined but never used               @typescript-eslint/no-unused-vars
+  107:23  warning  Unexpected any. Specify a different type       @typescript-eslint/no-explicit-any
+
+/workspace/cei-platform/app/api/fee-records/route.ts
+   1:10  warning  'NextRequest' is defined but never used          @typescript-eslint/no-unused-vars
+   3:20  warning  'createApiResponse' is defined but never used    @typescript-eslint/no-unused-vars
+   3:39  warning  'createErrorResponse' is defined but never used  @typescript-eslint/no-unused-vars
+   4:10  warning  'AuditLogService' is defined but never used      @typescript-eslint/no-unused-vars
+   4:27  warning  'AuditEventType' is defined but never used       @typescript-eslint/no-unused-vars
+  11:41  warning  'user' is defined but never used                 @typescript-eslint/no-unused-vars
+  18:18  warning  Unexpected any. Specify a different type         @typescript-eslint/no-explicit-any
+
+/workspace/cei-platform/app/api/hires/[id]/outcome/route.ts
+  13:10  warning  'NextRequest' is defined but never used  @typescript-eslint/no-unused-vars
+
+/workspace/cei-platform/app/api/hires/route.ts
+   1:10  warning  'NextRequest' is defined but never used          @typescript-eslint/no-unused-vars
+   3:20  warning  'createApiResponse' is defined but never used    @typescript-eslint/no-unused-vars
+   3:39  warning  'createErrorResponse' is defined but never used  @typescript-eslint/no-unused-vars
+  10:41  warning  'user' is defined but never used                 @typescript-eslint/no-unused-vars
+  17:18  warning  Unexpected any. Specify a different type         @typescript-eslint/no-explicit-any
+
+/workspace/cei-platform/app/api/insights/reflection/[id]/route.ts
+  255:1  warning  Assign object to a variable before exporting as module default  import/no-anonymous-default-export
+
+/workspace/cei-platform/app/api/job-postings/[id]/route.ts
+  3:20  warning  'createApiResponse' is defined but never used  @typescript-eslint/no-unused-vars
+
+/workspace/cei-platform/app/api/job-postings/my-postings/route.ts
+  1:10  warning  'NextRequest' is defined but never used  @typescript-eslint/no-unused-vars
+
+/workspace/cei-platform/app/api/job-postings/route.ts
+   1:10  warning  'NextRequest' is defined but never used                @typescript-eslint/no-unused-vars
+   3:10  warning  'currentUser' is defined but never used                @typescript-eslint/no-unused-vars
+   4:20  warning  'applyRateLimit' is defined but never used             @typescript-eslint/no-unused-vars
+   4:36  warning  'createApiResponse' is defined but never used          @typescript-eslint/no-unused-vars
+   8:10  warning  'redactContent' is defined but never used              @typescript-eslint/no-unused-vars
+  10:7   warning  'rateLimitService' is assigned a value but never used  @typescript-eslint/no-unused-vars
+  17:45  warning  'user' is defined but never used                       @typescript-eslint/no-unused-vars
+  28:18  warning  Unexpected any. Specify a different type               @typescript-eslint/no-explicit-any
+
+/workspace/cei-platform/app/api/micro-opportunities/route.ts
+  8:10  warning  'NextRequest' is defined but never used  @typescript-eslint/no-unused-vars
+
+/workspace/cei-platform/app/api/notifications/[id]/route.ts
+  13:66  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  79:67  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/workspace/cei-platform/app/api/notifications/mark-all-read/route.ts
+  19:65  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  25:18  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/workspace/cei-platform/app/api/notifications/route.ts
+   13:10  warning  'NextRequest' is defined but never used   @typescript-eslint/no-unused-vars
+   13:23  warning  'NextResponse' is defined but never used  @typescript-eslint/no-unused-vars
+   42:20  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  120:46  warning  'user' is defined but never used          @typescript-eslint/no-unused-vars
+
+/workspace/cei-platform/app/api/notifications/settings/route.ts
+   8:10  warning  'NextRequest' is defined but never used   @typescript-eslint/no-unused-vars
+  84:40  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/workspace/cei-platform/app/api/operator/behavioral-signals/route.ts
+  19:27  warning  'request' is defined but never used  @typescript-eslint/no-unused-vars
+
+/workspace/cei-platform/app/api/operator/capability-identity/route.ts
+   14:27  warning  'request' is defined but never used     @typescript-eslint/no-unused-vars
+  101:21  warning  '_' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+/workspace/cei-platform/app/api/operator/contribution-stats/route.ts
+  11:27  warning  'request' is defined but never used  @typescript-eslint/no-unused-vars
+
+/workspace/cei-platform/app/api/operator/profile/route.ts
+  13:27  warning  'request' is defined but never used  @typescript-eslint/no-unused-vars
+
+/workspace/cei-platform/app/api/opportunities/[id]/interest/route.ts
+  13:10  warning  'NextRequest' is defined but never used  @typescript-eslint/no-unused-vars
+
+/workspace/cei-platform/app/api/opportunities/route.ts
+  16:10  warning  'NextRequest' is defined but never used               @typescript-eslint/no-unused-vars
+  21:3   warning  'calculateCorrelationRisk' is defined but never used  @typescript-eslint/no-unused-vars
+
+/workspace/cei-platform/app/api/patterns/route.ts
+  49:27  warning  'request' is defined but never used  @typescript-eslint/no-unused-vars
+
+/workspace/cei-platform/app/api/situations/[id]/patterns/route.ts
+  11:10  warning  'auth' is defined but never used  @typescript-eslint/no-unused-vars
+
+/workspace/cei-platform/app/api/situations/follow-up/route.ts
+  112:80  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/workspace/cei-platform/app/api/situations/review/route.ts
+  18:55  warning  'user' is defined but never used  @typescript-eslint/no-unused-vars
+
+/workspace/cei-platform/app/api/situations/route.ts
+  300:113  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  301:110  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  302:95   warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  303:95   warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  304:83   warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  305:104  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  614:26   warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/workspace/cei-platform/app/api/test-login/route.ts
+  46:19  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/workspace/cei-platform/app/api/user/create/route.ts
+  5:28  warning  'req' is defined but never used  @typescript-eslint/no-unused-vars
+
+/workspace/cei-platform/app/api/user/details/route.ts
+  5:27  warning  'request' is defined but never used  @typescript-eslint/no-unused-vars
+
+/workspace/cei-platform/app/api/user/onboarding/route.ts
+  1:10  warning  'NextRequest' is defined but never used  @typescript-eslint/no-unused-vars
+
+/workspace/cei-platform/app/api/user/send-verification-email/route.ts
+  1:10  warning  'NextRequest' is defined but never used  @typescript-eslint/no-unused-vars
+  3:10  warning  'prisma' is defined but never used       @typescript-eslint/no-unused-vars
+
+/workspace/cei-platform/app/api/user/signal-metrics/route.ts
+  12:10  warning  'NextRequest' is defined but never used  @typescript-eslint/no-unused-vars
+
+/workspace/cei-platform/app/api/user/verify-email/route.ts
+  1:10  warning  'NextRequest' is defined but never used  @typescript-eslint/no-unused-vars
+
+/workspace/cei-platform/app/api/users/route.ts
+  1:10  warning  'NextRequest' is defined but never used   @typescript-eslint/no-unused-vars
+  1:23  warning  'NextResponse' is defined but never used  @typescript-eslint/no-unused-vars
+
+/workspace/cei-platform/app/dashboard/page.tsx
+  48:7  warning  'urgencyColors' is assigned a value but never used                                                         @typescript-eslint/no-unused-vars
+  70:6  warning  React Hook useEffect has a missing dependency: 'router'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+/workspace/cei-platform/app/demo/page.tsx
+  4:23  warning  'ArrowRight' is defined but never used  @typescript-eslint/no-unused-vars
+  4:35  warning  'Eye' is defined but never used         @typescript-eslint/no-unused-vars
+  4:40  warning  'Users' is defined but never used       @typescript-eslint/no-unused-vars
+  4:47  warning  'TrendingUp' is defined but never used  @typescript-eslint/no-unused-vars
+  4:59  warning  'Lightbulb' is defined but never used   @typescript-eslint/no-unused-vars
+
+/workspace/cei-platform/app/messages/[id]/page.tsx
+  55:6  warning  React Hook useEffect has missing dependencies: 'authLoading', 'fetchConversation', and 'fetchMessages'. Either include them or remove the dependency array  react-hooks/exhaustive-deps
+  60:6  warning  React Hook useEffect has a missing dependency: 'authLoading'. Either include it or remove the dependency array                                              react-hooks/exhaustive-deps
+
+/workspace/cei-platform/app/messages/page.tsx
+  46:6  warning  React Hook useEffect has a missing dependency: 'authLoading'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+/workspace/cei-platform/app/notifications/page.tsx
+  16:3  warning  'Eye' is defined but never used     @typescript-eslint/no-unused-vars
+  22:3  warning  'Filter' is defined but never used  @typescript-eslint/no-unused-vars
+
+/workspace/cei-platform/app/notifications/settings/page.tsx
+  154:66  warning  Unexpected any. Specify a different type                         @typescript-eslint/no-explicit-any
+  352:35  warning  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+
+/workspace/cei-platform/app/opportunities/[id]/page.tsx
+   47:9   warning  'router' is assigned a value but never used                                                                          @typescript-eslint/no-unused-vars
+   61:6   warning  React Hook useEffect has a missing dependency: 'fetchOpportunity'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+  206:60  warning  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`                                                      react/no-unescaped-entities
+  325:20  warning  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`                                                      react/no-unescaped-entities
+
+/workspace/cei-platform/app/opportunities/page.tsx
+  118:52   warning  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+  163:89   warning  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+  163:122  warning  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+
+/workspace/cei-platform/app/page.tsx
+    7:3   warning  'Clock' is defined but never used                                @typescript-eslint/no-unused-vars
+   52:20  warning  'setInsights' is assigned a value but never used                 @typescript-eslint/no-unused-vars
+  106:52  warning  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+
+/workspace/cei-platform/app/privacy/page.tsx
+  125:75  warning  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+
+/workspace/cei-platform/app/situations/[id]/page.tsx
+  77:6  warning  React Hook useEffect has a missing dependency: 'fetchSituation'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+/workspace/cei-platform/app/situations/new/page.tsx
+  200:55  warning  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+  214:88  warning  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+  241:63  warning  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+  344:69  warning  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+  360:18  warning  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+  368:34  warning  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+  467:15  warning  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+  467:54  warning  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+  492:41  warning  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+  498:75  warning  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+
+/workspace/cei-platform/app/situations/page.tsx
+   69:6   warning  React Hook useEffect has a missing dependency: 'fetchSituations'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+  103:21  warning  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`                                                     react/no-unescaped-entities
+
+/workspace/cei-platform/app/workforce/apply/[id]/page.tsx
+  49:6  warning  React Hook useEffect has missing dependencies: 'authLoading' and 'fetchJobPosting'. Either include them or remove the dependency array  react-hooks/exhaustive-deps
+
+/workspace/cei-platform/app/workforce/manage-applications/page.tsx
+  51:6  warning  React Hook useEffect has a missing dependency: 'authLoading'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+/workspace/cei-platform/app/workforce/my-applications/page.tsx
+   51:6   warning  React Hook useEffect has a missing dependency: 'authLoading'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+  196:45  warning  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`                                                 react/no-unescaped-entities
+
+/workspace/cei-platform/app/workforce/my-postings/page.tsx
+  44:6  warning  React Hook useEffect has a missing dependency: 'authLoading'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+/workspace/cei-platform/app/workforce/new/page.tsx
+  34:6  warning  React Hook useEffect has a missing dependency: 'authLoading'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+/workspace/cei-platform/app/workforce/page.tsx
+  167:18  warning  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+
+/workspace/cei-platform/app/workforce/profile/page.tsx
+  4:73  warning  'Award' is defined but never used   @typescript-eslint/no-unused-vars
+  4:80  warning  'Shield' is defined but never used  @typescript-eslint/no-unused-vars
+
+/workspace/cei-platform/components/NotificationCenter.tsx
+   5:10  warning  'Button' is defined but never used  @typescript-eslint/no-unused-vars
+  13:3   warning  'Eye' is defined but never used     @typescript-eslint/no-unused-vars
+
+/workspace/cei-platform/components/PatternBadge.tsx
+  16:6  warning  React Hook useEffect has a missing dependency: 'fetchPatterns'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+/workspace/cei-platform/components/PatternSignals.tsx
+  16:6  warning  React Hook useEffect has a missing dependency: 'fetchPatterns'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+/workspace/cei-platform/components/UserMenu.tsx
+  8:10  warning  'Button' is defined but never used  @typescript-eslint/no-unused-vars
+
+/workspace/cei-platform/components/ui/input.tsx
+  5:18  warning  An interface declaring no members is equivalent to its supertype  @typescript-eslint/no-empty-object-type
+
+/workspace/cei-platform/components/ui/textarea.tsx
+  5:18  warning  An interface declaring no members is equivalent to its supertype  @typescript-eslint/no-empty-object-type
+
+/workspace/cei-platform/lib/access-control.ts
+  71:35  warning  'role' is defined but never used  @typescript-eslint/no-unused-vars
+
+/workspace/cei-platform/lib/admin-auth.ts
+  9:16  warning  'clerkClient' is defined but never used  @typescript-eslint/no-unused-vars
+
+/workspace/cei-platform/lib/ai-structuring.ts
+  369:3  warning  'text' is defined but never used                                @typescript-eslint/no-unused-vars
+  370:3  warning  'issueType' is defined but never used                           @typescript-eslint/no-unused-vars
+  371:3  warning  'therapeuticArea' is defined but never used                     @typescript-eslint/no-unused-vars
+  378:1  warning  Assign object to a variable before exporting as module default  import/no-anonymous-default-export
+
+/workspace/cei-platform/lib/alert-system.ts
+  11:10  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/workspace/cei-platform/lib/analytics-tracker.ts
+  676:49  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/workspace/cei-platform/lib/anonymity-engine.ts
+   84:55  warning  'metadata' is defined but never used                            @typescript-eslint/no-unused-vars
+  269:45  warning  'removed' is defined but never used                             @typescript-eslint/no-unused-vars
+  641:44  warning  'params' is defined but never used                              @typescript-eslint/no-unused-vars
+  870:39  warning  Unexpected any. Specify a different type                        @typescript-eslint/no-explicit-any
+  870:50  warning  Unexpected any. Specify a different type                        @typescript-eslint/no-explicit-any
+  961:1   warning  Assign object to a variable before exporting as module default  import/no-anonymous-default-export
+
+/workspace/cei-platform/lib/anonymity-hardening.ts
+   10:10  warning  'sanitizeContribution' is defined but never used      @typescript-eslint/no-unused-vars
+  393:7   warning  'consistentCount' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+/workspace/cei-platform/lib/anonymity-simulation.ts
+   20:3   warning  'generateIsolatedOpportunityId' is defined but never used       @typescript-eslint/no-unused-vars
+   21:3   warning  'detectCorrelationAttack' is defined but never used             @typescript-eslint/no-unused-vars
+   22:3   warning  'injectDecoys' is defined but never used                        @typescript-eslint/no-unused-vars
+  179:15  warning  '_' is defined but never used                                   @typescript-eslint/no-unused-vars
+  254:9   warning  'matchDelays' is assigned a value but never used                @typescript-eslint/no-unused-vars
+  299:9   warning  'avgResponseTime' is assigned a value but never used            @typescript-eslint/no-unused-vars
+  472:9   warning  'bandCheck' is assigned a value but never used                  @typescript-eslint/no-unused-vars
+  515:41  warning  Unexpected any. Specify a different type                        @typescript-eslint/no-explicit-any
+  515:49  warning  Unexpected any. Specify a different type                        @typescript-eslint/no-explicit-any
+  516:24  warning  Unexpected any. Specify a different type                        @typescript-eslint/no-explicit-any
+  543:39  warning  Unexpected any. Specify a different type                        @typescript-eslint/no-explicit-any
+  543:50  warning  Unexpected any. Specify a different type                        @typescript-eslint/no-explicit-any
+  619:15  warning  '_' is defined but never used                                   @typescript-eslint/no-unused-vars
+  683:3   warning  'therapeuticAreas' is defined but never used                    @typescript-eslint/no-unused-vars
+  684:3   warning  'issueExpertise' is defined but never used                      @typescript-eslint/no-unused-vars
+  791:1   warning  Assign object to a variable before exporting as module default  import/no-anonymous-default-export
+
+/workspace/cei-platform/lib/anti-correlation.ts
+  281:15  warning  'key' is assigned a value but never used                        @typescript-eslint/no-unused-vars
+  524:7   warning  'RARE_COMBO_THRESHOLD' is assigned a value but never used       @typescript-eslint/no-unused-vars
+  590:3   warning  'existingContributions' is defined but never used               @typescript-eslint/no-unused-vars
+  614:15  warning  'key' is defined but never used                                 @typescript-eslint/no-unused-vars
+  723:1   warning  Assign object to a variable before exporting as module default  import/no-anonymous-default-export
+
+/workspace/cei-platform/lib/api-auth.ts
+   30:36  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  129:36  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  168:41  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  247:9   warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  249:21  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  267:13  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  269:19  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/workspace/cei-platform/lib/audit-logging.ts
+   69:29  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   84:29  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  105:31  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/workspace/cei-platform/lib/behavioral-pressure.ts
+   10:22  warning  'SignalScore' is defined but never used          @typescript-eslint/no-unused-vars
+  265:46  warning  'params' is defined but never used               @typescript-eslint/no-unused-vars
+  346:11  warning  'operatorId' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+/workspace/cei-platform/lib/capability-identity-secure.ts
+  135:23  warning  Unexpected any. Specify a different type                        @typescript-eslint/no-explicit-any
+  136:18  warning  Unexpected any. Specify a different type                        @typescript-eslint/no-explicit-any
+  137:21  warning  Unexpected any. Specify a different type                        @typescript-eslint/no-explicit-any
+  182:12  warning  'error' is defined but never used                               @typescript-eslint/no-unused-vars
+  198:12  warning  'error' is defined but never used                               @typescript-eslint/no-unused-vars
+  266:1   warning  Assign object to a variable before exporting as module default  import/no-anonymous-default-export
+
+/workspace/cei-platform/lib/capability-identity.ts
+  292:1  warning  Assign object to a variable before exporting as module default  import/no-anonymous-default-export
+
+/workspace/cei-platform/lib/clinicaltrials-api.ts
+   53:72  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  109:63  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  134:41  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  149:64  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  172:12  warning  'error' is defined but never used         @typescript-eslint/no-unused-vars
+
+/workspace/cei-platform/lib/contributor-health.ts
+  323:1  warning  Assign object to a variable before exporting as module default  import/no-anonymous-default-export
+
+/workspace/cei-platform/lib/decoy-enhancer.ts
+   16:23  warning  'randomInt' is defined but never used                           @typescript-eslint/no-unused-vars
+   17:10  warning  'prisma' is defined but never used                              @typescript-eslint/no-unused-vars
+   97:24  warning  'organizationId' is assigned a value but never used             @typescript-eslint/no-unused-vars
+  253:1   warning  Assign object to a variable before exporting as module default  import/no-anonymous-default-export
+
+/workspace/cei-platform/lib/execution-context.ts
+  379:82  warning  Unexpected any. Specify a different type                        @typescript-eslint/no-explicit-any
+  475:1   warning  Assign object to a variable before exporting as module default  import/no-anonymous-default-export
+
+/workspace/cei-platform/lib/failure-pathway.ts
+  269:46   warning  Unexpected any. Specify a different type                        @typescript-eslint/no-explicit-any
+  279:57   warning  Unexpected any. Specify a different type                        @typescript-eslint/no-explicit-any
+  325:102  warning  Unexpected any. Specify a different type                        @typescript-eslint/no-explicit-any
+  340:54   warning  Unexpected any. Specify a different type                        @typescript-eslint/no-explicit-any
+  395:1    warning  Assign object to a variable before exporting as module default  import/no-anonymous-default-export
+
+/workspace/cei-platform/lib/failure-types/clustering-engine.ts
+  214:9  warning  'now' is assigned a value but never used            @typescript-eslint/no-unused-vars
+  219:9  warning  'dominantLayer' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+/workspace/cei-platform/lib/failure-types/correction-pathways.ts
+  356:11  warning  'adjustedOptions' is assigned a value but never used            @typescript-eslint/no-unused-vars
+  462:7   warning  'tier1' is never reassigned. Use 'const' instead                prefer-const
+  463:7   warning  'tier2' is never reassigned. Use 'const' instead                prefer-const
+  479:1   warning  Assign object to a variable before exporting as module default  import/no-anonymous-default-export
+
+/workspace/cei-platform/lib/failure-types/cross-seed-intelligence.ts
+   11:3  warning  'PatternCluster' is defined but never used                      @typescript-eslint/no-unused-vars
+   55:3  warning  'allRelations' is defined but never used                        @typescript-eslint/no-unused-vars
+  477:1  warning  Assign object to a variable before exporting as module default  import/no-anonymous-default-export
+
+/workspace/cei-platform/lib/failure-types/evolution-engine.ts
+  289:15  warning  '_' is defined but never used                                   @typescript-eslint/no-unused-vars
+  310:3   warning  'existingEvolutions' is defined but never used                  @typescript-eslint/no-unused-vars
+  368:1   warning  Assign object to a variable before exporting as module default  import/no-anonymous-default-export
+
+/workspace/cei-platform/lib/failure-types/evolution-simulation.ts
+    8:52  warning  'FailureEvolution' is defined but never used                    @typescript-eslint/no-unused-vars
+    9:24  warning  'calculateSimilarity' is defined but never used                 @typescript-eslint/no-unused-vars
+   11:10  warning  'generateFailureTypeName' is defined but never used             @typescript-eslint/no-unused-vars
+  248:9   warning  'allClusters' is assigned a value but never used                @typescript-eslint/no-unused-vars
+  435:1   warning  Assign object to a variable before exporting as module default  import/no-anonymous-default-export
+
+/workspace/cei-platform/lib/failure-types/index.ts
+   80:28  warning  A `require()` style import is forbidden                         @typescript-eslint/no-require-imports
+   81:27  warning  A `require()` style import is forbidden                         @typescript-eslint/no-require-imports
+   82:42  warning  A `require()` style import is forbidden                         @typescript-eslint/no-require-imports
+   91:41  warning  Unexpected any. Specify a different type                        @typescript-eslint/no-explicit-any
+  117:28  warning  A `require()` style import is forbidden                         @typescript-eslint/no-require-imports
+  118:35  warning  A `require()` style import is forbidden                         @typescript-eslint/no-require-imports
+  130:1   warning  Assign object to a variable before exporting as module default  import/no-anonymous-default-export
+
+/workspace/cei-platform/lib/failure-types/naming-engine.ts
+   12:43  warning  'FailureType' is defined but never used                         @typescript-eslint/no-unused-vars
+  174:15  warning  'patternKey' is assigned a value but never used                 @typescript-eslint/no-unused-vars
+  284:15  warning  '_' is defined but never used                                   @typescript-eslint/no-unused-vars
+  319:1   warning  Assign object to a variable before exporting as module default  import/no-anonymous-default-export
+
+/workspace/cei-platform/lib/failure-types/predefined-types.ts
+  16:23  warning  'CorrectionPathways' is defined but never used  @typescript-eslint/no-unused-vars
+  16:43  warning  'CorrectionOption' is defined but never used    @typescript-eslint/no-unused-vars
+
+/workspace/cei-platform/lib/helpful-score.ts
+  8:61  warning  'points' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+/workspace/cei-platform/lib/hiring-loop.ts
+  425:3  warning  'organizationRating' is defined but never used  @typescript-eslint/no-unused-vars
+
+/workspace/cei-platform/lib/insight-engine.ts
+   10:19  warning  'PatternStatus' is defined but never used                       @typescript-eslint/no-unused-vars
+   10:34  warning  'ResolutionStatus' is defined but never used                    @typescript-eslint/no-unused-vars
+  214:1   warning  Assign object to a variable before exporting as module default  import/no-anonymous-default-export
+
+/workspace/cei-platform/lib/matching-finalization.ts
+  11:28  warning  'generatePatternSignature' is defined but never used  @typescript-eslint/no-unused-vars
+
+/workspace/cei-platform/lib/matching-v2.ts
+   18:3   warning  'ExecutionContext' is defined but never used          @typescript-eslint/no-unused-vars
+   24:3   warning  'generatePatternSignature' is defined but never used  @typescript-eslint/no-unused-vars
+  161:15  warning  Unexpected any. Specify a different type              @typescript-eslint/no-explicit-any
+  163:16  warning  Unexpected any. Specify a different type              @typescript-eslint/no-explicit-any
+  170:86  warning  Unexpected any. Specify a different type              @typescript-eslint/no-explicit-any
+  382:15  warning  Unexpected any. Specify a different type              @typescript-eslint/no-explicit-any
+  383:16  warning  Unexpected any. Specify a different type              @typescript-eslint/no-explicit-any
+  387:9   warning  'details' is assigned a value but never used          @typescript-eslint/no-unused-vars
+  426:16  warning  Unexpected any. Specify a different type              @typescript-eslint/no-explicit-any
+  458:18  warning  Unexpected any. Specify a different type              @typescript-eslint/no-explicit-any
+  459:17  warning  Unexpected any. Specify a different type              @typescript-eslint/no-explicit-any
+  464:39  warning  Unexpected any. Specify a different type              @typescript-eslint/no-explicit-any
+  506:20  warning  Unexpected any. Specify a different type              @typescript-eslint/no-explicit-any
+  517:20  warning  Unexpected any. Specify a different type              @typescript-eslint/no-explicit-any
+  540:18  warning  Unexpected any. Specify a different type              @typescript-eslint/no-explicit-any
+  541:17  warning  Unexpected any. Specify a different type              @typescript-eslint/no-explicit-any
+  542:18  warning  Unexpected any. Specify a different type              @typescript-eslint/no-explicit-any
+  549:39  warning  Unexpected any. Specify a different type              @typescript-eslint/no-explicit-any
+
+/workspace/cei-platform/lib/micro-opportunity.ts
+  457:3  warning  Assign object to a variable before exporting as module default  import/no-anonymous-default-export
+
+/workspace/cei-platform/lib/opportunity-scarcity.ts
+    8:35  warning  'SignalScore' is defined but never used                 @typescript-eslint/no-unused-vars
+  152:9   warning  'operatorTierIndex' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+/workspace/cei-platform/lib/organization-control.ts
+  8:10  warning  'generateSecureLookupKey' is defined but never used  @typescript-eslint/no-unused-vars
+  9:10  warning  'AccessTier' is defined but never used               @typescript-eslint/no-unused-vars
+
+/workspace/cei-platform/lib/pattern-engine.ts
+  292:65  warning  'count' is defined but never used                               @typescript-eslint/no-unused-vars
+  319:1   warning  Assign object to a variable before exporting as module default  import/no-anonymous-default-export
+
+/workspace/cei-platform/lib/quality-validation.ts
+    6:10  warning  'ExecutionContext' is defined but never used          @typescript-eslint/no-unused-vars
+    6:28  warning  'generatePatternSignature' is defined but never used  @typescript-eslint/no-unused-vars
+  186:33  warning  Unexpected any. Specify a different type              @typescript-eslint/no-explicit-any
+
+/workspace/cei-platform/lib/redaction.ts
+  238:64  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/workspace/cei-platform/lib/reflection-engine.ts
+  546:3  warning  'interactionData' is defined but never used                     @typescript-eslint/no-unused-vars
+  714:1  warning  Assign object to a variable before exporting as module default  import/no-anonymous-default-export
+
+/workspace/cei-platform/lib/reflection-quality.ts
+  221:3  warning  'burdenAbsorber' is defined but never used                      @typescript-eslint/no-unused-vars
+  502:1  warning  Assign object to a variable before exporting as module default  import/no-anonymous-default-export
+
+/workspace/cei-platform/lib/return-engine/behavioral-test.ts
+   10:45  warning  'Notification' is defined but never used  @typescript-eslint/no-unused-vars
+   29:3   warning  'eventData' is defined but never used     @typescript-eslint/no-unused-vars
+   38:8   warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  105:17  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/workspace/cei-platform/lib/return-engine/database.ts
+   98:29  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  260:13  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  276:52  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/workspace/cei-platform/lib/return-engine/engine.ts
+   17:3   warning  'NotificationPriority' is defined but never used   @typescript-eslint/no-unused-vars
+   18:3   warning  'DeliverySurface' is defined but never used        @typescript-eslint/no-unused-vars
+   24:3   warning  'NOTIFICATION_VARIANTS' is defined but never used  @typescript-eslint/no-unused-vars
+  265:35  warning  'context' is defined but never used                @typescript-eslint/no-unused-vars
+
+/workspace/cei-platform/lib/return-engine/integration.ts
+   16:26  warning  'updateTrustVector' is defined but never used         @typescript-eslint/no-unused-vars
+   16:63  warning  'getTrustWeightFromVector' is defined but never used  @typescript-eslint/no-unused-vars
+   18:10  warning  'advanceMatchStage' is defined but never used         @typescript-eslint/no-unused-vars
+   18:29  warning  'HiringStage' is defined but never used               @typescript-eslint/no-unused-vars
+  769:48  warning  'userId' is defined but never used                    @typescript-eslint/no-unused-vars
+
+/workspace/cei-platform/lib/return-engine/quality-audit.ts
+  45:9   warning  'identityPatterns' is assigned a value but never used  @typescript-eslint/no-unused-vars
+  97:41  warning  'index' is defined but never used                      @typescript-eslint/no-unused-vars
+
+/workspace/cei-platform/lib/return-engine/runtime-test.ts
+   51:15  warning  Unexpected any. Specify a different type           @typescript-eslint/no-explicit-any
+   96:36  warning  Unexpected any. Specify a different type           @typescript-eslint/no-explicit-any
+  163:12  warning  'e' is defined but never used                      @typescript-eslint/no-unused-vars
+  185:34  warning  Unexpected any. Specify a different type           @typescript-eslint/no-explicit-any
+  186:34  warning  Unexpected any. Specify a different type           @typescript-eslint/no-explicit-any
+  198:28  warning  Unexpected any. Specify a different type           @typescript-eslint/no-explicit-any
+  210:9   warning  'timePatterns' is assigned a value but never used  @typescript-eslint/no-unused-vars
+  221:52  warning  'v' is defined but never used                      @typescript-eslint/no-unused-vars
+
+/workspace/cei-platform/lib/signal-score.ts
+    8:10  warning  'createHash' is defined but never used                      @typescript-eslint/no-unused-vars
+  176:71  warning  'currentValueThreshold' is assigned a value but never used  @typescript-eslint/no-unused-vars
+  276:11  warning  'nextTier' is assigned a value but never used               @typescript-eslint/no-unused-vars
+  326:19  warning  'previousScore' is assigned a value but never used          @typescript-eslint/no-unused-vars
+
+/workspace/cei-platform/lib/simple-security.ts
+  449:16  warning  'warning' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+/workspace/cei-platform/lib/translation-engine.ts
+  955:1  warning  Assign object to a variable before exporting as module default  import/no-anonymous-default-export
+
+/workspace/cei-platform/lib/trust-vector.ts
+  546:1  warning  Assign object to a variable before exporting as module default  import/no-anonymous-default-export
+
+/workspace/cei-platform/middleware.ts
+  4:7  warning  'isPublicRoute' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+✖ 374 problems (0 errors, 374 warnings)
+  0 errors and 3 warnings potentially fixable with the `--fix` option.
+
+=== npm run build ===
+
+> behind-the-protocol@0.1.0 build
+> prisma generate && next build
+
+Loaded Prisma config from prisma.config.ts.
+
+Prisma schema loaded from prisma/schema.prisma.
+
+✔ Generated Prisma Client (v7.2.0) to ./node_modules/@prisma/client in 284ms
+
+Start by importing your Prisma Client (See: https://pris.ly/d/importing-client)
+
+Tip: Want to turn off tips and other hints? https://pris.ly/tip-4-nohints
+
+[@sentry/nextjs] DEPRECATION WARNING: disableLogger is deprecated and will be removed in a future version. Use webpack.treeshake.removeDebugLogging instead. (Not supported with Turbopack.)
+[@sentry/nextjs] DEPRECATION WARNING: automaticVercelMonitors is deprecated and will be removed in a future version. Use webpack.automaticVercelMonitors instead. (Not supported with Turbopack.)
+[@sentry/nextjs] DEPRECATION WARNING: reactComponentAnnotation is deprecated and will be removed in a future version. Use webpack.reactComponentAnnotation instead. (Not supported with Turbopack.)
+▲ Next.js 16.1.2 (Turbopack)
+- Environments: .env
+- Experiments (use with caution):
+  · clientTraceMetadata
+
+⚠ The "middleware" file convention is deprecated. Please use "proxy" instead. Learn more: https://nextjs.org/docs/messages/middleware-to-proxy
+  Creating an optimized production build ...
+[@sentry/nextjs] DEPRECATION WARNING: disableLogger is deprecated and will be removed in a future version. Use webpack.treeshake.removeDebugLogging instead. (Not supported with Turbopack.)
+[@sentry/nextjs] DEPRECATION WARNING: automaticVercelMonitors is deprecated and will be removed in a future version. Use webpack.automaticVercelMonitors instead. (Not supported with Turbopack.)
+[@sentry/nextjs] DEPRECATION WARNING: reactComponentAnnotation is deprecated and will be removed in a future version. Use webpack.reactComponentAnnotation instead. (Not supported with Turbopack.)
+✓ Compiled successfully in 11.4s
+  Running next.config.js provided runAfterProductionCompile ...
+✓ Completed runAfterProductionCompile in 299ms
+  Running TypeScript ...
+  Collecting page data using 1 worker ...
+[Upstash Redis] The 'url' property is missing or undefined in your Redis config.
+[Upstash Redis] The 'token' property is missing or undefined in your Redis config.
+  Generating static pages using 1 worker (0/72) ...
+  Generating static pages using 1 worker (18/72) 
+  Generating static pages using 1 worker (36/72) 
+  Generating static pages using 1 worker (54/72) 
+✓ Generating static pages using 1 worker (72/72) in 426.9ms
+  Finalizing page optimization ...
+
+Route (app)
+┌ ○ /
+├ ○ /_not-found
+├ ○ /admin/analytics
+├ ○ /admin/dashboard
+├ ○ /admin/hiring-fees
+├ ○ /admin/interactions
+├ ○ /admin/moderation
+├ ○ /admin/trust-safety
+├ ○ /admin/users
+├ ○ /admin/verifications
+├ ƒ /api/admin/analytics
+├ ƒ /api/admin/audit-logs
+├ ƒ /api/admin/fee-records/[id]
+├ ƒ /api/admin/flagged-content
+├ ƒ /api/admin/flagged-content/[id]/dismiss
+├ ƒ /api/admin/flagged-content/[id]/remove
+├ ƒ /api/admin/hires
+├ ƒ /api/admin/interactions
+├ ƒ /api/admin/interactions/[id]
+├ ƒ /api/admin/translation-queue
+├ ƒ /api/admin/trust-safety
+├ ƒ /api/admin/users
+├ ƒ /api/admin/users/[id]/status
+├ ƒ /api/admin/verifications
+├ ƒ /api/admin/verifications/[id]/approve
+├ ƒ /api/admin/verifications/[id]/reject
+├ ƒ /api/applications
+├ ƒ /api/applications/[id]
+├ ƒ /api/applications/[id]/hire
+├ ƒ /api/applications/my-applications
+├ ƒ /api/applications/organization-applications
+├ ƒ /api/auth/send-verification-code
+├ ƒ /api/auth/verify-code
+├ ƒ /api/conversations
+├ ƒ /api/conversations/[id]
+├ ƒ /api/conversations/[id]/messages
+├ ƒ /api/cron/scan-opportunities
+├ ƒ /api/fee-records
+├ ƒ /api/fee-records/[id]
+├ ƒ /api/hires
+├ ƒ /api/hires/[id]/outcome
+├ ƒ /api/insights/reflection/[id]
+├ ƒ /api/job-postings
+├ ƒ /api/job-postings/[id]
+├ ƒ /api/job-postings/my-postings
+├ ƒ /api/micro-opportunities
+├ ƒ /api/notifications
+├ ƒ /api/notifications/[id]
+├ ƒ /api/notifications/mark-all-read
+├ ƒ /api/notifications/settings
+├ ƒ /api/operator-profiles
+├ ƒ /api/operator/behavioral-signals
+├ ƒ /api/operator/capability-identity
+├ ƒ /api/operator/contribution-stats
+├ ƒ /api/operator/profile
+├ ƒ /api/opportunities
+├ ƒ /api/opportunities/[id]
+├ ƒ /api/opportunities/[id]/interest
+├ ƒ /api/patterns
+├ ƒ /api/situations
+├ ƒ /api/situations/[id]
+├ ƒ /api/situations/[id]/interact
+├ ƒ /api/situations/[id]/outcome
+├ ƒ /api/situations/[id]/patterns
+├ ƒ /api/situations/follow-up
+├ ƒ /api/situations/review
+├ ƒ /api/test-login
+├ ƒ /api/user/create
+├ ƒ /api/user/details
+├ ƒ /api/user/onboarding
+├ ƒ /api/user/send-verification-email
+├ ƒ /api/user/signal-metrics
+├ ƒ /api/user/verify-email
+├ ƒ /api/users
+├ ○ /dashboard
+├ ○ /demo
+├ ƒ /insights/reflection/[id]
+├ ○ /messages
+├ ƒ /messages/[id]
+├ ○ /notifications
+├ ○ /notifications/settings
+├ ○ /onboarding
+├ ○ /opportunities
+├ ƒ /opportunities/[id]
+├ ○ /privacy
+├ ○ /profile
+├ ƒ /sign-in/[[...sign-in]]
+├ ƒ /sign-up/[[...sign-up]]
+├ ○ /situations
+├ ƒ /situations/[id]
+├ ○ /situations/new
+├ ○ /workforce
+├ ƒ /workforce/apply/[id]
+├ ○ /workforce/manage-applications
+├ ○ /workforce/matches
+├ ○ /workforce/my-applications
+├ ○ /workforce/my-postings
+├ ○ /workforce/new
+└ ○ /workforce/profile
+
+
+ƒ Proxy (Middleware)
+
+○  (Static)   prerendered as static content
+ƒ  (Dynamic)  server-rendered on demand
+

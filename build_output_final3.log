@@ -1,0 +1,99 @@
+
+> cei-platform@0.1.0 build
+> prisma generate && next build
+
+Loaded Prisma config from prisma.config.ts.
+
+Prisma schema loaded from prisma/schema.prisma.
+
+✔ Generated Prisma Client (v7.2.0) to ./node_modules/@prisma/client in 267ms
+
+Start by importing your Prisma Client (See: https://pris.ly/d/importing-client)
+
+Tip: Need your database queries to be 1000x faster? Accelerate offers you that and more: https://pris.ly/tip-2-accelerate
+
+[@sentry/nextjs] DEPRECATION WARNING: disableLogger is deprecated and will be removed in a future version. Use webpack.treeshake.removeDebugLogging instead. (Not supported with Turbopack.)
+[@sentry/nextjs] DEPRECATION WARNING: automaticVercelMonitors is deprecated and will be removed in a future version. Use webpack.automaticVercelMonitors instead. (Not supported with Turbopack.)
+[@sentry/nextjs] DEPRECATION WARNING: reactComponentAnnotation is deprecated and will be removed in a future version. Use webpack.reactComponentAnnotation instead. (Not supported with Turbopack.)
+⚠ Warning: Next.js inferred your workspace root, but it may not be correct.
+ We detected multiple lockfiles and selected the directory of /workspace/package-lock.json as the root directory.
+ To silence this warning, set `turbopack.root` in your Next.js config, or consider removing one of the lockfiles if it's not needed.
+   See https://nextjs.org/docs/app/api-reference/config/next-config-js/turbopack#root-directory for more information.
+ Detected additional lockfiles: 
+   * /workspace/cei-platform/package-lock.json
+
+▲ Next.js 16.1.2 (Turbopack)
+- Environments: .env
+- Experiments (use with caution):
+  · clientTraceMetadata
+
+⚠ The "middleware" file convention is deprecated. Please use "proxy" instead. Learn more: https://nextjs.org/docs/messages/middleware-to-proxy
+  Creating an optimized production build ...
+[@sentry/nextjs] DEPRECATION WARNING: disableLogger is deprecated and will be removed in a future version. Use webpack.treeshake.removeDebugLogging instead. (Not supported with Turbopack.)
+[@sentry/nextjs] DEPRECATION WARNING: automaticVercelMonitors is deprecated and will be removed in a future version. Use webpack.automaticVercelMonitors instead. (Not supported with Turbopack.)
+[@sentry/nextjs] DEPRECATION WARNING: reactComponentAnnotation is deprecated and will be removed in a future version. Use webpack.reactComponentAnnotation instead. (Not supported with Turbopack.)
+✓ Compiled successfully in 8.0s
+  Running next.config.js provided runAfterProductionCompile ...
+✓ Completed runAfterProductionCompile in 231ms
+  Running TypeScript ...
+  Collecting page data using 1 worker ...
+  Generating static pages using 1 worker (0/35) ...
+  Generating static pages using 1 worker (8/35) 
+  Generating static pages using 1 worker (17/35) 
+  Generating static pages using 1 worker (26/35) 
+✓ Generating static pages using 1 worker (35/35) in 442.3ms
+  Finalizing page optimization ...
+
+Route (app)
+┌ ○ /
+├ ○ /_not-found
+├ ƒ /api/career-discussions
+├ ƒ /api/case-archive
+├ ƒ /api/industry-signals
+├ ƒ /api/operator-playbooks
+├ ƒ /api/operator-profiles
+├ ƒ /api/polls
+├ ƒ /api/polls/[id]/vote
+├ ƒ /api/threads
+├ ƒ /api/threads/[id]
+├ ƒ /api/threads/[id]/replies
+├ ƒ /api/trial-confessions
+├ ƒ /api/user/create
+├ ƒ /api/users
+├ ƒ /api/war-rooms
+├ ƒ /api/war-rooms/[id]
+├ ƒ /api/war-rooms/[id]/messages
+├ ƒ /api/war-rooms/[id]/participants
+├ ƒ /api/work-matches
+├ ƒ /api/work-requests
+├ ƒ /api/work-requests/[id]
+├ ○ /career
+├ ○ /case-archive
+├ ○ /cases
+├ ○ /confessions
+├ ○ /industry-signals
+├ ○ /playbooks
+├ ○ /polls
+├ ○ /polls/new
+├ ○ /privacy
+├ ○ /rooms
+├ ƒ /sign-in/[[...sign-in]]
+├ ƒ /sign-up/[[...sign-up]]
+├ ○ /threads
+├ ƒ /threads/[id]
+├ ○ /threads/new
+├ ○ /war-rooms
+├ ƒ /war-rooms/[id]
+├ ○ /war-rooms/new
+├ ○ /workforce
+├ ○ /workforce/matches
+├ ○ /workforce/profile
+├ ƒ /workforce/requests/[id]
+└ ○ /workforce/requests/new
+
+
+ƒ Proxy (Middleware)
+
+○  (Static)   prerendered as static content
+ƒ  (Dynamic)  server-rendered on demand
+

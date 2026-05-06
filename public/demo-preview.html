@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BTP Demo - How It Works</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+    body { font-family: 'Inter', sans-serif; }
+    .gradient-bg { background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0f172a 100%); }
+    .step-enter { animation: stepEnter 0.5s ease-out; }
+    @keyframes stepEnter {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .fade-in { animation: fadeIn 0.3s ease-out; }
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+  </style>
+<script src="https://sites.super.myninja.ai/_assets/ninja-daytona-script.js"></script>
+</head>
+<body class="gradient-bg min-h-screen text-white">
+  <div class="max-w-4xl mx-auto p-8">
+    <!-- Header -->
+    <div class="text-center mb-12">
+      <a href="/pop-preview.html" class="text-emerald-400 hover:text-emerald-300 mb-4 inline-block">
+        <i class="fas fa-arrow-left mr-2"></i>Back to Home
+      </a>
+      <h1 class="text-4xl font-bold mb-4">How BTP Works</h1>
+      <p class="text-slate-400 text-lg mb-8">
+        See the full flow from situation to solution in under 60 seconds
+      </p>
+      
+      <!-- Controls -->
+      <div class="flex justify-center gap-4">
+        <button id="playBtn" onclick="playDemo()" class="px-8 py-3 bg-emerald-500 hover:bg-emerald-600 rounded-lg font-medium transition">
+          <i class="fas fa-play mr-2"></i>Play Demo
+        </button>
+        <button onclick="resetDemo()" class="px-6 py-3 bg-slate-800 hover:bg-slate-700 rounded-lg font-medium transition">
+          <i class="fas fa-redo mr-2"></i>Reset
+        </button>
+      </div>
+    </div>
+
+    <!-- Progress Bar -->
+    <div class="flex items-center justify-between mb-12 px-4">
+      <div class="flex items-center" id="step-1-indicator">
+        <div id="step-circle-1" class="w-12 h-12 rounded-full bg-slate-800 flex items-center justify-center text-xl transition-all">
+          <i class="fas fa-edit"></i>
+        </div>
+      </div>
+      <div id="line-1" class="flex-1 h-1 mx-2 bg-slate-800 rounded transition-all"></div>
+      <div class="flex items-center" id="step-2-indicator">
+        <div id="step-circle-2" class="w-12 h-12 rounded-full bg-slate-800 flex items-center justify-center text-xl transition-all">
+          <i class="fas fa-check"></i>
+        </div>
+      </div>
+      <div id="line-2" class="flex-1 h-1 mx-2 bg-slate-800 rounded transition-all"></div>
+      <div class="flex items-center" id="step-3-indicator">
+        <div id="step-circle-3" class="w-12 h-12 rounded-full bg-slate-800 flex items-center justify-center text-xl transition-all">
+          <i class="fas fa-chart-bar"></i>
+        </div>
+      </div>
+      <div id="line-3" class="flex-1 h-1 mx-2 bg-slate-800 rounded transition-all"></div>
+      <div class="flex items-center" id="step-4-indicator">
+        <div id="step-circle-4" class="w-12 h-12 rounded-full bg-slate-800 flex items-center justify-center text-xl transition-all">
+          <i class="fas fa-lightbulb"></i>
+        </div>
+      </div>
+      <div id="line-4" class="flex-1 h-1 mx-2 bg-slate-800 rounded transition-all"></div>
+      <div class="flex items-center" id="step-5-indicator">
+        <div id="step-circle-5" class="w-12 h-12 rounded-full bg-slate-800 flex items-center justify-center text-xl transition-all">
+          <i class="fas fa-users"></i>
+        </div>
+      </div>
+    </div>
+
+    <!-- Step Labels -->
+    <div class="flex justify-between text-center text-sm mb-8 px-2">
+      <span class="w-24 text-slate-500">Situation Posted</span>
+      <span class="w-24 text-slate-500">Others Validate</span>
+      <span class="w-24 text-slate-500">Pattern Forms</span>
+      <span class="w-24 text-slate-500">Insight Appears</span>
+      <span class="w-24 text-slate-500">Matching</span>
+    </div>
+
+    <!-- Content Area -->
+    <div id="content-area" class="bg-slate-900 border border-slate-800 rounded-xl p-8 min-h-[400px]">
+      <div id="step-0" class="text-center py-16">
+        <i class="fas fa-play-circle text-6xl text-slate-600 mb-4"></i>
+        <p class="text-slate-400 text-lg">Click "Play Demo" to start</p>
+      </div>
+      
+      <!-- Step 1: Situation Posted -->
+      <div id="step-1" class="hidden step-enter">
+        <h2 class="text-2xl font-bold mb-6"><i class="fas fa-edit text-emerald-400 mr-3"></i>Situation Posted</h2>
+        <p class="text-slate-400 mb-6">A CRC shares a real situation from their site</p>
+        
+        <div class="bg-slate-800 rounded-xl p-6 border border-slate-700">
+          <div class="flex items-start gap-4">
+            <div class="w-10 h-10 bg-slate-700 rounded-full flex items-center justify-center">
+              <i class="fas fa-user text-slate-400"></i>
+            </div>
+            <div class="flex-1">
+              <div class="flex items-center gap-2 mb-2">
+                <span class="font-medium">Anonymous CRC</span>
+                <span class="text-slate-500 text-sm">just now</span>
+              </div>
+              <h3 class="text-xl font-semibold mb-3">Protocol amendments killing enrollment momentum</h3>
+              <p class="text-slate-300">We had strong enrollment going, then three protocol amendments in two months. Now sites are confused and patients are dropping. Sponsors don't seem to understand the operational impact.</p>
+              <div class="flex gap-2 mt-4">
+                <span class="px-3 py-1 bg-slate-700 rounded-full text-sm">Oncology</span>
+                <span class="px-3 py-1 bg-slate-700 rounded-full text-sm">Phase 3</span>
+                <span class="px-3 py-1 bg-slate-700 rounded-full text-sm">enrollment</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 2: Others Validate -->
+      <div id="step-2" class="hidden step-enter">
+        <h2 class="text-2xl font-bold mb-6"><i class="fas fa-check-circle text-emerald-400 mr-3"></i>Others Validate</h2>
+        <p class="text-slate-400 mb-6">Other operators confirm they've seen the same thing</p>
+        
+        <div class="space-y-4">
+          <div class="bg-slate-800 rounded-lg p-4 border border-slate-700 flex items-center gap-4 fade-in">
+            <div class="w-8 h-8 bg-emerald-500/20 rounded-full flex items-center justify-center">
+              <i class="fas fa-eye text-emerald-400 text-sm"></i>
+            </div>
+            <div>
+              <span class="text-emerald-400 font-medium">Seen this</span>
+              <p class="text-slate-300 text-sm">"Yep, seen this exact thing. You're not alone."</p>
+            </div>
+          </div>
+          
+          <div class="bg-slate-800 rounded-lg p-4 border border-slate-700 flex items-center gap-4 fade-in" style="animation-delay: 0.2s">
+            <div class="w-8 h-8 bg-emerald-500/20 rounded-full flex items-center justify-center">
+              <i class="fas fa-eye text-emerald-400 text-sm"></i>
+            </div>
+            <div>
+              <span class="text-emerald-400 font-medium">Seen this</span>
+              <p class="text-slate-300 text-sm">"This is happening at our site too."</p>
+            </div>
+          </div>
+          
+          <div class="bg-slate-800 rounded-lg p-4 border border-slate-700 flex items-center gap-4 fade-in" style="animation-delay: 0.4s">
+            <div class="w-8 h-8 bg-amber-500/20 rounded-full flex items-center justify-center">
+              <i class="fas fa-info text-amber-400 text-sm"></i>
+            </div>
+            <div>
+              <span class="text-amber-400 font-medium">Different angle</span>
+              <p class="text-slate-300 text-sm">"In our case this was actually driven by the CRO, not the sponsor."</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 3: Pattern Forms -->
+      <div id="step-3" class="hidden step-enter">
+        <h2 class="text-2xl font-bold mb-6"><i class="fas fa-chart-bar text-emerald-400 mr-3"></i>Pattern Forms</h2>
+        <p class="text-slate-400 mb-6">Multiple similar situations cluster into a pattern</p>
+        
+        <div class="bg-slate-800 rounded-xl p-6 border border-emerald-500/50">
+          <div class="flex items-center gap-2 mb-4">
+            <span class="px-3 py-1 bg-amber-500/20 text-amber-400 rounded-full text-sm font-medium">Repeating</span>
+            <span class="text-slate-400 text-sm">5 situations</span>
+          </div>
+          
+          <h3 class="text-xl font-semibold mb-3">Enrollment Challenges Keep Appearing</h3>
+          <p class="text-slate-300 mb-4">Multiple trials experiencing similar enrollment obstacles related to protocol design and patient populations.</p>
+          
+          <div class="flex flex-wrap gap-2 mb-4">
+            <span class="px-3 py-1 bg-slate-700 rounded text-sm">Oncology</span>
+            <span class="px-3 py-1 bg-slate-700 rounded text-sm">Cardiology</span>
+            <span class="px-3 py-1 bg-slate-700 rounded text-sm">Neurology</span>
+          </div>
+          
+          <div class="text-sm text-slate-400">
+            <i class="fas fa-link mr-2"></i>Connected to your situation + 4 others
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 4: Insight Appears -->
+      <div id="step-4" class="hidden step-enter">
+        <h2 class="text-2xl font-bold mb-6"><i class="fas fa-lightbulb text-emerald-400 mr-3"></i>Insight Appears</h2>
+        <p class="text-slate-400 mb-6">The system generates a grounded insight</p>
+        
+        <div class="bg-emerald-500/10 border border-emerald-500/30 rounded-xl p-6">
+          <div class="flex items-start gap-4">
+            <div class="w-12 h-12 bg-emerald-500/20 rounded-full flex items-center justify-center">
+              <i class="fas fa-lightbulb text-emerald-400 text-xl"></i>
+            </div>
+            <div>
+              <h3 class="text-lg font-semibold text-emerald-400 mb-2">Pattern Insight</h3>
+              <p class="text-slate-200 text-lg">"This pattern is likely to impact enrollment timelines across therapeutic areas. Sites with flexible protocol designs have seen better outcomes."</p>
+              <div class="mt-4 text-sm text-slate-400">
+                <i class="fas fa-check-circle mr-2 text-emerald-400"></i>Based on 5 situations across Oncology, Cardiology, Neurology
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 5: Matching -->
+      <div id="step-5" class="hidden step-enter">
+        <h2 class="text-2xl font-bold mb-6"><i class="fas fa-users text-emerald-400 mr-3"></i>Find Who's Dealt With This</h2>
+        <p class="text-slate-400 mb-6">Connect with operators who have relevant experience</p>
+        
+        <div class="space-y-4">
+          <div class="bg-slate-800 rounded-xl p-4 border border-slate-700 flex items-center justify-between">
+            <div class="flex items-center gap-4">
+              <div class="w-10 h-10 bg-slate-700 rounded-full flex items-center justify-center font-mono text-sm">
+                CAP-7291
+              </div>
+              <div>
+                <p class="font-medium">Senior CRC with 8 years oncology experience</p>
+                <p class="text-slate-400 text-sm">Has dealt with similar enrollment issues</p>
+              </div>
+            </div>
+            <button class="px-4 py-2 bg-emerald-500 hover:bg-emerald-600 rounded-lg text-sm font-medium transition">
+              Connect
+            </button>
+          </div>
+          
+          <div class="bg-slate-800 rounded-xl p-4 border border-slate-700 flex items-center justify-between">
+            <div class="flex items-center gap-4">
+              <div class="w-10 h-10 bg-slate-700 rounded-full flex items-center justify-center font-mono text-sm">
+                CAP-3847
+              </div>
+              <div>
+                <p class="font-medium">Site Director at high-volume research center</p>
+                <p class="text-slate-400 text-sm">Resolved enrollment-related protocol issues</p>
+              </div>
+            </div>
+            <button class="px-4 py-2 bg-emerald-500 hover:bg-emerald-600 rounded-lg text-sm font-medium transition">
+              Connect
+            </button>
+          </div>
+          
+          <div class="bg-slate-800 rounded-xl p-4 border border-slate-700 flex items-center justify-between">
+            <div class="flex items-center gap-4">
+              <div class="w-10 h-10 bg-slate-700 rounded-full flex items-center justify-center font-mono text-sm">
+                CAP-9156
+              </div>
+              <div>
+                <p class="font-medium">CRA with multisite coordination experience</p>
+                <p class="text-slate-400 text-sm">Worked through similar CRO communication issues</p>
+              </div>
+            </div>
+            <button class="px-4 py-2 bg-emerald-500 hover:bg-emerald-600 rounded-lg text-sm font-medium transition">
+              Connect
+            </button>
+          </div>
+        </div>
+        
+        <div class="mt-6 p-4 bg-slate-800/50 rounded-lg text-center">
+          <p class="text-slate-300"><i class="fas fa-shield-alt text-emerald-400 mr-2"></i>Anonymous until you choose to connect</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Navigation -->
+    <div class="flex justify-between mt-8">
+      <button id="prevBtn" onclick="prevStep()" disabled class="px-6 py-3 bg-slate-800 hover:bg-slate-700 disabled:opacity-50 disabled:cursor-not-allowed rounded-lg font-medium transition">
+        <i class="fas fa-arrow-left mr-2"></i>Previous
+      </button>
+      <button id="nextBtn" onclick="nextStep()" disabled class="px-6 py-3 bg-slate-800 hover:bg-slate-700 disabled:opacity-50 disabled:cursor-not-allowed rounded-lg font-medium transition">
+        Next<i class="fas fa-arrow-right ml-2"></i>
+      </button>
+    </div>
+  </div>
+
+  <script>
+    let currentStep = 0;
+    let isPlaying = false;
+    const totalSteps = 5;
+    let playInterval;
+
+    function updateUI() {
+      // Hide all steps
+      for (let i = 0; i <= totalSteps; i++) {
+        const el = document.getElementById(`step-${i}`);
+        if (el) el.classList.add('hidden');
+      }
+      
+      // Show current step
+      const currentEl = document.getElementById(`step-${currentStep}`);
+      if (currentEl) currentEl.classList.remove('hidden');
+      
+      // Update progress indicators
+      for (let i = 1; i <= totalSteps; i++) {
+        const circle = document.getElementById(`step-circle-${i}`);
+        const line = document.getElementById(`line-${i}`);
+        
+        if (i <= currentStep) {
+          circle.classList.remove('bg-slate-800');
+          circle.classList.add('bg-emerald-500');
+        } else {
+          circle.classList.add('bg-slate-800');
+          circle.classList.remove('bg-emerald-500');
+        }
+        
+        if (line) {
+          if (i < currentStep) {
+            line.classList.remove('bg-slate-800');
+            line.classList.add('bg-emerald-500');
+          } else {
+            line.classList.add('bg-slate-800');
+            line.classList.remove('bg-emerald-500');
+          }
+        }
+      }
+      
+      // Update buttons
+      document.getElementById('prevBtn').disabled = currentStep === 0;
+      document.getElementById('nextBtn').disabled = currentStep === 0 || currentStep === totalSteps;
+      
+      // Update play button
+      const playBtn = document.getElementById('playBtn');
+      if (isPlaying) {
+        playBtn.innerHTML = '<i class="fas fa-pause mr-2"></i>Playing...';
+        playBtn.disabled = true;
+      } else {
+        playBtn.innerHTML = '<i class="fas fa-play mr-2"></i>Play Demo';
+        playBtn.disabled = false;
+      }
+    }
+
+    function playDemo() {
+      if (isPlaying) return;
+      
+      isPlaying = true;
+      currentStep = 1;
+      updateUI();
+      
+      playInterval = setInterval(() => {
+        if (currentStep >= totalSteps) {
+          clearInterval(playInterval);
+          isPlaying = false;
+          updateUI();
+          return;
+        }
+        currentStep++;
+        updateUI();
+      }, 2500);
+    }
+
+    function resetDemo() {
+      clearInterval(playInterval);
+      isPlaying = false;
+      currentStep = 0;
+      updateUI();
+    }
+
+    function nextStep() {
+      if (currentStep < totalSteps) {
+        currentStep++;
+        updateUI();
+      }
+    }
+
+    function prevStep() {
+      if (currentStep > 1) {
+        currentStep--;
+        updateUI();
+      }
+    }
+
+    // Initialize
+    updateUI();
+  </script>
+</body>
+</html>

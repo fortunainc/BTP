@@ -1,0 +1,3 @@
+127.0.0.1 - - [23/Mar/2026 23:13:28] "GET / HTTP/1.1" 200 -
+127.0.0.1 - - [23/Mar/2026 23:14:27] "GET /?password=5f5e92b0-ce67-4eaf-867f-674a25adbf86 HTTP/1.1" 200 -
+172.18.0.1 - - [23/Mar/2026 23:14:27] "GET /?hideControls=true&password=5f5e92b0-ce67-4eaf-867f-674a25adbf86 HTTP/1.1" 200 -

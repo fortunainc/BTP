@@ -1,0 +1,81 @@
+
+=== ANTI-FORUM / SOCIAL MECHANIC SCAN: active alpha pages/routes ===
+app/page.tsx:25:  createdAt: string;
+app/page.tsx:324:          Anonymous context only. No profiles, public counts, or popularity mechanics.
+app/page.tsx:353:      createdAt: new Date().toISOString()
+app/page.tsx:364:      createdAt: new Date().toISOString()
+app/page.tsx:375:      createdAt: new Date().toISOString()
+app/page.tsx:386:      createdAt: new Date().toISOString()
+app/page.tsx:397:      createdAt: new Date().toISOString()
+app/page.tsx:408:      createdAt: new Date().toISOString()
+app/situations/[id]/page.tsx:5: * - no usernames, profiles, replies, likes, votes, karma, popularity sorting, or exact counts
+app/situations/[id]/page.tsx:26:  timeLabel: string;
+app/situations/[id]/page.tsx:245:              <span className="text-sm text-slate-500 ml-auto">{situation.timeLabel}</span>
+app/situations/[id]/page.tsx:262:                    Choose a structured response. No replies, profiles, names, likes, or public counts.
+app/situations/[id]/page.tsx:360:                If this changed, resolved, or became worse, add an outcome. It improves pattern quality without creating a thread.
+app/situations/page.tsx:23:  timeLabel: string;
+app/situations/page.tsx:182:                        {situation.timeLabel}
+app/insights/reflection/[id]/page.tsx:4: * Shows updated anonymous context without exact counts, profile codes, reply chains, or social mechanics.
+app/insights/reflection/[id]/page.tsx:163:                  Structured anonymous context appeared after your original submission. The reflection below now includes that context without exposing identity, count, or timing details.
+app/notifications/settings/page.tsx:90:    description: 'New opportunities matching your profile',
+app/notifications/page.tsx:49:  createdAt: string;
+app/notifications/page.tsx:55:  totalCount: number;
+app/notifications/page.tsx:56:  unreadCount: number;
+app/notifications/page.tsx:85:  OPPORTUNITY: 'New opportunities matching your profile',
+app/notifications/page.tsx:114:  const [unreadCount, setUnreadCount] = useState(0);
+app/notifications/page.tsx:122:  const [totalCount, setTotalCount] = useState(0);
+app/notifications/page.tsx:154:      setTotalCount(data.totalCount);
+app/notifications/page.tsx:155:      setUnreadCount(data.unreadCount);
+app/notifications/page.tsx:268:              {unreadCount > 0 && (
+app/notifications/page.tsx:270:                  {unreadCount} unread
+app/notifications/page.tsx:275:              {unreadCount > 0 && (
+app/notifications/page.tsx:486:        {notifications.length > 0 && totalCount > notifications.length && (
+app/api/situations/follow-up/route.ts:84:        createdAt: true
+app/api/situations/follow-up/route.ts:98:      (Date.now() - contribution.createdAt.getTime()) / (1000 * 60 * 60 * 24)
+app/api/situations/follow-up/route.ts:186:      orderBy: { createdAt: 'desc' },
+app/api/situations/follow-up/route.ts:195:        createdAt: true,
+app/api/situations/follow-up/route.ts:205:      (Date.now() - contribution.createdAt.getTime()) / (1000 * 60 * 60 * 24)
+app/api/situations/follow-up/route.ts:215:        createdAt: fu.createdAt
+app/api/situations/follow-up/route.ts:304:    const contributionCount = await prisma.contribution.count({
+app/api/situations/follow-up/route.ts:308:    const followUpCount = await prisma.contributionFollowUp.count({
+app/api/situations/route.ts:15: * - NO social metrics (no counts, rankings, leaderboards)
+app/api/situations/route.ts:134:      where.createdAt = { gte: startDate };
+app/api/situations/route.ts:149:        createdAt: true,
+app/api/situations/route.ts:158:        createdAt: 'desc'
+app/api/situations/route.ts:166:      const timeBucketInfo = bucketTimestamp(situation.createdAt);
+app/api/situations/route.ts:168:      // Get interaction types present (NOT counts)
+app/api/situations/route.ts:184:        timeLabel: timeBucketInfo.label,
+app/api/situations/route.ts:185:        // Interaction presence (NOT counts)
+app/api/situations/route.ts:335:      const priorSituationCount = await prisma.contribution.count({
+app/api/situations/route.ts:568:        timeBucket: bucketTimestamp(situation.createdAt).label,
+app/api/situations/[id]/route.ts:5: * No actor identities, no public profiles, no exact small counts, and no exact public timestamps.
+app/api/situations/[id]/route.ts:53:  const timeBucketInfo = bucketTimestamp(situation.createdAt);
+app/api/situations/[id]/route.ts:102:      timeLabel: timeBucketInfo.label,
+app/api/situations/[id]/interact/route.ts:7: * - no replies, threads, usernames, public profiles, likes, votes, karma, or popularity sorting
+app/api/situations/[id]/interact/route.ts:8: * - no exact public counts or exact public timestamps
+app/api/situations/[id]/interact/route.ts:204:      // Deliberately no exact counts and no actor identities.
+app/api/situations/[id]/outcome/route.ts:171:    const helpfulCount = outcomes.filter(o => o.wasHelpful).length;
+app/api/situations/[id]/outcome/route.ts:180:      helpfulCount,
+app/api/situations/[id]/outcome/route.ts:181:      helpfulPercentage: Math.round((helpfulCount / totalOutcomes) * 100),
+app/api/situations/[id]/patterns/route.ts:6: * NEVER exposes counts or user data
+app/api/situations/[id]/patterns/route.ts:38:    const seenTooCount = await prisma.interaction.count({
+app/api/situations/[id]/patterns/route.ts:55:      const areaPatternCount = await prisma.contribution.count({
+app/api/situations/[id]/patterns/route.ts:60:          createdAt: {
+app/api/situations/[id]/patterns/route.ts:76:    const accurateCount = await prisma.interaction.count({
+app/api/situations/review/route.ts:7: *       → returns sanitized content + redaction count
+app/api/insights/reflection/[id]/route.ts:5: * - exact small counts
+app/api/insights/reflection/[id]/route.ts:7: * - operator profile codes
+app/api/insights/reflection/[id]/route.ts:167:    timeBucket: bucketTimestamp(contribution.createdAt).label,
+app/api/notifications/route.ts:55:      // Get notifications and counts
+app/api/notifications/route.ts:56:      const [notifications, totalCount, unreadCount, unreadByClass] = await Promise.all([
+app/api/notifications/route.ts:61:            { createdAt: 'desc' },
+app/api/notifications/route.ts:66:        prisma.notification.count({ where: { userId: user.id, dismissed: false } }),
+app/api/notifications/route.ts:67:        prisma.notification.count({ where: { userId: user.id, read: false, dismissed: false } }),
+app/api/notifications/route.ts:90:        displayTime: getTimeBucket(n.createdAt),
+app/api/notifications/route.ts:95:        totalCount,
+app/api/notifications/route.ts:96:        unreadCount,
+app/api/notifications/route.ts:161:function getTimeBucket(createdAt: Date): string {
+app/api/notifications/route.ts:163:  const diffMs = now.getTime() - new Date(createdAt).getTime();
+app/api/notifications/route.ts:172:  } else if (diffHours < 24 && now.getDate() === new Date(createdAt).getDate()) {
+app/api/notifications/route.ts:174:  } else if (diffDays === 1 || (diffDays === 0 && now.getDate() !== new Date(createdAt).getDate())) {
+app/api/notifications/mark-all-read/route.ts:42:      count: result.count,

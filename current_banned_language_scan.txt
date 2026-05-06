@@ -1,0 +1,105 @@
+=== BANNED USER-FACING TERM SCAN: active alpha pages/routes ===
+app/situations/[id]/page.tsx:4: * Anti-forum rules:
+app/situations/[id]/page.tsx:5: * - no usernames, profiles, replies, likes, votes, karma, popularity sorting, or exact counts
+app/situations/[id]/page.tsx:262:                    Choose a structured response. No replies, profiles, names, likes, or public counts.
+app/situations/[id]/page.tsx:360:                If this changed, resolved, or became worse, add an outcome. It improves pattern quality without creating a thread.
+app/api/situations/follow-up/route.ts:23:import { updateTrustVector } from '@/lib/trust-vector';
+app/api/situations/follow-up/route.ts:131:    // Update trust vector (responding to follow-ups is positive signal)
+app/api/situations/follow-up/route.ts:331:    // Determine signal level
+app/api/situations/route.ts:39:import { updateTrustVector } from '@/lib/trust-vector';
+app/api/situations/route.ts:218: *  - chips: Optional signal chips the user selected
+app/api/situations/route.ts:255:      const { signal, structured } = translateAndStructure(rawText);
+app/api/situations/route.ts:276:        suppressedSignalType: signal.suppressedSignalType,
+app/api/situations/route.ts:277:        emotionalSignalType: signal.emotionalSignalType,
+app/api/situations/route.ts:278:        workaroundType: signal.workaroundType,
+app/api/situations/route.ts:279:        systemOfRecordMismatch: signal.systemOfRecordMismatch,
+app/api/situations/route.ts:280:        officialRealityGap: signal.officialRealityGap,
+app/api/situations/route.ts:281:        decisionDistanceLevel: signal.decisionDistanceLevel,
+app/api/situations/route.ts:282:        burdenAbsorber: signal.burdenAbsorber,
+app/api/situations/route.ts:283:        burdenType: signal.burdenType,
+app/api/situations/route.ts:284:        invisibleWorkType: signal.invisibleWorkType,
+app/api/situations/route.ts:285:        likelyDownstreamRisk: signal.likelyDownstreamRisk,
+app/api/situations/route.ts:286:        driftIndicators: signal.driftIndicators
+app/api/situations/route.ts:292:          suppressedSignalType: signal.suppressedSignalType,
+app/api/situations/route.ts:293:          emotionalSignalType: signal.emotionalSignalType,
+app/api/situations/route.ts:294:          workaroundType: signal.workaroundType,
+app/api/situations/route.ts:295:          burdenAbsorber: signal.burdenAbsorber,
+app/api/situations/route.ts:296:          burdenType: signal.burdenType,
+app/api/situations/route.ts:297:          invisibleWorkType: signal.invisibleWorkType
+app/api/situations/route.ts:299:        // Apply generalized values back to signal
+app/api/situations/route.ts:300:        if (generalized.suppressedSignalType) signal.suppressedSignalType = generalized.suppressedSignalType as any;
+app/api/situations/route.ts:301:        if (generalized.emotionalSignalType) signal.emotionalSignalType = generalized.emotionalSignalType as any;
+app/api/situations/route.ts:302:        if (generalized.workaroundType) signal.workaroundType = generalized.workaroundType as any;
+app/api/situations/route.ts:303:        if (generalized.burdenAbsorber) signal.burdenAbsorber = generalized.burdenAbsorber as any;
+app/api/situations/route.ts:304:        if (generalized.burdenType) signal.burdenType = generalized.burdenType as any;
+app/api/situations/route.ts:305:        if (generalized.invisibleWorkType) signal.invisibleWorkType = generalized.invisibleWorkType as any;
+app/api/situations/route.ts:333:      const microOpportunityEligible = signal.microOpportunityEligible;
+app/api/situations/route.ts:374:          suppressedSignalType: signal.suppressedSignalType,
+app/api/situations/route.ts:375:          emotionalSignalType: signal.emotionalSignalType,
+app/api/situations/route.ts:376:          workaroundPresent: signal.workaroundPresent,
+app/api/situations/route.ts:377:          workaroundType: signal.workaroundType,
+app/api/situations/route.ts:378:          systemOfRecordMismatch: signal.systemOfRecordMismatch,
+app/api/situations/route.ts:379:          officialRealityGap: signal.officialRealityGap,
+app/api/situations/route.ts:380:          decisionDistanceLevel: signal.decisionDistanceLevel,
+app/api/situations/route.ts:381:          burdenAbsorber: signal.burdenAbsorber,
+app/api/situations/route.ts:382:          burdenType: signal.burdenType,
+app/api/situations/route.ts:383:          invisibleWorkType: signal.invisibleWorkType,
+app/api/situations/route.ts:384:          likelyDownstreamRisk: signal.likelyDownstreamRisk,
+app/api/situations/route.ts:385:          escalationPattern: signal.escalationPattern,
+app/api/situations/route.ts:386:          patientImpactPotential: signal.patientImpactPotential,
+app/api/situations/route.ts:387:          operationalDebtLevel: signal.operationalDebtLevel,
+app/api/situations/route.ts:388:          economicValuePotential: signal.economicValuePotential,
+app/api/situations/route.ts:390:          driftIndicatorsJson: signal.driftIndicators,
+app/api/situations/route.ts:391:          failureTrajectoryPrediction: signal.failureTrajectoryPrediction,
+app/api/situations/route.ts:392:          signalQualityScore: signal.signalQualityScore,
+app/api/situations/route.ts:394:          predictiveSummary: signal.predictiveSummary,
+app/api/situations/route.ts:395:          confidenceScore: signal.confidenceScore
+app/api/situations/route.ts:403:          signalStage: determineSignalStage(signal),
+app/api/situations/route.ts:404:          workaroundPresent: signal.workaroundPresent,
+app/api/situations/route.ts:405:          workaroundType: signal.workaroundType,
+app/api/situations/route.ts:406:          suppressedSignalType: signal.suppressedSignalType,
+app/api/situations/route.ts:407:          emotionalSignalType: signal.emotionalSignalType,
+app/api/situations/route.ts:408:          systemOfRecordMismatch: signal.systemOfRecordMismatch,
+app/api/situations/route.ts:409:          officialRealityGap: signal.officialRealityGap,
+app/api/situations/route.ts:410:          decisionDistanceLevel: signal.decisionDistanceLevel,
+app/api/situations/route.ts:411:          burdenAbsorber: signal.burdenAbsorber,
+app/api/situations/route.ts:412:          burdenType: signal.burdenType,
+app/api/situations/route.ts:413:          invisibleWorkType: signal.invisibleWorkType,
+app/api/situations/route.ts:414:          likelyDownstreamRisk: signal.likelyDownstreamRisk,
+app/api/situations/route.ts:415:          escalationPattern: signal.escalationPattern,
+app/api/situations/route.ts:416:          patientImpactPotential: signal.patientImpactPotential,
+app/api/situations/route.ts:417:          operationalDebtLevel: signal.operationalDebtLevel,
+app/api/situations/route.ts:418:          economicValuePotential: signal.economicValuePotential,
+app/api/situations/route.ts:419:          microOpportunityEligible: signal.microOpportunityEligible,
+app/api/situations/route.ts:420:          driftIndicatorsJson: signal.driftIndicators,
+app/api/situations/route.ts:421:          failureTrajectoryPrediction: signal.failureTrajectoryPrediction,
+app/api/situations/route.ts:422:          signalQualityScore: signal.signalQualityScore,
+app/api/situations/route.ts:423:          predictiveSummary: signal.predictiveSummary,
+app/api/situations/route.ts:424:          confidenceScore: signal.confidenceScore,
+app/api/situations/route.ts:443:              suppressedSignalType: signal.suppressedSignalType,
+app/api/situations/route.ts:444:              emotionalSignalType: signal.emotionalSignalType,
+app/api/situations/route.ts:445:              workaroundPresent: signal.workaroundPresent,
+app/api/situations/route.ts:446:              systemMismatch: signal.systemOfRecordMismatch,
+app/api/situations/route.ts:447:              decisionDistance: signal.decisionDistanceLevel,
+app/api/situations/route.ts:448:              signalQualityScore: signal.signalQualityScore,
+app/api/situations/route.ts:449:              failureTrajectory: signal.failureTrajectoryPrediction,
+app/api/situations/route.ts:486:      // Update user's trust vector
+app/api/situations/route.ts:490:      const reflection = generateQuickReflection(signal, finalIssueCategory, {
+app/api/situations/route.ts:528:      scheduleFullReflection(situation.id, signal, finalIssueCategory, {
+app/api/situations/route.ts:537:      createPathwaysForContribution(situation.id, signal).catch(err => {
+app/api/situations/route.ts:555:      if (signal.signalQualityScore === 'HIGH') {
+app/api/situations/route.ts:602:  signal: ExecutionSignal,
+app/api/situations/route.ts:613:      contributionId, signal, issueCategory, contextParams,
+app/api/situations/route.ts:757: * Determine the signal stage for the ExecutionSignalExtraction record
+app/api/situations/route.ts:759:function determineSignalStage(signal: ExecutionSignal): string {
+app/api/situations/route.ts:760:  if (signal.failureTrajectoryPrediction === 'HIGH_RISK_ESCALATION') return 'FAILURE';
+app/api/situations/route.ts:761:  if (signal.failureTrajectoryPrediction === 'LIKELY_ESCALATION') return 'ACTIVE';
+app/api/situations/route.ts:762:  if (signal.workaroundPresent || signal.systemOfRecordMismatch) return 'ACTIVE';
+app/api/situations/[id]/route.ts:4: * Fetches a specific situation with anti-forum, privacy-safe interaction state.
+app/api/situations/[id]/interact/route.ts:4: * Anti-forum rules:
+app/api/situations/[id]/interact/route.ts:7: * - no replies, threads, usernames, public profiles, likes, votes, karma, or popularity sorting
+app/api/situations/[id]/interact/route.ts:14:import { getTrustWeight } from '@/lib/trust-vector';
+app/api/situations/[id]/outcome/route.ts:9: * - Outcomes reinforce or modify trust scores
+app/api/situations/[id]/outcome/route.ts:15:import { updateTrustVector } from '@/lib/trust-vector';
+app/api/situations/[id]/outcome/route.ts:85:      // Calculate impact score if not provided
+app/api/situations/[id]/outcome/route.ts:111:      // Update contribution author's trust vector with outcome data
