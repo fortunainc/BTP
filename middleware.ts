@@ -4,10 +4,10 @@ import { NextResponse } from "next/server";
 const isPublicRoute = createRouteMatcher(['/', '/sign-in', '/about']);
 const isAdminRoute = createRouteMatcher(['/admin/:path*']);
 
-export default clerkMiddleware(async (auth, req) => {
-  // Get the auth state by calling auth()
-  const authState = await auth();
-  
+export default clerkMiddleware((auth, req) => {
+  // Get the auth state by calling auth() - NO await in Clerk 6.x
+  const authState = auth();
+
   // Protect admin routes - require authentication
   if (isAdminRoute(req)) {
     if (!authState.userId) {
@@ -19,7 +19,7 @@ export default clerkMiddleware(async (auth, req) => {
     // Note: Role-based access is handled in the API routes and page components
     // This middleware just ensures the user is signed in
   }
-  
+
   // If user is signed in and trying to access sign-in, redirect to dashboard
   if (authState.userId && req.nextUrl.pathname === "/sign-in") {
     return NextResponse.redirect(new URL("/dashboard", req.url));
