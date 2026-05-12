@@ -4,10 +4,11 @@ import { NextResponse } from "next/server";
 const isPublicRoute = createRouteMatcher(['/', '/sign-in', '/about']);
 const isAdminRoute = createRouteMatcher(['/admin/:path*']);
 
-export default clerkMiddleware((auth, req) => {
+export default clerkMiddleware((auth,req) => {
   // Protect admin routes - require authentication
   if (isAdminRoute(req)) {
-    if (!auth().userId) {
+    const { userId } = auth()
+    if (!userId) {
       // Redirect unauthenticated users to sign-in
       const signInUrl = new URL('/sign-in', req.url);
       signInUrl.searchParams.set('redirect_url', req.url);
@@ -18,7 +19,8 @@ export default clerkMiddleware((auth, req) => {
   }
 
   // If user is signed in and trying to access sign-in, redirect to dashboard
-  if (auth().userId && req.nextUrl.pathname === "/sign-in") {
+  const { userId } = auth()
+  if (userId && req.nextUrl.pathname === "/sign-in") {
     return NextResponse.redirect(new URL("/dashboard", req.url));
   }
 
