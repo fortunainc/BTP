@@ -7,7 +7,7 @@ const isAdminRoute = createRouteMatcher(['/admin/:path*']);
 export default clerkMiddleware((auth, req) => {
   // Protect admin routes - require authentication
   if (isAdminRoute(req)) {
-    const session = auth() as { userId: string | null }
+    const session = auth() as unknown as { userId: string | null }
     if (!session.userId) {
       // Redirect unauthenticated users to sign-in
       const signInUrl = new URL('/sign-in', req.url);
@@ -19,7 +19,7 @@ export default clerkMiddleware((auth, req) => {
   }
 
   // If user is signed in and trying to access sign-in, redirect to dashboard
-  const session = auth() as { userId: string | null }
+  const session = auth() as unknown as { userId: string | null }
   if (session.userId && req.nextUrl.pathname === "/sign-in") {
     return NextResponse.redirect(new URL("/dashboard", req.url));
   }
