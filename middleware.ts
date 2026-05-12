@@ -1,26 +1,27 @@
 import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
 
-const isPublicRoute = createRouteMatcher(['/', '/sign-in', '/about', '/privacy']);
+// Public routes that don't require authentication
+const isPublicRoute = createRouteMatcher([
+  '/',
+  '/sign-in(.*)',
+  '/sign-up(.*)',
+  '/privacy',
+  '/situations',
+]);
 
+// Simplified middleware without auth() calls
 export default clerkMiddleware((auth, req) => {
-  // Allow public routes through
-  if (isPublicRoute(req)) {
-    // Just let them pass
-  }
-
-  // Redirect /workforce routes to /opportunities
+  // Route redirects
   if (req.nextUrl.pathname.startsWith("/workforce")) {
     const newPath = req.nextUrl.pathname.replace(/^\/workforce/, "/opportunities");
     return NextResponse.redirect(new URL(newPath, req.url));
   }
 
-  // Redirect /marketplace to /opportunities
   if (req.nextUrl.pathname === "/marketplace") {
     return NextResponse.redirect(new URL("/opportunities", req.url));
   }
 
-  // Redirect /signals to /situations
   if (req.nextUrl.pathname.startsWith("/signals")) {
     const newPath = req.nextUrl.pathname.replace(/^\/signals/, "/situations");
     return NextResponse.redirect(new URL(newPath, req.url));
@@ -28,5 +29,5 @@ export default clerkMiddleware((auth, req) => {
 });
 
 export const config = {
-  matcher: ["/((?!.*\\\\..*|_next).*)"],
+  matcher: ["/((?!.*\\..*|_next).*)"],
 };

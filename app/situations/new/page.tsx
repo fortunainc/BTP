@@ -21,11 +21,11 @@
 
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@clerk/nextjs';
 import Link from 'next/link';
-import { Loader2, Shield, Eye, CheckCircle, AlertTriangle } from 'lucide-react';
+import { Loader2, Shield, Eye, CheckCircle, AlertTriangle, User } from 'lucide-react';
 
 // Optional chips — NOT required
 const SIGNAL_CHIPS = [
@@ -81,15 +81,100 @@ export default function NewSituationPage() {
   
   // Result state
   const [result, setResult] = useState<SubmissionResult | null>(null);
+  const [onboardingComplete, setOnboardingComplete] = useState<boolean | null>(null);
+  const [checkingOnboarding, setCheckingOnboarding] = useState(true);
 
-  // Redirect if not signed in
-  if (isLoaded && !isSignedIn) {
+  // Check onboarding status when user is authenticated
+  useEffect(() => {
+    const checkOnboarding = async () => {
+      if (!isLoaded || !isSignedIn) {
+        setCheckingOnboarding(false);
+        return;
+      }
+
+      try {
+        const response = await fetch('/api/user/status');
+        if (response.ok) {
+          const data = await response.json();
+          setOnboardingComplete(data.onboardingCompleted === 1);
+        } else {
+          setOnboardingComplete(false);
+        }
+      } catch (error) {
+        console.error('Error checking onboarding:', error);
+        setOnboardingComplete(false);
+      } finally {
+        setCheckingOnboarding(false);
+      }
+    };
+
+    checkOnboarding();
+  }, [isLoaded, isSignedIn]);
+
+  // Loading state
+  if (!isLoaded || checkingOnboarding) {
     return (
       <div className="min-h-screen bg-slate-950 flex flex-col justify-center items-center px-4">
-        <p className="text-slate-400 text-lg text-center">Please sign in to share a situation</p>
-        <Link href="/sign-in" className="mt-4 px-4 py-2 bg-cyan-600 text-white rounded-md hover:bg-cyan-700">
-          Sign In
-        </Link>
+        <Loader2 className="w-8 h-8 text-cyan-500 animate-spin mb-4" />
+        <p className="text-slate-400">Checking your account...</p>
+      </div>
+    );
+  }
+
+  // Account Gate - Not authenticated
+  if (!isSignedIn) {
+    return (
+      <div className="min-h-screen bg-slate-950 flex flex-col justify-center items-center px-4">
+        <div className="max-w-md w-full text-center">
+          <div className="w-16 h-16 bg-cyan-500/20 rounded-full flex items-center justify-center mx-auto mb-6">
+            <Shield className="w-8 h-8 text-cyan-500" />
+          </div>
+          <h1 className="text-2xl font-bold text-white mb-3">
+            Create an account to share anonymously.
+          </h1>
+          <p className="text-slate-400 mb-8 leading-relaxed">
+            BTP requires sign-in so each submission can be protected, reviewed, and connected to your anonymous handle. Your identity remains hidden.
+          </p>
+          <div className="flex flex-col gap-3">
+            <Link
+              href="/sign-up"
+              className="w-full py-3 bg-cyan-600 text-white rounded-lg font-medium hover:bg-cyan-700 transition-colors"
+            >
+              Create account
+            </Link>
+            <Link
+              href="/sign-in"
+              className="w-full py-3 border border-slate-700 text-slate-300 rounded-lg font-medium hover:bg-slate-800 transition-colors"
+            >
+              Sign in
+            </Link>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Profile Completion Gate - Authenticated but onboarding incomplete
+  if (!onboardingComplete) {
+    return (
+      <div className="min-h-screen bg-slate-950 flex flex-col justify-center items-center px-4">
+        <div className="max-w-md w-full text-center">
+          <div className="w-16 h-16 bg-amber-500/20 rounded-full flex items-center justify-center mx-auto mb-6">
+            <User className="w-8 h-8 text-amber-500" />
+          </div>
+          <h1 className="text-2xl font-bold text-white mb-3">
+            Complete your profile to share
+          </h1>
+          <p className="text-slate-400 mb-8 leading-relaxed">
+            Before you can submit, we need a few details to connect your submissions to your anonymous handle.
+          </p>
+          <Link
+            href="/onboarding"
+            className="w-full py-3 bg-cyan-600 text-white rounded-lg font-medium hover:bg-cyan-700 transition-colors block"
+          >
+            Complete profile
+          </Link>
+        </div>
       </div>
     );
   }
