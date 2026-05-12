@@ -5,12 +5,9 @@ const isPublicRoute = createRouteMatcher(['/', '/sign-in', '/about']);
 const isAdminRoute = createRouteMatcher(['/admin/:path*']);
 
 export default clerkMiddleware((auth, req) => {
-  // Get the auth state by calling auth() - NO await in Clerk 6.x
-  const authState = auth();
-
   // Protect admin routes - require authentication
   if (isAdminRoute(req)) {
-    if (!authState.userId) {
+    if (!auth().userId) {
       // Redirect unauthenticated users to sign-in
       const signInUrl = new URL('/sign-in', req.url);
       signInUrl.searchParams.set('redirect_url', req.url);
@@ -21,7 +18,7 @@ export default clerkMiddleware((auth, req) => {
   }
 
   // If user is signed in and trying to access sign-in, redirect to dashboard
-  if (authState.userId && req.nextUrl.pathname === "/sign-in") {
+  if (auth().userId && req.nextUrl.pathname === "/sign-in") {
     return NextResponse.redirect(new URL("/dashboard", req.url));
   }
 
