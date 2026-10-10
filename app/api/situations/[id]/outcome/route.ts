@@ -10,9 +10,12 @@
  */
 
 import { NextRequest } from 'next/server';
+import { randomUUID } from 'crypto';
 import { prisma } from '@/lib/prisma';
 import { withAuth, createApiResponse, createErrorResponse } from '@/lib/api-auth';
 import { updateTrustVector } from '@/lib/trust-vector';
+import { applyAutomaticRedaction } from '@/lib/anti-correlation';
+import { buildLedgerEvent } from '@/lib/knowledge-ledger';
 
 // Valid outcome types
 const OUTCOME_TYPES = [
@@ -96,17 +99,41 @@ export const POST = withAuth(async (req, user) => {
         finalImpactScore = defaultImpactScores[outcomeType];
       }
 
+      const sanitizedOutcomeData = typeof outcomeData === 'string'
+        ? applyAutomaticRedaction(outcomeData.slice(0, 2000)).redactedContent
+        : null;
+      const finalWasHelpful = wasHelpful !== undefined ? wasHelpful : (finalImpactScore > 0);
+
       // Create contribution outcome
-      await prisma.contributionOutcome.create({
+      const outcomeId = randomUUID();
+      const outcomeDataRecord = {
         data: {
+          id: outcomeId,
           contributionId,
           userId: user.id,
           outcomeType,
-          outcomeData: outcomeData || null,
-          wasHelpful: wasHelpful !== undefined ? wasHelpful : (finalImpactScore > 0),
+          outcomeData: sanitizedOutcomeData,
+          wasHelpful: finalWasHelpful,
           impactScore: finalImpactScore
         }
+      };
+      const ledgerEvent = buildLedgerEvent({
+        aggregateType: 'OUTCOME',
+        aggregateId: outcomeId,
+        eventType: 'CREATED',
+        actorUserId: user.id,
+        payload: {
+          questionId: contributionId,
+          outcomeType,
+          outcomeData: sanitizedOutcomeData,
+          wasHelpful: finalWasHelpful,
+          impactScore: finalImpactScore,
+        },
       });
+      const [outcome] = await prisma.$transaction([
+        prisma.contributionOutcome.create(outcomeDataRecord),
+        prisma.knowledgeLedgerEvent.create({ data: ledgerEvent }),
+      ]);
 
       // Update contribution author's trust vector with outcome data
       if (contribution.userId) {

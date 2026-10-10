@@ -4,7 +4,7 @@
  * Privacy rules:
  * - no public identity, open discussion, popularity mechanics, or exact public counts
  * - structured responses only
- * - optional context capped at 200 characters
+ * - public answers capped at 2,000 characters; structured context remains brief
  * - privacy-safe summaries only
  */
 
@@ -36,6 +36,13 @@ interface InteractionStatus {
   updatedReflectionAvailable: boolean;
 }
 
+interface PublicAnswer {
+  id: string;
+  text: string;
+  role: string;
+  timeLabel: string;
+}
+
 const INTERACTION_BUTTONS = [
   { type: 'SEEN_THIS', label: "I've seen this", helper: 'Validates that this is not isolated', icon: '👀' },
   { type: 'TRIED_SIMILAR', label: 'We tried something similar', helper: 'Adds attempted-action context', icon: '🔁' },
@@ -59,6 +66,12 @@ export default function SituationDetailPage({ params }: { params: Promise<{ id: 
   const { isSignedIn } = useAuth();
   const [situation, setSituation] = useState<Situation | null>(null);
   const [interactionStatus, setInteractionStatus] = useState<InteractionStatus | null>(null);
+  const [answers, setAnswers] = useState<PublicAnswer[]>([]);
+  const [answerText, setAnswerText] = useState('');
+  const [showHelpRequest, setShowHelpRequest] = useState(false);
+  const [helpType, setHelpType] = useState('CONSULTATION');
+  const [helpDetails, setHelpDetails] = useState('');
+  const [helpTiming, setHelpTiming] = useState('');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
@@ -88,6 +101,7 @@ export default function SituationDetailPage({ params }: { params: Promise<{ id: 
       const data = await response.json();
       setSituation(data.situation);
       setInteractionStatus(data.interactions);
+      setAnswers(data.answers || []);
     } catch (err) {
       console.error('Error fetching situation:', err);
       setError('Failed to load situation');
@@ -143,6 +157,39 @@ export default function SituationDetailPage({ params }: { params: Promise<{ id: 
   const handleSubmitContextInteraction = async () => {
     if (!selectedContextType || !contextText.trim()) return;
     await submitInteraction(selectedContextType, contextText.trim());
+  };
+
+  const handleSubmitAnswer = async () => {
+    if (!answerText.trim()) return;
+    await submitInteraction('ANSWER', answerText.trim());
+    setAnswerText('');
+  };
+
+  const handleSubmitHelpRequest = async () => {
+    if (!isSignedIn) {
+      window.location.href = '/sign-in';
+      return;
+    }
+    if (!helpDetails.trim()) return;
+    try {
+      setSubmitting(true);
+      setError(null);
+      const response = await fetch('/api/help-requests', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ contributionId: id, helpType, details: helpDetails, timing: helpTiming }),
+      });
+      const data = await response.json();
+      if (!data.success) throw new Error(data.error || 'Failed to request help');
+      setSuccessMessage('Private help requested. BTP will review the request and match the right expert.');
+      setHelpDetails('');
+      setHelpTiming('');
+      setShowHelpRequest(false);
+    } catch (requestError) {
+      setError(requestError instanceof Error ? requestError.message : 'Failed to request help');
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   const handleSubmitOutcome = async () => {
@@ -205,7 +252,7 @@ export default function SituationDetailPage({ params }: { params: Promise<{ id: 
       <header className="border-b border-slate-800">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <Link href="/situations" className="text-cyan-400 hover:text-cyan-300 text-sm font-medium">
-            ← Back to Intelligence Feed
+          ← Back to Community Questions
           </Link>
         </div>
       </header>
@@ -255,6 +302,101 @@ export default function SituationDetailPage({ params }: { params: Promise<{ id: 
             </div>
 
             <div className="mt-8 pt-6 border-t border-slate-800">
+              <div className="mb-8">
+                <h2 className="text-lg font-semibold text-white">Public answers</h2>
+                <p className="text-sm text-slate-400 mt-1">
+                  Answers are public to the BTP community. Identity and employer remain private.
+                </p>
+
+                {answers.length > 0 ? (
+                  <div className="mt-4 space-y-3">
+                    {answers.map((answer) => (
+                      <div key={answer.id} className="rounded-lg border border-slate-800 bg-slate-950 p-4">
+                        <div className="flex items-center justify-between gap-3 mb-2">
+                          <span className="text-xs font-medium text-cyan-300">{answer.role}</span>
+                          <span className="text-xs text-slate-600">{answer.timeLabel}</span>
+                        </div>
+                        <p className="text-sm text-slate-300 whitespace-pre-wrap">{answer.text}</p>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="mt-4 text-sm text-slate-500">No answers yet.</p>
+                )}
+
+                <div className="mt-5 rounded-lg border border-slate-800 bg-slate-950 p-4">
+                  <label className="block text-sm font-medium text-white mb-2">Answer from your experience</label>
+                  <textarea
+                    value={answerText}
+                    onChange={(event) => setAnswerText(event.target.value.slice(0, 2000))}
+                    rows={5}
+                    maxLength={2000}
+                    className="w-full bg-slate-900 border border-slate-700 rounded-md px-3 py-2 text-sm text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-cyan-500"
+                    placeholder="Share what you would do, why, and any important limitations. Do not include names, employers, protocol IDs, or patient details."
+                  />
+                  <div className="mt-2 flex items-center justify-between">
+                    <span className="text-xs text-slate-600">{answerText.length}/2000</span>
+                    <button
+                      onClick={handleSubmitAnswer}
+                      disabled={submitting || !answerText.trim()}
+                      className="px-4 py-2 bg-cyan-600 text-white text-sm font-medium rounded-md hover:bg-cyan-700 disabled:opacity-50"
+                    >
+                      {submitting ? 'Publishing...' : 'Publish answer'}
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <div className="mb-8 rounded-lg border border-purple-500/20 bg-purple-500/10 p-5">
+                <h2 className="text-lg font-semibold text-white">Need confidential help applying the answer?</h2>
+                <p className="text-sm text-slate-400 mt-1">Request a private expert consultation, review, or defined project.</p>
+                {!showHelpRequest ? (
+                  <button
+                    onClick={() => setShowHelpRequest(true)}
+                    className="mt-4 px-4 py-2 rounded-md bg-purple-600 text-white text-sm font-medium hover:bg-purple-700"
+                  >
+                    Request private help
+                  </button>
+                ) : (
+                  <div className="mt-4 space-y-3">
+                    <select
+                      value={helpType}
+                      onChange={(event) => setHelpType(event.target.value)}
+                      className="w-full bg-slate-900 border border-slate-700 rounded-md px-3 py-2 text-sm text-white"
+                    >
+                      <option value="CONSULTATION">Expert consultation</option>
+                      <option value="WRITTEN_REVIEW">Written resolution review</option>
+                      <option value="DOCUMENT_REVIEW">Document or workflow review</option>
+                      <option value="PROJECT_HELP">Defined project help</option>
+                    </select>
+                    <textarea
+                      value={helpDetails}
+                      onChange={(event) => setHelpDetails(event.target.value.slice(0, 2000))}
+                      rows={4}
+                      maxLength={2000}
+                      className="w-full bg-slate-900 border border-slate-700 rounded-md px-3 py-2 text-sm text-white placeholder-slate-500"
+                      placeholder="What would you like help resolving? Keep identifying details out for now."
+                    />
+                    <input
+                      value={helpTiming}
+                      onChange={(event) => setHelpTiming(event.target.value.slice(0, 100))}
+                      className="w-full bg-slate-900 border border-slate-700 rounded-md px-3 py-2 text-sm text-white placeholder-slate-500"
+                      placeholder="Timing (optional), e.g. this week"
+                    />
+                    <div className="flex justify-end gap-2">
+                      <button onClick={() => setShowHelpRequest(false)} className="px-4 py-2 text-sm text-slate-400">Cancel</button>
+                      <button
+                        onClick={handleSubmitHelpRequest}
+                        disabled={submitting || !helpDetails.trim()}
+                        className="px-4 py-2 rounded-md bg-purple-600 text-white text-sm font-medium disabled:opacity-50"
+                      >
+                        {submitting ? 'Submitting...' : 'Submit privately'}
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
+
               <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-3 mb-5">
                 <div>
                   <h2 className="text-lg font-semibold text-white">Add anonymous operator context</h2>

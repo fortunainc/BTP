@@ -100,10 +100,10 @@ export default function SituationsPage() {
           <div className="flex justify-between items-start">
             <div>
               <h1 className="text-3xl font-bold text-white mb-2">
-                What's happening
+                Questions from the BTP community
               </h1>
               <p className="text-slate-400">
-                Real situations from clinical trials, confirmed by operators
+                Ask openly. Answer from experience. Keep identities and employers protected.
               </p>
             </div>
             {isSignedIn && (
@@ -111,7 +111,7 @@ export default function SituationsPage() {
                 href="/situations/new"
                 className="inline-flex items-center px-6 py-3 bg-slate-700 hover:bg-slate-600 text-white rounded-lg font-medium transition-colors border border-slate-600"
               >
-                Share a situation
+                Ask a question
               </Link>
             )}
           </div>
@@ -155,12 +155,12 @@ export default function SituationsPage() {
         ) : situations.length === 0 ? (
           <div className="text-center py-12">
             <p className="text-lg text-slate-500 mb-2">
-              No situations yet
+              No questions yet
             </p>
             <p className="text-slate-600">
               {isSignedIn 
-                ? 'Share the first situation from your trial'
-                : 'Sign in to share situations'
+                ? 'Ask the first question'
+                : 'Sign in to ask a question'
               }
             </p>
           </div>

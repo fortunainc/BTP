@@ -3,12 +3,13 @@
  *
  * Privacy rules:
  * - structured responses only
- * - optional context is capped at 200 characters and redacted
- * - no open discussion, public identity, popularity mechanics, or exact public counts
+ * - public answers are capped at 2,000 characters and redacted
+ * - generalized verified roles are public; real identity remains private
  * - no exact public timestamps
  */
 
 import { NextRequest } from 'next/server';
+import { randomUUID } from 'crypto';
 import { prisma } from '@/lib/prisma';
 import { withAuth, createApiResponse, createErrorResponse } from '@/lib/api-auth';
 import { getTrustWeight } from '@/lib/trust-vector';
@@ -22,8 +23,10 @@ import {
   type OperatorInteractionType,
 } from '@/lib/operator-return-loop';
 import { getOrCreateUserMetrics, trackEvent, EVENT_TYPES } from '@/lib/analytics-tracker';
+import { buildLedgerEvent } from '@/lib/knowledge-ledger';
 
 const INTERACTION_BASE_WEIGHTS: Record<OperatorInteractionType, number> = {
+  ANSWER: 2.0,
   SEEN_THIS: 1.5,
   TRIED_SIMILAR: 1.2,
   WORKED_FOR_US: 2.0,
@@ -47,6 +50,10 @@ export const POST = withAuth(async (req, user) => {
   const normalizedType = normalizeInteractionType(String(body.interactionType || ''));
   const rawContext = typeof body.context === 'string' ? body.context : undefined;
 
+  if (normalizedType === 'ANSWER' && user.verificationStatus !== 'Approved') {
+    return createErrorResponse('Only verified BTP members can publish answers', 403);
+  }
+
   if (!normalizedType || !OPERATOR_INTERACTION_TYPES.includes(normalizedType)) {
     return createErrorResponse(
       `Invalid interaction type. Must be one of: ${OPERATOR_INTERACTION_TYPES.join(', ')}`,
@@ -54,14 +61,24 @@ export const POST = withAuth(async (req, user) => {
     );
   }
 
-  if (rawContext && rawContext.trim().length > 200) {
-    return createErrorResponse('Optional context must be 200 characters or fewer', 400);
+  const contextLimit = normalizedType === 'ANSWER' ? 2000 : 200;
+  if (rawContext && rawContext.trim().length > contextLimit) {
+    return createErrorResponse(
+      normalizedType === 'ANSWER'
+        ? 'Answers must be 2,000 characters or fewer'
+        : 'Optional context must be 200 characters or fewer',
+      400
+    );
+  }
+
+  if (normalizedType === 'ANSWER' && !rawContext?.trim()) {
+    return createErrorResponse('Answer text is required', 400);
   }
 
   const contribution = await prisma.contribution.findUnique({
     where: {
       id: contributionId,
-      contributionType: 'situation',
+      contributionType: { in: ['question', 'situation'] },
     },
     select: {
       id: true,
@@ -73,11 +90,11 @@ export const POST = withAuth(async (req, user) => {
   });
 
   if (!contribution) {
-    return createErrorResponse('Situation not found', 404);
+    return createErrorResponse('Question not found', 404);
   }
 
   if (contribution.userId === user.id) {
-    return createErrorResponse('You cannot add structured context to your own situation', 400);
+    return createErrorResponse('You cannot answer or add context to your own question', 400);
   }
 
   const existingInteraction = await prisma.interaction.findFirst({
@@ -89,7 +106,10 @@ export const POST = withAuth(async (req, user) => {
   });
 
   if (existingInteraction) {
-    return createErrorResponse('You already added this anonymous context', 400);
+    return createErrorResponse(
+      normalizedType === 'ANSWER' ? 'You already answered this question' : 'You already added this context',
+      400
+    );
   }
 
   const contextResult = redactInteractionContext(rawContext, {
@@ -101,18 +121,41 @@ export const POST = withAuth(async (req, user) => {
   const userTrustWeight = await getTrustWeight(user.id);
   const effectiveWeight = (INTERACTION_BASE_WEIGHTS[normalizedType] || 1.0) * userTrustWeight;
 
-  const interaction = await prisma.interaction.create({
+  const interactionId = randomUUID();
+  const interactionData = {
     data: {
-      contributionId,
-      userId: user.id,
+        id: interactionId,
+        contributionId,
+        userId: user.id,
+        interactionType: normalizedType,
+        weight: effectiveWeight,
+        context: contextResult.blockedFromDisplay ? null : contextResult.displayContext,
+        originalContext: null,
+        correlationRisk: contextResult.correlationRisk,
+        isVerified: normalizedType === 'ANSWER' && user.verificationStatus === 'Approved',
+        displayStatus: contextResult.blockedFromDisplay ? 'PENDING_REVIEW' : 'VISIBLE',
+    },
+  };
+  const ledgerEvent = buildLedgerEvent({
+    aggregateType: normalizedType === 'ANSWER' ? 'ANSWER' : 'INTERACTION',
+    aggregateId: interactionId,
+    eventType: 'CREATED',
+    actorUserId: user.id,
+    payload: {
+      questionId: contributionId,
       interactionType: normalizedType,
-      weight: effectiveWeight,
-      context: contextResult.blockedFromDisplay ? null : contextResult.displayContext,
-      originalContext: contextResult.originalContext,
+      answer: normalizedType === 'ANSWER' ? contextResult.displayContext : null,
+      context: normalizedType === 'ANSWER' ? null : contextResult.displayContext,
+      roleCategory: user.roleCategory,
+      verificationStatus: user.verificationStatus,
       correlationRisk: contextResult.correlationRisk,
-      displayStatus: contextResult.blockedFromDisplay ? 'PENDING_REVIEW' : 'VISIBLE',
+      visibility: contextResult.blockedFromDisplay ? 'PENDING_REVIEW' : 'COMMUNITY_VISIBLE',
     },
   });
+  const [interaction] = await prisma.$transaction([
+    prisma.interaction.create(interactionData),
+    prisma.knowledgeLedgerEvent.create({ data: ledgerEvent }),
+  ]);
 
   if (contribution.userId) {
     await triggerReturnLoopForInteraction({
@@ -180,7 +223,7 @@ export async function GET(
     const contribution = await prisma.contribution.findUnique({
       where: {
         id: contributionId,
-        contributionType: 'situation',
+        contributionType: { in: ['question', 'situation'] },
       },
       include: {
         interactions: {

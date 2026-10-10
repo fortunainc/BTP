@@ -316,7 +316,7 @@ export default function DashboardPage() {
             <div className="space-y-3">
               <p className="text-sm text-slate-400">Resolution Status</p>
               {Object.keys(metrics.resolutions).length === 0 ? (
-                <p className="text-sm text-slate-500">No situations yet</p>
+                <p className="text-sm text-slate-500">No questions yet</p>
               ) : (
                 Object.entries(metrics.resolutions).map(([status, count]) => (
                   <div key={status} className="flex items-center justify-between p-3 bg-slate-800/50 rounded-lg">
@@ -336,7 +336,7 @@ export default function DashboardPage() {
                   className="flex items-center gap-2 text-sm text-cyan-400 hover:text-cyan-300"
                 >
                   <ArrowRight className="w-4 h-4" />
-                  Submit a new situation
+                  Ask a new question
                 </Link>
                 {!metrics.account.isVerified && (
                   <Link

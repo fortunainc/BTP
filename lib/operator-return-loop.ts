@@ -15,6 +15,7 @@ import { applyAutomaticRedaction, calculateCorrelationRisk } from '@/lib/anti-co
 import { getOrCreateUserMetrics, trackEvent, EVENT_TYPES } from '@/lib/analytics-tracker';
 
 export type OperatorInteractionType =
+  | 'ANSWER'
   | 'SEEN_THIS'
   | 'TRIED_SIMILAR'
   | 'WORKED_FOR_US'
@@ -24,6 +25,7 @@ export type OperatorInteractionType =
   | 'STAYED_MANAGEABLE';
 
 export const OPERATOR_INTERACTION_TYPES: OperatorInteractionType[] = [
+  'ANSWER',
   'SEEN_THIS',
   'TRIED_SIMILAR',
   'WORKED_FOR_US',
@@ -52,6 +54,13 @@ export const INTERACTION_COPY: Record<OperatorInteractionType, {
   notificationClass: 'VALIDATION' | 'EXPANSION' | 'MOMENTUM' | 'PRESSURE' | 'OPPORTUNITY';
   notificationCopy: string;
 }> = {
+  ANSWER: {
+    label: 'Answer',
+    successMessage: 'Your answer is now visible to the BTP community.',
+    notificationVariantId: 'EXP-ANSWER',
+    notificationClass: 'EXPANSION',
+    notificationCopy: 'A verified operator answered your question.',
+  },
   SEEN_THIS: {
     label: "I've seen this",
     successMessage: 'Added anonymously. This helps show whether the situation is isolated.',
@@ -133,7 +142,7 @@ export function redactInteractionContext(context: string | undefined, riskContex
     };
   }
 
-  const trimmed = context.trim().slice(0, 200);
+  const trimmed = context.trim().slice(0, 2000);
   const { redactedContent } = applyAutomaticRedaction(trimmed);
   const risk = calculateCorrelationRisk(trimmed, {
     therapeuticArea: riskContext?.therapeuticArea || undefined,
@@ -142,8 +151,8 @@ export function redactInteractionContext(context: string | undefined, riskContex
   });
 
   return {
-    displayContext: redactedContent.slice(0, 200),
-    originalContext: trimmed,
+    displayContext: redactedContent.slice(0, 2000),
+    originalContext: null,
     correlationRisk: risk.riskScore,
     blockedFromDisplay: risk.riskScore >= HIGH_RISK_THRESHOLD,
   };
@@ -180,6 +189,10 @@ export function buildInteractionSummary(interactions: Array<{
 
   const total = normalized.length;
   const summaries: string[] = [];
+
+  if ((counts.ANSWER || 0) > 0) {
+    summaries.push('Verified operators have answered this question');
+  }
 
   if ((counts.SEEN_THIS || 0) > 0) {
     const bucket = bucketCount(counts.SEEN_THIS || 0);
@@ -395,6 +408,17 @@ export async function triggerReturnLoopForInteraction(params: {
 
   const seenCount = normalized.filter((type) => type === 'SEEN_THIS').length;
   const total = normalized.length;
+
+  if (params.interactionType === 'ANSWER') {
+    await createReturnLoopNotification({
+      authorId: params.authorId,
+      actorId: params.actorId,
+      contributionId: params.contributionId,
+      interactionType: params.interactionType,
+      trigger: 'WHAT_WORKED',
+    });
+    return;
+  }
 
   if (params.interactionType === 'SEEN_THIS' && seenCount === 1) {
     await createReturnLoopNotification({

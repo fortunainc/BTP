@@ -5,7 +5,7 @@
  * 
  * Rules:
  * - Single text field only
- * - Prompt: "What's happening in your trial that shouldn't be?"
+ * - Prompt: "What question do you need help answering?"
  * - Subtext: anonymity reminder
  * - Optional chips (NOT required)
  * - No required fields beyond text
@@ -192,7 +192,7 @@ export default function NewSituationPage() {
     e.preventDefault();
     
     if (!description.trim()) {
-      setError('Please describe what\'s happening');
+      setError('Please enter your question');
       return;
     }
 
@@ -238,7 +238,6 @@ export default function NewSituationPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           description: redactedContent,
-          originalDescription: description.trim(),
           chips: selectedChips,
           confirmedRedaction: true
         })
@@ -275,8 +274,8 @@ export default function NewSituationPage() {
     return (
       <div className="min-h-screen bg-slate-950 flex flex-col justify-center items-center px-4">
         <Loader2 className="w-12 h-12 text-cyan-500 animate-spin mb-4" />
-        <h2 className="text-xl font-semibold text-white mb-2">Translating your experience</h2>
-        <p className="text-slate-400 text-center mb-6">Comparing against similar anonymous context...</p>
+        <h2 className="text-xl font-semibold text-white mb-2">Preparing your question</h2>
+        <p className="text-slate-400 text-center mb-6">Protecting identifying details and organizing the context...</p>
         <div className="text-sm text-slate-500 text-center space-y-1">
           <p>Checking for pattern matches</p>
           <p>Identifying workarounds others have used</p>
@@ -296,8 +295,8 @@ export default function NewSituationPage() {
             <div className="w-16 h-16 bg-emerald-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
               <CheckCircle className="w-8 h-8 text-emerald-500" />
             </div>
-            <h1 className="text-2xl font-bold text-white mb-2">You said what you couldn't say anywhere else.</h1>
-            <p className="text-slate-400">Your situation has been turned into anonymous, structured context.</p>
+            <h1 className="text-2xl font-bold text-white mb-2">Your question is live.</h1>
+            <p className="text-slate-400">Verified BTP members can now answer it publicly without exposing their identity.</p>
           </div>
 
           {/* Anonymity Confirmation */}
@@ -549,7 +548,7 @@ export default function NewSituationPage() {
 
       <main className="max-w-2xl mx-auto px-4 py-8">
         <h1 className="text-2xl font-bold text-white mb-1">
-          What's happening in your trial that shouldn't be?
+          What question do you need help answering?
         </h1>
         <p className="text-slate-500 text-sm mb-6">
           Keep it anonymous. No names, sponsors, sites, protocol IDs, or patient details.
@@ -570,7 +569,7 @@ export default function NewSituationPage() {
               onChange={(e) => setDescription(e.target.value)}
               rows={5}
               className="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-3 text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-transparent resize-none text-base"
-              placeholder="e.g., 'We keep skipping the pharmacokinetic draws because the timing window is impossible with our patient volume' or 'Everyone knows the monitoring visit prep takes two full days but nobody accounts for it'"
+              placeholder="Ask the question you cannot get a clear answer to at work."
               autoFocus
             />
             <p className="text-xs text-slate-600 mt-1.5">

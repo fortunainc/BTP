@@ -27,6 +27,7 @@
  */
 
 import { NextRequest } from 'next/server';
+import { randomUUID } from 'crypto';
 import { prisma } from '@/lib/prisma';
 import { withAuth, createApiResponse, createErrorResponse } from '@/lib/api-auth';
 import { 
@@ -43,6 +44,7 @@ import { createPathwaysForContribution } from '@/lib/failure-pathway';
 import { scanForAggressiveTriggers } from '@/lib/micro-opportunity';
 import { getOrCreateUserMetrics, trackEvent, EVENT_TYPES } from '@/lib/analytics-tracker';
 import type { ExecutionSignal } from '@/lib/translation-engine';
+import { buildLedgerEvent } from '@/lib/knowledge-ledger';
 
 // Valid therapeutic areas
 const THERAPEUTIC_AREAS = [
@@ -82,26 +84,25 @@ const ISSUE_CATEGORIES = [
  * 
  * List situations with anonymity-preserving filters
  */
-export async function GET(request: NextRequest) {
+export const GET = withAuth(async (request: NextRequest, user) => {
   try {
+    if (user.verificationStatus !== 'Approved' && user.userRole !== 'admin') {
+      return createErrorResponse('Approved BTP membership is required', 403);
+    }
+
     const { searchParams } = new URL(request.url);
     const therapeuticArea = searchParams.get('therapeuticArea');
     const issueCategory = searchParams.get('issueCategory');
     const timeBucket = searchParams.get('timeBucket'); // 'today', 'week', 'month'
     
     // Build where clause
-    // SQS FILTER: Only show MEDIUM+ quality situations to users
-    // LOW SQS contributions are internal-only — they don't appear in feeds or patterns
-    // FOUNDER OVERRIDE: forceIncludeFromPatterns bypasses SQS gate; forceExcludeFromPatterns always wins
+    // Public questions remain discoverable regardless of their internal signal score.
+    // Safety review still wins: hidden, flagged, or founder-excluded records stay out.
     const where: Record<string, unknown> = {
-      contributionType: 'situation',
+      contributionType: { in: ['question', 'situation'] },
       isHidden: false,
       isFlagged: false,
       forceExcludeFromPatterns: false,
-      OR: [
-        { signalQualityScore: { in: ['HIGH', 'MEDIUM'] } },
-        { forceIncludeFromPatterns: true },
-      ],
     };
     
     if (therapeuticArea && THERAPEUTIC_AREAS.includes(therapeuticArea)) {
@@ -201,7 +202,7 @@ export async function GET(request: NextRequest) {
     console.error('Error fetching situations:', error);
     return createErrorResponse('Internal server error', 500);
   }
-}
+}, { requireAuth: true });
 
 /**
  * POST /api/situations
@@ -213,7 +214,6 @@ export async function GET(request: NextRequest) {
  * 
  * Parameters:
  *  - description: The SANITIZED content (user-reviewed)
- *  - originalDescription: The raw content (stored for audit only)
  *  - confirmedRedaction: Boolean confirming user saw the redacted version
  *  - chips: Optional context chips the user selected
  *  - category: Optional category hint (legacy)
@@ -223,7 +223,6 @@ export const POST = withAuth(async (req, user) => {
       const body = await req.json();
       const { 
         description, 
-        originalDescription,
         confirmedRedaction,
         chips,
         category,
@@ -249,9 +248,9 @@ export const POST = withAuth(async (req, user) => {
       }
       
       // ─── TRANSLATION ENGINE ───
-      // Run the full translation pipeline on the ORIGINAL content
-      // (extraction works better on raw text, but we store the sanitized version)
-      const rawText = originalDescription || description;
+      // The approved sanitized question is the source of truth. Raw preview
+      // text is not processed or retained after the user approves the preview.
+      const rawText = description;
       const { signal, structured } = translateAndStructure(rawText);
       
       // ─── REDACTION ───
@@ -259,9 +258,9 @@ export const POST = withAuth(async (req, user) => {
       let redactedDescription: string;
       let redactions: Array<{ original: string; replacement: string; type: string; position: [number, number] }>;
       
-      if (confirmedRedaction && originalDescription) {
-        // User confirmed the sanitized version — re-run redaction for audit trail
-        const redactionResult = applyAutomaticRedaction(originalDescription);
+      if (confirmedRedaction) {
+        // Re-run redaction on the approved text for defense in depth.
+        const redactionResult = applyAutomaticRedaction(description);
         redactedDescription = redactionResult.redactedContent;
         redactions = redactionResult.redactions;
       } else {
@@ -335,18 +334,20 @@ export const POST = withAuth(async (req, user) => {
       const priorSituationCount = await prisma.contribution.count({
         where: {
           userId: user.id,
-          contributionType: 'situation',
+          contributionType: { in: ['question', 'situation'] },
         },
       });
       
       // ─── CREATE THE CONTRIBUTION ───
-      const situation = await prisma.contribution.create({
+      const situationId = randomUUID();
+      const situationData = {
         data: {
+          id: situationId,
           userId: user.id,
-          contributionType: 'situation',
+          contributionType: 'question',
           title: generatedTitle,
           description: redactedDescription,
-          originalContent: rawText,
+          originalContent: null,
           therapeuticArea: finalTherapeuticArea,
           trialPhase: finalTrialPhase,
           issueCategory: finalIssueCategory,
@@ -394,7 +395,28 @@ export const POST = withAuth(async (req, user) => {
           predictiveSummary: signal.predictiveSummary,
           confidenceScore: signal.confidenceScore
         }
+      };
+      const ledgerEvent = buildLedgerEvent({
+        aggregateType: 'QUESTION',
+        aggregateId: situationId,
+        eventType: 'CREATED',
+        actorUserId: user.id,
+        payload: {
+          question: redactedDescription,
+          title: generatedTitle,
+          therapeuticArea: finalTherapeuticArea,
+          trialPhase: finalTrialPhase,
+          issueCategory: finalIssueCategory,
+          urgencyLevel: finalUrgencyLevel,
+          chips: chips || [],
+          redactionCount: redactions.length,
+          visibility: requiresReview ? 'PENDING_REVIEW' : 'COMMUNITY_VISIBLE',
+        },
       });
+      const [situation] = await prisma.$transaction([
+        prisma.contribution.create(situationData),
+        prisma.knowledgeLedgerEvent.create({ data: ledgerEvent }),
+      ]);
       
       // ─── CREATE EXECUTION SIGNAL EXTRACTION RECORD ───
       await prisma.executionSignalExtraction.create({
@@ -434,7 +456,7 @@ export const POST = withAuth(async (req, user) => {
           resourceType: 'Contribution',
           resourceId: situation.id,
           details: {
-            contributionType: 'situation',
+            contributionType: 'question',
             therapeuticArea: finalTherapeuticArea,
             issueCategory: finalIssueCategory,
             correlationRisk: riskResult.riskScore,

@@ -71,7 +71,7 @@ export default function HomePage() {
               href="/situations/new"
               className="px-4 py-2 bg-slate-800 hover:bg-slate-700 rounded-lg text-sm font-medium transition-colors"
             >
-              Share a situation
+              Ask a question
             </Link>
           </div>
         </div>
@@ -90,13 +90,13 @@ export default function HomePage() {
               href="/situations/new"
               className="px-8 py-4 bg-cyan-600 hover:bg-cyan-700 rounded-lg text-white font-medium transition-colors text-lg"
             >
-              Share a situation
+              Ask a question
             </Link>
             <Link
               href="/situations"
               className="px-8 py-4 bg-slate-800 hover:bg-slate-700 rounded-lg text-white font-medium transition-colors text-lg"
             >
-              View situations
+              View questions
             </Link>
           </div>
         </div>
@@ -156,14 +156,14 @@ export default function HomePage() {
 
           {loading ? (
             <div className="text-center py-12">
-              <p className="text-slate-400">Loading situations...</p>
+              <p className="text-slate-400">Loading questions...</p>
             </div>
           ) : situations.length === 0 ? (
             <div className="text-center py-12 border border-dashed border-slate-700 rounded-lg">
               <Lock className="w-12 h-12 text-slate-600 mx-auto mb-4" />
-              <p className="text-slate-400 mb-2">No situations shared yet. Be one of the first operators to share what's actually happening behind the protocol.</p>
+              <p className="text-slate-400 mb-2">No questions yet. Be one of the first members to ask what no one at work can answer clearly.</p>
               <Link href="/situations/new" className="inline-flex items-center gap-2 px-6 py-3 bg-cyan-600 text-white rounded-lg hover:bg-cyan-700 transition-colors mt-4">
-                Share a situation
+                Ask a question
               </Link>
             </div>
           ) : (

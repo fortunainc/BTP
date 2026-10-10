@@ -214,6 +214,7 @@ function extractPrivacySafeContexts(
   interactions: { interactionType: string; context: string | null; displayStatus?: string | null }[]
 ): Record<OperatorInteractionType, string[]> {
   const result: Record<OperatorInteractionType, string[]> = {
+    ANSWER: [],
     SEEN_THIS: [],
     TRIED_SIMILAR: [],
     WORKED_FOR_US: [],
