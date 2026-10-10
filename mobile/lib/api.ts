@@ -18,8 +18,8 @@ export async function apiRequest<T>(path: string, options: RequestOptions = {}):
   return response.json() as Promise<T>;
 }
 
-type SituationApi = { id: string; title: string; description?: string; issueCategory?: string; timeLabel?: string; answerCount?: number; isAuthor?: boolean };
-const toSummary = (item: SituationApi): QuestionSummary => ({ id: item.id, title: item.title, description: item.description, role: "Verified BTP member", topic: item.issueCategory || "Clinical trials", answerCount: item.answerCount ?? 0, createdLabel: item.timeLabel || "Recently", isAuthor: item.isAuthor });
+type SituationApi = { id: string; title: string; description?: string; issueCategory?: string; timeLabel?: string; hasVisibleAnswer?: boolean; isAuthor?: boolean };
+const toSummary = (item: SituationApi): QuestionSummary => ({ id: item.id, title: item.title, description: item.description, role: "Verified BTP member", topic: item.issueCategory || "Clinical trials", hasVisibleAnswer: item.hasVisibleAnswer ?? false, createdLabel: item.timeLabel || "Recently", isAuthor: item.isAuthor });
 
 export const api = {
   session: (token: string | null) => apiRequest<{

@@ -177,7 +177,9 @@ export function buildInteractionSummary(interactions: Array<{
   maturityLabel: string;
   updatedReflectionAvailable: boolean;
 } {
-  const visible = interactions.filter((i) => i.displayStatus !== 'BLOCKED' && i.displayStatus !== 'SUPPRESSED');
+  // Treat an omitted status as visible for legacy rows, but never let content
+  // awaiting moderation influence member-facing summaries or return loops.
+  const visible = interactions.filter((i) => !i.displayStatus || i.displayStatus === 'VISIBLE');
   const normalized = visible
     .map((i) => normalizeInteractionType(i.interactionType))
     .filter((type): type is OperatorInteractionType => Boolean(type));

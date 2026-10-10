@@ -3,7 +3,7 @@ export type QuestionSummary = {
   title: string;
   role: string;
   topic: string;
-  answerCount: number;
+  hasVisibleAnswer: boolean;
   createdLabel: string;
   description?: string;
   isAuthor?: boolean;

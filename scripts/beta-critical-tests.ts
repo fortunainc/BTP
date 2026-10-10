@@ -33,6 +33,11 @@ function testQuestionAndAnswerSummary() {
       context: 'Moderated content must not affect the member summary.',
       displayStatus: 'SUPPRESSED',
     },
+    {
+      interactionType: 'WORKED_FOR_US',
+      context: 'Pending review must not leak into member-facing signals.',
+      displayStatus: 'PENDING_REVIEW',
+    },
   ]);
 
   assert.equal(summary.hasInteractions, true);

@@ -16,8 +16,8 @@ export function QuestionCard({ question }: { question: QuestionSummary }) {
       <View style={styles.footer}>
         <View style={styles.tag}><Text style={styles.tagText}>{question.topic}</Text></View>
         <View style={styles.answers}>
-          <Ionicons color={colors.muted} name="chatbubble-outline" size={15} />
-          <Text style={styles.answerText}>{question.answerCount} answers</Text>
+          <Ionicons color={colors.muted} name={question.hasVisibleAnswer ? "checkmark-circle-outline" : "chatbubble-outline"} size={15} />
+          <Text style={styles.answerText}>{question.hasVisibleAnswer ? "Answered" : "Needs an answer"}</Text>
         </View>
       </View>
     </Pressable>

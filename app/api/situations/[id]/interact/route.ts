@@ -164,7 +164,9 @@ export const POST = withAuth(async (req, user) => {
     prisma.knowledgeLedgerEvent.create({ data: ledgerEvent }),
   ]);
 
-  if (contribution.userId) {
+  // Do not alert an asker about content that members cannot see yet. Founder
+  // moderation can trigger the appropriate notification after approval.
+  if (contribution.userId && !contextResult.blockedFromDisplay) {
     await triggerReturnLoopForInteraction({
       contributionId,
       authorId: contribution.userId,

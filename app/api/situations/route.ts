@@ -150,6 +150,10 @@ export const GET = withAuth(async (request: NextRequest, user) => {
         createdAt: true,
         // NO userId - complete anonymity
         interactions: {
+          where: {
+            interactionType: 'ANSWER',
+            displayStatus: 'VISIBLE',
+          },
           select: {
             interactionType: true
           }
@@ -166,11 +170,6 @@ export const GET = withAuth(async (request: NextRequest, user) => {
       // Bucket the timestamp
       const timeBucketInfo = bucketTimestamp(situation.createdAt);
       
-      // Get interaction types present (NOT counts)
-      const interactionTypes = [...new Set(
-        situation.interactions.map(i => i.interactionType)
-      )];
-      
       return {
         id: situation.id,
         title: situation.title,
@@ -183,9 +182,13 @@ export const GET = withAuth(async (request: NextRequest, user) => {
         // Time bucket instead of exact timestamp
         timeBucket: timeBucketInfo.bucket,
         timeLabel: timeBucketInfo.label,
-        // Interaction presence (NOT counts)
+        // Coarse response state only. Pending, suppressed, and blocked answers
+        // must not leak into member-facing discovery.
+        hasVisibleAnswer: situation.interactions.length > 0,
+        // Retain the existing web list contract without exposing any additional
+        // interaction state. These aliases now describe visible answers only.
         hasInteractions: situation.interactions.length > 0,
-        interactionTypesPresent: interactionTypes
+        interactionTypesPresent: situation.interactions.length > 0 ? ['ANSWER'] : [],
       };
     });
     

@@ -6,7 +6,7 @@ export const previewQuestions: QuestionSummary[] = [
     title: "How have other sites handled a study process that changed before the written guidance caught up?",
     role: "Site regulatory professional",
     topic: "Study execution",
-    answerCount: 3,
+    hasVisibleAnswer: true,
     createdLabel: "2h",
   },
   {
@@ -14,7 +14,7 @@ export const previewQuestions: QuestionSummary[] = [
     title: "What is a practical way to restore continuity after repeated monitor transitions?",
     role: "Clinical research coordinator",
     topic: "Monitoring",
-    answerCount: 1,
+    hasVisibleAnswer: false,
     createdLabel: "5h",
   },
 ];
