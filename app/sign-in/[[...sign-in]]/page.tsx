@@ -1,4 +1,5 @@
 import { SignIn } from '@clerk/nextjs';
+import Link from 'next/link';
 
 export default function SignInPage() {
   const publishableKey = process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY;
@@ -24,9 +25,9 @@ export default function SignInPage() {
               Authentication is currently being configured. Please check back shortly.
             </p>
           </div>
-          <a href="/" className="text-blue-400 hover:text-blue-300 underline">
+          <Link href="/" className="text-blue-400 hover:text-blue-300 underline">
             Return to Home
-          </a>
+          </Link>
         </div>
       </div>
     );

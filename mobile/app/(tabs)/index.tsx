@@ -1,19 +1,28 @@
-import { useEffect, useState } from "react";
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import { useCallback, useEffect, useState } from "react";
+import { ActivityIndicator, Pressable, StyleSheet, Text, View } from "react-native";
 import { router } from "expo-router";
 
 import { AppScreen } from "@/components/AppScreen";
 import { QuestionCard } from "@/components/QuestionCard";
 import { colors, spacing } from "@/constants/theme";
-import { previewQuestions } from "@/data/preview";
 import { api, liveApiConfigured } from "@/lib/api";
 import { useBtpAuth } from "@/lib/auth";
 import type { QuestionSummary } from "@/types/question";
 
 export default function HomeScreen() {
   const auth = useBtpAuth();
-  const [questions, setQuestions] = useState<QuestionSummary[]>(previewQuestions);
-  useEffect(() => { if (liveApiConfigured && auth.signedIn) void auth.getToken().then(api.questions.list).then((items) => setQuestions(items.slice(0, 3))).catch(() => undefined); }, [auth]);
+  const { getToken, signedIn } = auth;
+  const [questions, setQuestions] = useState<QuestionSummary[]>([]);
+  const [loading, setLoading] = useState(liveApiConfigured);
+  const [error, setError] = useState("");
+  const load = useCallback(async () => {
+    if (!liveApiConfigured || !signedIn) return;
+    setLoading(true); setError("");
+    try { setQuestions((await api.questions.list(await getToken())).slice(0, 3)); }
+    catch (e) { setQuestions([]); setError(e instanceof Error ? e.message : "Could not load questions."); }
+    finally { setLoading(false); }
+  }, [getToken, signedIn]);
+  useEffect(() => { void load(); }, [load]);
   return (
     <AppScreen>
       <View style={styles.heading}>
@@ -30,7 +39,7 @@ export default function HomeScreen() {
         <Text style={styles.sectionTitle}>Needs your experience</Text>
         <Pressable onPress={() => router.push("/(tabs)/questions")}><Text style={styles.link}>See all</Text></Pressable>
       </View>
-      {questions.map((question) => <QuestionCard key={question.id} question={question} />)}
+      {loading ? <View style={styles.state}><ActivityIndicator color={colors.accent}/><Text style={styles.stateText}>Loading questions…</Text></View> : error ? <View style={styles.state}><Text style={styles.errorTitle}>Questions are unavailable</Text><Text style={styles.stateText}>{error}</Text><Pressable onPress={() => void load()} style={styles.retry}><Text style={styles.retryText}>Retry</Text></Pressable></View> : questions.length === 0 ? <View style={styles.state}><Text style={styles.emptyTitle}>No questions need an answer yet</Text><Text style={styles.stateText}>You can ask the first question or check again later.</Text></View> : questions.map((question) => <QuestionCard key={question.id} question={question} />)}
     </AppScreen>
   );
 }
@@ -47,4 +56,10 @@ const styles = StyleSheet.create({
   sectionHeader: { alignItems: "center", flexDirection: "row", justifyContent: "space-between", marginTop: spacing.sm },
   sectionTitle: { color: colors.ink, fontSize: 19, fontWeight: "700" },
   link: { color: colors.accent, fontSize: 14, fontWeight: "700" },
+  state: { alignItems: "center", backgroundColor: colors.surface, borderColor: colors.border, borderRadius: 18, borderWidth: 1, gap: spacing.sm, padding: spacing.lg },
+  stateText: { color: colors.muted, fontSize: 14, lineHeight: 20, textAlign: "center" },
+  errorTitle: { color: colors.danger, fontSize: 16, fontWeight: "700" },
+  emptyTitle: { color: colors.ink, fontSize: 16, fontWeight: "700" },
+  retry: { borderColor: colors.accent, borderRadius: 12, borderWidth: 1, paddingHorizontal: spacing.lg, paddingVertical: spacing.sm },
+  retryText: { color: colors.accent, fontWeight: "700" },
 });

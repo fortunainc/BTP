@@ -22,6 +22,10 @@ type SituationApi = { id: string; title: string; description?: string; issueCate
 const toSummary = (item: SituationApi): QuestionSummary => ({ id: item.id, title: item.title, description: item.description, role: "Verified BTP member", topic: item.issueCategory || "Clinical trials", answerCount: item.answerCount ?? 0, createdLabel: item.timeLabel || "Recently", isAuthor: item.isAuthor });
 
 export const api = {
+  session: (token: string | null) => apiRequest<{
+    authenticated: boolean;
+    member: { id: string; handle: string; roleCategory?: string | null; companyCategory?: string | null; verificationStatus?: string | null; approved: boolean };
+  }>("/api/mobile/session", { token }),
   questions: {
     async list(token: string | null) { const result = await apiRequest<{ situations: SituationApi[] }>("/api/situations", { token }); return result.situations.map(toSummary); },
     async detail(token: string | null, id: string): Promise<QuestionDetail> { const result = await apiRequest<{ situation: SituationApi; answers: QuestionDetail["answers"]; isAuthor?: boolean }>(`/api/situations/${id}`, { token }); const q = toSummary(result.situation); return { ...q, isAuthor: result.situation.isAuthor ?? result.isAuthor ?? false, description: result.situation.description || result.situation.title, answers: result.answers || [] }; },

@@ -123,8 +123,10 @@ function simulate() {
   assert.equal(bucketCount(12), 'many');
   assert.equal(bucketCount(30), 'showing up repeatedly');
 
-  // Seven structured types remain the only allowed public interaction controls.
+  // Answer plus seven structured context types remain the only allowed public
+  // interaction controls. ANSWER is part of the beta's core help loop.
   assert.deepEqual(OPERATOR_INTERACTION_TYPES, [
+    'ANSWER',
     'SEEN_THIS',
     'TRIED_SIMILAR',
     'WORKED_FOR_US',

@@ -1,20 +1,51 @@
 import { ClerkProvider, useAuth, useSignIn } from "@clerk/clerk-expo";
 import * as SecureStore from "expo-secure-store";
-import { createContext, type PropsWithChildren, useContext, useState } from "react";
+import { createContext, type PropsWithChildren, useCallback, useContext, useEffect, useState } from "react";
 import { ActivityIndicator, Alert, Pressable, StyleSheet, Text, TextInput, View } from "react-native";
 import { colors, spacing } from "@/constants/theme";
+import { api, ApiError, liveApiConfigured } from "@/lib/api";
 
-type AuthState = { configured: boolean; ready: boolean; signedIn: boolean; getToken: () => Promise<string | null>; signOut: () => Promise<void> };
+export type BtpMember = { id: string; handle: string; roleCategory?: string | null; companyCategory?: string | null; verificationStatus?: string | null; approved: boolean };
+type AuthState = { configured: boolean; ready: boolean; signedIn: boolean; member: BtpMember | null; getToken: () => Promise<string | null>; signOut: () => Promise<void> };
 const publishableKey = process.env.EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY;
 const devToken = process.env.EXPO_PUBLIC_DEV_AUTH_TOKEN;
-const AuthContext = createContext<AuthState>({ configured: Boolean(devToken), ready: true, signedIn: Boolean(devToken), getToken: async () => devToken ?? null, signOut: async () => undefined });
+const AuthContext = createContext<AuthState>({ configured: Boolean(devToken), ready: true, signedIn: Boolean(devToken), member: null, getToken: async () => devToken ?? null, signOut: async () => undefined });
 const tokenCache = { getToken: (key: string) => SecureStore.getItemAsync(key), saveToken: (key: string, value: string) => SecureStore.setItemAsync(key, value) };
 
 function ClerkBridge({ children }: PropsWithChildren) {
   const { getToken, isLoaded, isSignedIn, signOut } = useAuth();
+  const [member, setMember] = useState<BtpMember | null>(null);
+  const [checking, setChecking] = useState(true);
+  const [error, setError] = useState("");
+  const [notFound, setNotFound] = useState(false);
+  const checkMembership = useCallback(async () => {
+    if (!isSignedIn || !liveApiConfigured) return;
+    setChecking(true); setError(""); setNotFound(false);
+    try {
+      const result = await api.session(await getToken());
+      setMember(result.member);
+    } catch (e) {
+      setMember(null);
+      if (e instanceof ApiError && e.status === 404) setNotFound(true);
+      else setError(e instanceof Error ? e.message : "Could not verify your BTP membership.");
+    } finally { setChecking(false); }
+  }, [getToken, isSignedIn]);
+  useEffect(() => { if (isLoaded && isSignedIn) void checkMembership(); }, [checkMembership, isLoaded, isSignedIn]);
   if (!isLoaded) return <View style={styles.center}><ActivityIndicator color={colors.accent}/></View>;
   if (!isSignedIn) return <SignInScreen/>;
-  return <AuthContext.Provider value={{ configured: true, ready: true, signedIn: true, getToken: async () => getToken(), signOut }}>{children}</AuthContext.Provider>;
+  if (!liveApiConfigured) return <AccessScreen title="App setup needed" copy="This build is not connected to the BTP service." onRetry={checkMembership} onSignOut={signOut} retryLabel="Try again" />;
+  if (checking) return <View style={styles.center}><ActivityIndicator color={colors.accent}/><Text style={styles.checking}>Checking your BTP membership…</Text></View>;
+  if (error) return <AccessScreen title="Could not verify access" copy={error} onRetry={checkMembership} onSignOut={signOut} retryLabel="Retry" />;
+  if (notFound) return <AccessScreen title="Invitation setup incomplete" copy="This sign-in is not connected to a BTP member account yet. Contact BTP to finish your invitation." onRetry={checkMembership} onSignOut={signOut} retryLabel="Check again" />;
+  if (!member?.approved) {
+    const rejected = member?.verificationStatus?.toLowerCase() === "rejected";
+    return <AccessScreen title={rejected ? "Access not approved" : "Verification pending"} copy={rejected ? "This account is not approved for the BTP beta. Contact BTP if you think this is an error." : "BTP is reviewing your invitation and professional verification. You’ll be able to enter once it is approved."} onRetry={checkMembership} onSignOut={signOut} retryLabel="Check status" />;
+  }
+  return <AuthContext.Provider value={{ configured: true, ready: true, signedIn: true, member, getToken: async () => getToken(), signOut }}>{children}</AuthContext.Provider>;
+}
+
+function AccessScreen({ title, copy, onRetry, onSignOut, retryLabel }: { title: string; copy: string; onRetry: () => Promise<void>; onSignOut: () => Promise<void>; retryLabel: string }) {
+  return <View style={styles.access}><Text style={styles.brand}>BTP</Text><Text style={styles.title}>{title}</Text><Text style={styles.copy}>{copy}</Text><Pressable onPress={() => void onRetry()} style={styles.button}><Text style={styles.buttonText}>{retryLabel}</Text></Pressable><Pressable onPress={() => void onSignOut()} style={styles.secondary}><Text style={styles.secondaryText}>Sign out</Text></Pressable></View>;
 }
 
 function SignInScreen() {
@@ -29,4 +60,4 @@ export function BtpAuthProvider({ children }: PropsWithChildren) {
 }
 export function useBtpAuth() { return useContext(AuthContext); }
 
-const styles=StyleSheet.create({center:{alignItems:"center",backgroundColor:colors.background,flex:1,justifyContent:"center"},signIn:{backgroundColor:colors.background,flex:1,gap:spacing.md,justifyContent:"center",padding:spacing.lg},brand:{color:colors.accent,fontSize:14,fontWeight:"900",letterSpacing:3},title:{color:colors.ink,fontSize:32,fontWeight:"700"},copy:{color:colors.muted,fontSize:15,lineHeight:22,marginBottom:spacing.sm},input:{backgroundColor:colors.surface,borderColor:colors.border,borderRadius:14,borderWidth:1,color:colors.ink,fontSize:16,padding:15},button:{alignItems:"center",backgroundColor:colors.accent,borderRadius:14,padding:16},buttonText:{color:colors.white,fontSize:16,fontWeight:"700"},disabled:{opacity:.45},note:{color:colors.muted,fontSize:12,lineHeight:18,textAlign:"center"}});
+const styles=StyleSheet.create({center:{alignItems:"center",backgroundColor:colors.background,flex:1,gap:spacing.md,justifyContent:"center",padding:spacing.lg},checking:{color:colors.muted,fontSize:14},access:{backgroundColor:colors.background,flex:1,gap:spacing.md,justifyContent:"center",padding:spacing.lg},signIn:{backgroundColor:colors.background,flex:1,gap:spacing.md,justifyContent:"center",padding:spacing.lg},brand:{color:colors.accent,fontSize:14,fontWeight:"900",letterSpacing:3},title:{color:colors.ink,fontSize:32,fontWeight:"700"},copy:{color:colors.muted,fontSize:15,lineHeight:22,marginBottom:spacing.sm},input:{backgroundColor:colors.surface,borderColor:colors.border,borderRadius:14,borderWidth:1,color:colors.ink,fontSize:16,padding:15},button:{alignItems:"center",backgroundColor:colors.accent,borderRadius:14,padding:16},buttonText:{color:colors.white,fontSize:16,fontWeight:"700"},secondary:{alignItems:"center",borderColor:colors.border,borderRadius:14,borderWidth:1,padding:15},secondaryText:{color:colors.ink,fontSize:15,fontWeight:"700"},disabled:{opacity:.45},note:{color:colors.muted,fontSize:12,lineHeight:18,textAlign:"center"}});
