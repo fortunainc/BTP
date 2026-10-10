@@ -1,4 +1,4 @@
-import type { ActivityItem, PrivateHelpRequest, QuestionDetail, QuestionSummary } from "@/types/question";
+import type { ActivityItem, AnswerSubmission, HelpType, OutcomeType, PrivateHelpRequest, QuestionDetail, QuestionSummary } from "@/types/question";
 
 const API_URL = process.env.EXPO_PUBLIC_API_URL;
 export const liveApiConfigured = Boolean(API_URL);
@@ -31,11 +31,11 @@ export const api = {
     async detail(token: string | null, id: string): Promise<QuestionDetail> { const result = await apiRequest<{ situation: SituationApi; answers: QuestionDetail["answers"]; isAuthor?: boolean }>(`/api/situations/${id}`, { token }); const q = toSummary(result.situation); return { ...q, isAuthor: result.situation.isAuthor ?? result.isAuthor ?? false, description: result.situation.description || result.situation.title, answers: result.answers || [] }; },
     review: (token: string | null, description: string) => apiRequest<{ redactedContent: string; redactionsApplied: number; message: string; piiWarning?: string | null }>("/api/situations/review", { token, method: "POST", body: JSON.stringify({ description }) }),
     create: (token: string | null, description: string) => apiRequest<{ id: string; message: string }>("/api/situations", { token, method: "POST", body: JSON.stringify({ description, confirmedRedaction: true }) }),
-    answer: (token: string | null, id: string, context: string) => apiRequest(`/api/situations/${id}/interact`, { token, method: "POST", body: JSON.stringify({ interactionType: "ANSWER", context }) }),
+    answer: (token: string | null, id: string, context: string) => apiRequest<AnswerSubmission>(`/api/situations/${id}/interact`, { token, method: "POST", body: JSON.stringify({ interactionType: "ANSWER", context }) }),
     followState: (token: string | null, id: string) => apiRequest<{ following: boolean }>(`/api/situations/${id}/follow`, { token }),
     follow: (token: string | null, id: string, following: boolean) => apiRequest<{ following: boolean }>(`/api/situations/${id}/follow`, { token, method: following ? "POST" : "DELETE" }),
-    outcome: (token: string | null, id: string, outcomeType: string, outcomeData: string) => apiRequest(`/api/situations/${id}/outcome`, { token, method: "POST", body: JSON.stringify({ outcomeType, outcomeData, wasHelpful: ["resolution", "validation"].includes(outcomeType) }) }),
-    privateHelp: (token: string | null, id: string, helpType: string, details: string, timing: string) => apiRequest("/api/help-requests", { token, method: "POST", body: JSON.stringify({ contributionId: id, helpType, details, timing }) }),
+    outcome: (token: string | null, id: string, outcomeType: OutcomeType, outcomeData: string) => apiRequest(`/api/situations/${id}/outcome`, { token, method: "POST", body: JSON.stringify({ outcomeType, outcomeData }) }),
+    privateHelp: (token: string | null, id: string, helpType: HelpType, details: string, timing: string) => apiRequest("/api/help-requests", { token, method: "POST", body: JSON.stringify({ contributionId: id, helpType, details, timing }) }),
     helpfulState: (token: string | null, answerId: string) => apiRequest<{ helpful: boolean }>(`/api/answers/${answerId}/helpful`, { token }),
     helpful: (token: string | null, answerId: string, helpful: boolean) => apiRequest<{ helpful: boolean }>(`/api/answers/${answerId}/helpful`, { token, method: helpful ? "POST" : "DELETE" }),
     report: (token: string | null, contentType: "QUESTION" | "ANSWER", contentId: string, reason: string, description?: string) => apiRequest<{ success: boolean; alreadyReported?: boolean }>("/api/reports", { token, method: "POST", body: JSON.stringify({ contentType, contentId, reason, description }) }),
