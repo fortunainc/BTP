@@ -32,6 +32,10 @@ const OUTCOME_TYPES = [
  * Record an outcome for a contribution
  */
 export const POST = withAuth(async (req, user) => {
+      if (user.verificationStatus !== 'Approved' && user.userRole !== 'admin') {
+        return createErrorResponse('Approved BTP membership is required', 403);
+      }
+
       // Extract contributionId from URL path: /api/situations/[id]/outcome
       const url = new URL(req.url);
       const pathSegments = url.pathname.split('/');
@@ -41,8 +45,6 @@ export const POST = withAuth(async (req, user) => {
       const { 
         outcomeType, 
         outcomeData, 
-        wasHelpful,
-        impactScore
       } = body;
 
       // Validate outcome type
@@ -62,12 +64,23 @@ export const POST = withAuth(async (req, user) => {
           id: true,
           userId: true,
           therapeuticArea: true,
-          contributionType: true
+          contributionType: true,
+          isHidden: true,
+          isFlagged: true,
+          forceExcludeFromPatterns: true,
         }
       });
 
       if (!contribution) {
         return createErrorResponse('Contribution not found', 404);
+      }
+
+      if (contribution.isHidden || contribution.isFlagged || contribution.forceExcludeFromPatterns) {
+        return createErrorResponse('Contribution not found', 404);
+      }
+
+      if (contribution.userId !== user.id && user.userRole !== 'admin') {
+        return createErrorResponse('Only the question author can report what happened', 403);
       }
 
       // Check if outcome already exists
@@ -85,24 +98,21 @@ export const POST = withAuth(async (req, user) => {
         );
       }
 
-      // Calculate impact score if not provided
-      let finalImpactScore = impactScore;
-      if (finalImpactScore === undefined) {
-        // Default impact scores based on outcome type
-        const defaultImpactScores: Record<string, number> = {
-          resolution: 1.0,
-          validation: 0.8,
-          correction: 0.3,
-          incomplete: 0.2,
-          misleading: -0.5
-        };
-        finalImpactScore = defaultImpactScores[outcomeType];
-      }
+      // Impact is derived from the validated outcome type. Never trust a
+      // client-supplied score because it feeds trust and quality signals.
+      const defaultImpactScores: Record<string, number> = {
+        resolution: 1.0,
+        validation: 0.8,
+        correction: 0.3,
+        incomplete: 0.2,
+        misleading: -0.5
+      };
+      const finalImpactScore = defaultImpactScores[outcomeType];
 
       const sanitizedOutcomeData = typeof outcomeData === 'string'
         ? applyAutomaticRedaction(outcomeData.slice(0, 2000)).redactedContent
         : null;
-      const finalWasHelpful = wasHelpful !== undefined ? wasHelpful : (finalImpactScore > 0);
+      const finalWasHelpful = finalImpactScore > 0;
 
       // Create contribution outcome
       const outcomeId = randomUUID();
@@ -150,7 +160,7 @@ export const POST = withAuth(async (req, user) => {
           details: {
             outcomeType,
             impactScore: finalImpactScore,
-            wasHelpful,
+            wasHelpful: finalWasHelpful,
             targetUserId: contribution.userId
           }
         }
@@ -169,12 +179,25 @@ export const POST = withAuth(async (req, user) => {
  * 
  * Get outcome summary for a contribution (aggregated, not individual)
  */
-export async function GET(
-  request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
-) {
+export const GET = withAuth(async (request: NextRequest, user) => {
   try {
-    const { id: contributionId } = await params;
+    if (user.verificationStatus !== 'Approved' && user.userRole !== 'admin') {
+      return createErrorResponse('Approved BTP membership is required', 403);
+    }
+
+    const contributionId = new URL(request.url).pathname.split('/')[3];
+
+    const contribution = await prisma.contribution.findFirst({
+      where: {
+        id: contributionId,
+        contributionType: { in: ['question', 'situation'] },
+        isHidden: false,
+        isFlagged: false,
+        forceExcludeFromPatterns: false,
+      },
+      select: { id: true },
+    });
+    if (!contribution) return createErrorResponse('Contribution not found', 404);
 
     // Get aggregated outcomes (no individual user data)
     const outcomes = await prisma.contributionOutcome.findMany({
@@ -214,7 +237,7 @@ export async function GET(
     console.error('Error fetching outcomes:', error);
     return createErrorResponse('Internal server error', 500);
   }
-}
+}, { requireAuth: true });
 
 /**
  * Get user-friendly message for outcome type

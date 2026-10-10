@@ -45,7 +45,13 @@ export const POST = withAuth(async (req, user) => {
   if (rawDetails.length > 2000) return createErrorResponse('Details must be 2,000 characters or fewer', 400);
 
   const question = await prisma.contribution.findFirst({
-    where: { id: contributionId, contributionType: { in: ['question', 'situation'] } },
+    where: {
+      id: contributionId,
+      contributionType: { in: ['question', 'situation'] },
+      isHidden: false,
+      isFlagged: false,
+      forceExcludeFromPatterns: false,
+    },
     select: { id: true },
   });
   if (!question) return createErrorResponse('Question not found', 404);

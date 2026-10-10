@@ -42,6 +42,10 @@ const INTERACTION_BASE_WEIGHTS: Record<OperatorInteractionType, number> = {
  * Record one structured, anonymous operator interaction.
  */
 export const POST = withAuth(async (req, user) => {
+  if (user.verificationStatus !== 'Approved' && user.userRole !== 'admin') {
+    return createErrorResponse('Approved BTP membership is required', 403);
+  }
+
   const url = new URL(req.url);
   const pathSegments = url.pathname.split('/');
   const contributionId = pathSegments[3];
@@ -49,10 +53,6 @@ export const POST = withAuth(async (req, user) => {
   const body = await req.json();
   const normalizedType = normalizeInteractionType(String(body.interactionType || ''));
   const rawContext = typeof body.context === 'string' ? body.context : undefined;
-
-  if (normalizedType === 'ANSWER' && user.verificationStatus !== 'Approved') {
-    return createErrorResponse('Only verified BTP members can publish answers', 403);
-  }
 
   if (!normalizedType || !OPERATOR_INTERACTION_TYPES.includes(normalizedType)) {
     return createErrorResponse(
@@ -86,10 +86,17 @@ export const POST = withAuth(async (req, user) => {
       therapeuticArea: true,
       trialPhase: true,
       issueCategory: true,
+      isHidden: true,
+      isFlagged: true,
+      forceExcludeFromPatterns: true,
     },
   });
 
   if (!contribution) {
+    return createErrorResponse('Question not found', 404);
+  }
+
+  if (contribution.isHidden || contribution.isFlagged || contribution.forceExcludeFromPatterns) {
     return createErrorResponse('Question not found', 404);
   }
 
@@ -213,17 +220,21 @@ export const POST = withAuth(async (req, user) => {
  *
  * Return privacy-safe interaction summary only.
  */
-export async function GET(
-  request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
-) {
+export const GET = withAuth(async (request: NextRequest, user) => {
   try {
-    const { id: contributionId } = await params;
+    if (user.verificationStatus !== 'Approved' && user.userRole !== 'admin') {
+      return createErrorResponse('Approved BTP membership is required', 403);
+    }
+
+    const contributionId = new URL(request.url).pathname.split('/')[3];
 
     const contribution = await prisma.contribution.findUnique({
       where: {
         id: contributionId,
         contributionType: { in: ['question', 'situation'] },
+        isHidden: false,
+        isFlagged: false,
+        forceExcludeFromPatterns: false,
       },
       include: {
         interactions: {
@@ -250,4 +261,4 @@ export async function GET(
     console.error('Error fetching interactions:', error);
     return createErrorResponse('Internal server error', 500);
   }
-}
+}, { requireAuth: true });

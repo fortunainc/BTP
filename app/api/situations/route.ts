@@ -220,6 +220,10 @@ export const GET = withAuth(async (request: NextRequest, user) => {
  *  - role: Optional role hint (legacy)
  */
 export const POST = withAuth(async (req, user) => {
+      if (user.verificationStatus !== 'Approved' && user.userRole !== 'admin') {
+        return createErrorResponse('Approved BTP membership is required', 403);
+      }
+
       const body = await req.json();
       const { 
         description, 

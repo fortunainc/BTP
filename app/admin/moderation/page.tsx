@@ -9,27 +9,25 @@ type FlaggedContent = {
   contentType: string;
   contentId: string;
   reason: string;
+  description: string | null;
   status: string;
-  flaggedBy: {
-    anonymousHandle: string;
-  };
+  action: string | null;
+  contentState: string;
+  contentPreview: string | null;
   createdAt: string;
 };
 
 type AuditLog = {
   id: string;
   action: string;
-  entityType: string;
+  resourceType: string;
   details: any;
   createdAt: string;
-  user: {
-    anonymousHandle: string;
-  };
 };
 
 export default function AdminModerationPage() {
   const router = useRouter();
-  const { user, isAdmin } = useAuth();
+  const { isAdmin } = useAuth();
   const [flaggedContent, setFlaggedContent] = useState<FlaggedContent[]>([]);
   const [auditLogs, setAuditLogs] = useState<AuditLog[]>([]);
   const [loading, setLoading] = useState(true);
@@ -80,17 +78,28 @@ export default function AdminModerationPage() {
     }
   };
 
-  const handleRemoveContent = async (flagId: string, contentId: string, contentType: string) => {
-    if (!confirm('Remove this content? This action cannot be undone.')) return;
+  const handleHideContent = async (flagId: string) => {
+    if (!confirm('Hide this content from members? The source and report evidence will be preserved.')) return;
 
     try {
       const response = await fetch(`/api/admin/flagged-content/${flagId}/remove`, {
         method: 'POST',
       });
-      if (!response.ok) throw new Error('Failed to remove content');
+      if (!response.ok) throw new Error('Failed to hide content');
       await fetchData();
     } catch (error) {
-      console.error('Error removing content:', error);
+      console.error('Error hiding content:', error);
+    }
+  };
+
+  const handleRestoreContent = async (flagId: string) => {
+    if (!confirm('Restore this content to member visibility?')) return;
+    try {
+      const response = await fetch(`/api/admin/flagged-content/${flagId}/restore`, { method: 'POST' });
+      if (!response.ok) throw new Error('Failed to restore content');
+      await fetchData();
+    } catch (error) {
+      console.error('Error restoring content:', error);
     }
   };
 
@@ -98,7 +107,7 @@ export default function AdminModerationPage() {
     const styles = {
       Pending: 'bg-yellow-500/20 text-yellow-500',
       Dismissed: 'bg-gray-500/20 text-gray-500',
-      Removed: 'bg-red-500/20 text-red-500',
+      Resolved: 'bg-blue-500/20 text-blue-400',
     };
     return styles[status as keyof typeof styles] || 'bg-gray-500/20 text-gray-500';
   };
@@ -121,7 +130,7 @@ export default function AdminModerationPage() {
         {/* Header */}
         <div className="mb-8">
           <h1 className="text-3xl font-bold">Moderation Dashboard</h1>
-          <p className="text-gray-400 mt-1">Manage flagged content and view audit logs</p>
+          <p className="text-gray-400 mt-1">Review reports, hide or restore content, and preserve moderation evidence</p>
         </div>
 
         {/* Tabs */}
@@ -170,9 +179,11 @@ export default function AdminModerationPage() {
                       <h3 className="text-lg font-semibold mb-1">
                         Reason: {flag.reason}
                       </h3>
-                      <p className="text-sm text-gray-400">
-                        Flagged by: {flag.flaggedBy.anonymousHandle}
-                      </p>
+                      <p className="text-sm text-gray-400">Visibility: {flag.contentState}</p>
+                      {flag.description && <p className="text-sm text-gray-300 mt-2">Reporter note: {flag.description}</p>}
+                      {flag.contentPreview && (
+                        <pre className="mt-3 max-w-3xl whitespace-pre-wrap rounded bg-gray-900 p-3 text-xs text-gray-300">{flag.contentPreview}</pre>
+                      )}
                       <p className="text-xs text-gray-500 mt-1">
                         {new Date(flag.createdAt).toLocaleString()}
                       </p>
@@ -180,10 +191,10 @@ export default function AdminModerationPage() {
                     {flag.status === 'Pending' && (
                       <div className="flex gap-2">
                         <button
-                          onClick={() => handleRemoveContent(flag.id, flag.contentId, flag.contentType)}
+                          onClick={() => handleHideContent(flag.id)}
                           className="px-4 py-2 bg-red-600 hover:bg-red-700 rounded-lg text-sm font-medium transition-colors"
                         >
-                          Remove Content
+                          Hide Content
                         </button>
                         <button
                           onClick={() => handleDismissFlag(flag.id)}
@@ -192,6 +203,14 @@ export default function AdminModerationPage() {
                           Dismiss
                         </button>
                       </div>
+                    )}
+                    {flag.contentState !== 'VISIBLE' && flag.contentState !== 'MISSING' && (
+                      <button
+                        onClick={() => handleRestoreContent(flag.id)}
+                        className="px-4 py-2 bg-emerald-700 hover:bg-emerald-600 rounded-lg text-sm font-medium transition-colors"
+                      >
+                        Restore Content
+                      </button>
                     )}
                   </div>
                 </div>
@@ -218,12 +237,9 @@ export default function AdminModerationPage() {
                       <div className="flex items-center gap-3 mb-2">
                         <span className="font-semibold">{log.action}</span>
                         <span className="px-2 py-0.5 bg-blue-500/20 text-blue-500 rounded text-xs">
-                          {log.entityType}
+                          {log.resourceType}
                         </span>
                       </div>
-                      <p className="text-sm text-gray-400">
-                        User: {log.user.anonymousHandle}
-                      </p>
                       <p className="text-xs text-gray-500 mt-1">
                         {new Date(log.createdAt).toLocaleString()}
                       </p>

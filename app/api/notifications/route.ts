@@ -32,6 +32,10 @@ import { TriggerContext, TriggerEvent } from '@/lib/return-engine/types';
 
 export const GET = withAuth(async (request, user) => {
     try {
+      if (user.verificationStatus !== 'Approved' && user.userRole !== 'admin') {
+        return createErrorResponse('Approved BTP membership is required', 403);
+      }
+
       const { searchParams } = new URL(request.url);
       const unreadOnly = searchParams.get('unreadOnly') === 'true';
       const limit = parseInt(searchParams.get('limit') || '50');
@@ -128,6 +132,10 @@ export const GET = withAuth(async (request, user) => {
 
 export const POST = withAuth(async (request, user) => {
   try {
+    if (user.userRole !== 'admin') {
+      return createErrorResponse('Admin access required', 403);
+    }
+
     const body = await request.json();
     const { event, targetUserId, actorId, ...eventData } = body;
 

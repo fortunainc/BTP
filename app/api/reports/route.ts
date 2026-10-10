@@ -35,11 +35,22 @@ export const POST = withAuth(async (request, user) => {
   const storedContentType = contentType === 'QUESTION' ? 'Contribution' : 'Interaction';
   const contentExists = contentType === 'QUESTION'
     ? await prisma.contribution.findFirst({
-        where: { id: contentId, contributionType: { in: ['question', 'situation'] } },
+        where: {
+          id: contentId,
+          contributionType: { in: ['question', 'situation'] },
+          isHidden: false,
+          isFlagged: false,
+          forceExcludeFromPatterns: false,
+        },
         select: { id: true },
       })
     : await prisma.interaction.findFirst({
-        where: { id: contentId, interactionType: 'ANSWER' },
+        where: {
+          id: contentId,
+          interactionType: 'ANSWER',
+          displayStatus: 'VISIBLE',
+          contribution: { isHidden: false, isFlagged: false, forceExcludeFromPatterns: false },
+        },
         select: { id: true },
       });
 

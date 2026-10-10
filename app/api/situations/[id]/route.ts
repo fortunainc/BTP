@@ -57,7 +57,7 @@ export const GET = withAuth(async (req, user) => {
     return createErrorResponse('Situation not found', 404);
   }
 
-  if (situation.isHidden || situation.isFlagged) {
+  if (situation.isHidden || situation.isFlagged || situation.forceExcludeFromPatterns) {
     if (situation.userId !== user?.id && user?.userRole !== 'admin') {
       return createErrorResponse('Situation not found', 404);
     }
@@ -111,6 +111,7 @@ export const GET = withAuth(async (req, user) => {
       issueCategory: situation.issueCategory,
       urgencyLevel: situation.urgencyLevel,
       resolutionStatus: situation.resolutionStatus,
+      isAuthor: situation.userId === user.id,
       timeBucket: timeBucketInfo.bucket,
       timeLabel: timeBucketInfo.label,
     },

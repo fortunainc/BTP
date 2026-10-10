@@ -17,6 +17,10 @@ import { applyAutomaticRedaction } from '@/lib/anti-correlation';
 
 export const POST = withAuth(async (req: NextRequest, user) => {
   try {
+    if (user.verificationStatus !== 'Approved' && user.userRole !== 'admin') {
+      return createErrorResponse('Approved BTP membership is required', 403);
+    }
+
     const body = await req.json();
     const { description, chips } = body as { description?: string; chips?: string[] };
 

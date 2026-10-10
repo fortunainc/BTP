@@ -11,7 +11,7 @@ async function visibleAnswer(answerId: string) {
       id: answerId,
       interactionType: 'ANSWER',
       displayStatus: 'VISIBLE',
-      contribution: { isHidden: false, isFlagged: false },
+      contribution: { isHidden: false, isFlagged: false, forceExcludeFromPatterns: false },
     },
     select: { id: true, userId: true },
   });

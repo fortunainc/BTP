@@ -6,8 +6,18 @@ export type QuestionSummary = {
   answerCount: number;
   createdLabel: string;
   description?: string;
+  isAuthor?: boolean;
 };
 
 export type Answer = { id: string; text: string; role: string; timeLabel: string };
 export type QuestionDetail = QuestionSummary & { description: string; answers: Answer[] };
 export type ActivityItem = { id: string; title: string; detail: string; displayTime: string; read: boolean; questionId?: string | null };
+export type PrivateHelpRequest = {
+  id: string;
+  contributionId: string;
+  helpType: string;
+  details: string;
+  timing?: string | null;
+  status: string;
+  createdAt: string;
+};
