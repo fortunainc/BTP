@@ -251,23 +251,22 @@ model Interaction {
   @@index([interactionType])
 }
 
-// Immutable knowledge ledger. The application only appends sanitized question,
-// answer, help-request, moderation, and correction events. Database triggers in
-// the accompanying migration reject UPDATE and DELETE operations.
+// Content-free, append-only integrity ledger. Source records remain governed by
+// normal retention/deletion rules; this table stores only one-way proofs that an
+// event occurred. Database triggers reject UPDATE and DELETE operations.
 model KnowledgeLedgerEvent {
-  id              String   @id @default(cuid())
-  aggregateType   String // QUESTION, ANSWER, INTERACTION, OUTCOME, HELP_REQUEST
-  aggregateId     String
-  eventType       String // CREATED, HIDDEN, RESTORED, CORRECTED, etc.
-  sequence        Int      @default(0)
-  previousEventId String?
-  actorUserId     String?
-  payload         Json
-  payloadHash     String
-  createdAt       DateTime @default(now())
+  id                String   @id @default(cuid())
+  aggregateType     String // QUESTION, ANSWER, INTERACTION, OUTCOME, HELP_REQUEST
+  aggregateRefHash  String // one-way reference; never the source record ID
+  eventType         String // CREATED, HIDDEN, RESTORED, CORRECTED, etc.
+  sequence          Int      @default(0)
+  previousEventHash String?
+  contentHash       String // one-way digest of source event content
+  rowHash           String // database-sealed digest of this immutable proof row
+  createdAt         DateTime @default(now())
 
-  @@unique([aggregateType, aggregateId, sequence])
-  @@index([aggregateType, aggregateId, createdAt])
+  @@unique([aggregateType, aggregateRefHash, sequence])
+  @@index([aggregateType, aggregateRefHash, createdAt])
   @@index([eventType, createdAt])
 }
 

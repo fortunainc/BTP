@@ -3,21 +3,20 @@ CREATE EXTENSION IF NOT EXISTS pgcrypto;
 CREATE TABLE "KnowledgeLedgerEvent" (
     "id" TEXT NOT NULL,
     "aggregateType" TEXT NOT NULL,
-    "aggregateId" TEXT NOT NULL,
+    "aggregateRefHash" TEXT NOT NULL,
     "eventType" TEXT NOT NULL,
     "sequence" INTEGER NOT NULL DEFAULT 0,
-    "previousEventId" TEXT,
-    "actorUserId" TEXT,
-    "payload" JSONB NOT NULL,
-    "payloadHash" TEXT NOT NULL,
+    "previousEventHash" TEXT,
+    "contentHash" TEXT NOT NULL,
+    "rowHash" TEXT NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT "KnowledgeLedgerEvent_pkey" PRIMARY KEY ("id")
 );
 
-CREATE UNIQUE INDEX "KnowledgeLedgerEvent_aggregateType_aggregateId_sequence_key"
-ON "KnowledgeLedgerEvent"("aggregateType", "aggregateId", "sequence");
-CREATE INDEX "KnowledgeLedgerEvent_aggregateType_aggregateId_createdAt_idx"
-ON "KnowledgeLedgerEvent"("aggregateType", "aggregateId", "createdAt");
+CREATE UNIQUE INDEX "KnowledgeLedgerEvent_aggregateType_aggregateRefHash_sequence_key"
+ON "KnowledgeLedgerEvent"("aggregateType", "aggregateRefHash", "sequence");
+CREATE INDEX "KnowledgeLedgerEvent_aggregateType_aggregateRefHash_createdAt_idx"
+ON "KnowledgeLedgerEvent"("aggregateType", "aggregateRefHash", "createdAt");
 CREATE INDEX "KnowledgeLedgerEvent_eventType_createdAt_idx"
 ON "KnowledgeLedgerEvent"("eventType", "createdAt");
 
@@ -26,14 +25,13 @@ ON "KnowledgeLedgerEvent"("eventType", "createdAt");
 CREATE OR REPLACE FUNCTION seal_knowledge_ledger_event()
 RETURNS trigger AS $$
 BEGIN
-  NEW."payloadHash" := encode(digest(convert_to(
+  NEW."rowHash" := encode(digest(convert_to(
     coalesce(NEW."aggregateType", '') || chr(31) ||
-    coalesce(NEW."aggregateId", '') || chr(31) ||
+    coalesce(NEW."aggregateRefHash", '') || chr(31) ||
     coalesce(NEW."eventType", '') || chr(31) ||
     coalesce(NEW."sequence"::text, '') || chr(31) ||
-    coalesce(NEW."previousEventId", '') || chr(31) ||
-    coalesce(NEW."actorUserId", '') || chr(31) ||
-    coalesce(NEW."payload"::text, ''),
+    coalesce(NEW."previousEventHash", '') || chr(31) ||
+    coalesce(NEW."contentHash", ''),
     'UTF8'
   ), 'sha256'), 'hex');
   RETURN NEW;

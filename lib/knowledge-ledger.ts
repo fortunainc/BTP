@@ -22,24 +22,31 @@ export function buildLedgerEvent(input: {
   actorUserId?: string | null;
   payload: Prisma.InputJsonObject;
   sequence?: number;
-  previousEventId?: string | null;
+  previousEventHash?: string | null;
 }) {
   const id = randomUUID();
   const sequence = input.sequence ?? 0;
-  const immutableContent = {
+  const sourceEvent = {
     aggregateType: input.aggregateType,
     aggregateId: input.aggregateId,
     eventType: input.eventType,
     sequence,
-    previousEventId: input.previousEventId ?? null,
+    previousEventHash: input.previousEventHash ?? null,
     actorUserId: input.actorUserId ?? null,
     payload: input.payload,
   };
+  const hash = (value: unknown) => createHash('sha256').update(canonicalize(value)).digest('hex');
 
   return {
     id,
-    ...immutableContent,
-    payloadHash: createHash('sha256').update(canonicalize(immutableContent)).digest('hex'),
+    aggregateType: input.aggregateType,
+    aggregateRefHash: hash({ aggregateType: input.aggregateType, aggregateId: input.aggregateId }),
+    eventType: input.eventType,
+    sequence,
+    previousEventHash: input.previousEventHash ?? null,
+    contentHash: hash(sourceEvent),
+    // The database trigger replaces this placeholder with its own seal.
+    rowHash: '',
   };
 }
 

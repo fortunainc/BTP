@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
 import { withAuth } from '@/lib/api-auth';
 import { prisma } from '@/lib/prisma';
 import { DOMPurify } from '@/lib/dompurify';
@@ -15,12 +15,8 @@ export const POST = withAuth(async (req, user) => {
         return NextResponse.json({ error: 'Invalid user role' }, { status: 400 });
       }
 
-      if (!linkedinUrl) {
-        return NextResponse.json({ error: 'LinkedIn URL is required' }, { status: 400 });
-      }
-
       const linkedinRegex = /^https?:\/\/(www\.)?linkedin\.com\/in\/[\w-]+\/?$/;
-      if (!linkedinRegex.test(linkedinUrl)) {
+      if (linkedinUrl && !linkedinRegex.test(linkedinUrl)) {
         return NextResponse.json({ error: 'Invalid LinkedIn URL format' }, { status: 400 });
       }
 
@@ -46,7 +42,7 @@ export const POST = withAuth(async (req, user) => {
       }
 
       // Update user profile
-      const sanitizedLinkedinUrl = DOMPurify.sanitize(linkedinUrl);
+      const sanitizedLinkedinUrl = linkedinUrl ? DOMPurify.sanitize(linkedinUrl) : null;
       const sanitizedHandle = DOMPurify.sanitize(anonymousHandle).toLowerCase();
       const sanitizedRoleCategory = roleCategory ? DOMPurify.sanitize(roleCategory) : undefined;
       const sanitizedCompanyType = companyType ? DOMPurify.sanitize(companyType) : undefined;
@@ -71,7 +67,7 @@ export const POST = withAuth(async (req, user) => {
         resourceId: user.id,
         metadata: {
           userRole,
-          hasLinkedinUrl: true,
+          hasLinkedinUrl: Boolean(sanitizedLinkedinUrl),
           handle: sanitizedHandle,
           roleCategory: sanitizedRoleCategory,
           companyCategory: sanitizedCompanyType,

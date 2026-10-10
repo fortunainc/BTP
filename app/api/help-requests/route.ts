@@ -6,7 +6,34 @@ import { prisma } from '@/lib/prisma';
 
 const HELP_TYPES = ['CONSULTATION', 'WRITTEN_REVIEW', 'DOCUMENT_REVIEW', 'PROJECT_HELP'];
 
+export const GET = withAuth(async (_req, user) => {
+  if (user.verificationStatus !== 'Approved' && user.userRole !== 'admin') {
+    return createErrorResponse('Approved BTP membership is required', 403);
+  }
+
+  const requests = await prisma.privateHelpRequest.findMany({
+    where: { userId: user.id },
+    orderBy: { createdAt: 'desc' },
+    take: 50,
+    select: {
+      id: true,
+      contributionId: true,
+      helpType: true,
+      details: true,
+      timing: true,
+      status: true,
+      createdAt: true,
+    },
+  });
+
+  return createApiResponse({ requests });
+}, { requireAuth: true });
+
 export const POST = withAuth(async (req, user) => {
+  if (user.verificationStatus !== 'Approved' && user.userRole !== 'admin') {
+    return createErrorResponse('Approved BTP membership is required', 403);
+  }
+
   const body = await req.json();
   const contributionId = String(body.contributionId || '');
   const helpType = String(body.helpType || 'CONSULTATION');
