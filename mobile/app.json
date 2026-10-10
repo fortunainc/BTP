@@ -7,6 +7,12 @@
     "scheme": "btp",
     "userInterfaceStyle": "light",
     "newArchEnabled": true,
+    "icon": "./assets/brand/app-icon.png",
+    "splash": {
+      "image": "./assets/brand/splash.png",
+      "resizeMode": "cover",
+      "backgroundColor": "#3A1A1E"
+    },
     "ios": {
       "supportsTablet": false,
       "bundleIdentifier": "com.btp.mobile",
@@ -17,7 +23,8 @@
     "android": {
       "package": "com.btp.mobile",
       "adaptiveIcon": {
-        "backgroundColor": "#F5F3ED"
+        "foregroundImage": "./assets/brand/app-icon.png",
+        "backgroundColor": "#3A1A1E"
       }
     },
     "plugins": [

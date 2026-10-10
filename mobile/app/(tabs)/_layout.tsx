@@ -3,7 +3,7 @@ import { Tabs } from "expo-router";
 import type { ComponentProps } from "react";
 import { Platform, StyleSheet, View } from "react-native";
 
-import { colors } from "@/constants/theme";
+import { colors, fonts } from "@/constants/theme";
 
 type IconName = ComponentProps<typeof Ionicons>["name"];
 
@@ -74,7 +74,7 @@ const styles = StyleSheet.create({
     paddingBottom: Platform.OS === "ios" ? 22 : 10,
     paddingTop: 8,
   },
-  label: { fontSize: 11, fontWeight: "600" },
+  label: { fontFamily: fonts.interface, fontSize: 11, fontWeight: "600" },
   askButton: {
     alignItems: "center",
     backgroundColor: colors.accent,

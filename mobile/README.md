@@ -50,7 +50,7 @@ Before the first EAS build:
 2. From this directory, authenticate to the intended Expo account and run `eas init`. This safely writes the real EAS project ID into the Expo config; the repository intentionally contains no fake project ID.
 3. Configure `EXPO_PUBLIC_API_URL` and `EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY` for the EAS `production` environment. The API URL must be the deployed HTTPS backend, not `localhost`.
 4. Confirm the deployed backend accepts the mobile app's Clerk bearer tokens and that the Clerk application allows the app's native redirect scheme, `btp://`.
-5. Add final App Store icon and splash artwork before external testing. Expo defaults are sufficient only for local functional checks.
+5. The approved beta app icon, oxblood splash, palette, Geist interface font and restrained Cormorant identity treatment are included under `assets/brand`.
 6. Run the checks below, then use `eas build --platform ios --profile production`. Building or submitting requires explicit authorization and the appropriate Expo/Apple credentials.
 
 Validation commands:
@@ -67,7 +67,7 @@ Submission is deliberately separate from building. Do not run `eas submit` until
 
 - Confirm the final iOS bundle identifier and Android package name.
 - Complete `eas init` and set the two production environment values.
-- Add final app icons and splash assets.
+- Revisit trademark clearance and custom/commercial display lettering after beta; neither blocks TestFlight.
 - Add push notifications after the core question-and-answer loop is stable; they are not required to install the first TestFlight build.
 
 ## Architecture rule

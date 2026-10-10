@@ -1,14 +1,24 @@
 export const colors = {
-  background: "#F5F3ED",
-  surface: "#FFFFFF",
-  ink: "#17221E",
-  muted: "#68736E",
-  accent: "#176B52",
-  accentSoft: "#DCECE5",
-  border: "#E3E2DC",
-  warm: "#EDB85B",
+  oxblood: "#3A1A1E",
+  gilt: "#C9A66B",
+  vellum: "#EFE6D8",
+  night: "#1C0E10",
+  antiqueGold: "#9C7A3C",
+  background: "#EFE6D8",
+  surface: "#FFFDFC",
+  ink: "#3A1A1E",
+  muted: "#715E5B",
+  accent: "#3A1A1E",
+  accentSoft: "#E5D5C8",
+  border: "#D8C7B8",
+  warm: "#C9A66B",
   danger: "#B54C4C",
   white: "#FFFFFF",
 };
 
 export const spacing = { xs: 6, sm: 10, md: 16, lg: 24, xl: 32 };
+
+export const fonts = {
+  interface: "Geist",
+  displayItalic: "CormorantGaramond-Italic",
+} as const;
