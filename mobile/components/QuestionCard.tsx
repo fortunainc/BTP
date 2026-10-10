@@ -1,12 +1,13 @@
 import { Ionicons } from "@expo/vector-icons";
 import { Pressable, StyleSheet, Text, View } from "react-native";
+import { router } from "expo-router";
 
 import { colors, spacing } from "@/constants/theme";
 import type { QuestionSummary } from "@/types/question";
 
 export function QuestionCard({ question }: { question: QuestionSummary }) {
   return (
-    <Pressable accessibilityRole="button" style={({ pressed }) => [styles.card, pressed && styles.pressed]}>
+    <Pressable accessibilityRole="button" onPress={() => router.push({ pathname: "/question/[id]", params: { id: question.id } })} style={({ pressed }) => [styles.card, pressed && styles.pressed]}>
       <View style={styles.metaRow}>
         <Text style={styles.role}>{question.role}</Text>
         <Text style={styles.time}>{question.createdLabel}</Text>

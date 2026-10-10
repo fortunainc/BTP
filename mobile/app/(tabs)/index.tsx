@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 import { router } from "expo-router";
 
@@ -5,8 +6,14 @@ import { AppScreen } from "@/components/AppScreen";
 import { QuestionCard } from "@/components/QuestionCard";
 import { colors, spacing } from "@/constants/theme";
 import { previewQuestions } from "@/data/preview";
+import { api, liveApiConfigured } from "@/lib/api";
+import { useBtpAuth } from "@/lib/auth";
+import type { QuestionSummary } from "@/types/question";
 
 export default function HomeScreen() {
+  const auth = useBtpAuth();
+  const [questions, setQuestions] = useState<QuestionSummary[]>(previewQuestions);
+  useEffect(() => { if (liveApiConfigured && auth.signedIn) void auth.getToken().then(api.questions.list).then((items) => setQuestions(items.slice(0, 3))).catch(() => undefined); }, [auth]);
   return (
     <AppScreen>
       <View style={styles.heading}>
@@ -23,7 +30,7 @@ export default function HomeScreen() {
         <Text style={styles.sectionTitle}>Needs your experience</Text>
         <Pressable onPress={() => router.push("/(tabs)/questions")}><Text style={styles.link}>See all</Text></Pressable>
       </View>
-      {previewQuestions.map((question) => <QuestionCard key={question.id} question={question} />)}
+      {questions.map((question) => <QuestionCard key={question.id} question={question} />)}
     </AppScreen>
   );
 }

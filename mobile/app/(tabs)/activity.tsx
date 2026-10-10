@@ -1,37 +1,16 @@
 import { Ionicons } from "@expo/vector-icons";
-import { StyleSheet, Text, View } from "react-native";
-
-import { AppScreen } from "@/components/AppScreen";
+import { router } from "expo-router";
+import { useCallback, useEffect, useState } from "react";
+import { Pressable, RefreshControl, ScrollView, StyleSheet, Text, View } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { colors, spacing } from "@/constants/theme";
+import { api, liveApiConfigured } from "@/lib/api";
+import { useBtpAuth } from "@/lib/auth";
+import type { ActivityItem } from "@/types/question";
 
-const items = [
-  { icon: "chatbubble-ellipses-outline" as const, title: "Someone answered your question", detail: "A site manager shared how their team approached a similar situation.", time: "12m" },
-  { icon: "checkmark-circle-outline" as const, title: "What happened?", detail: "Close the loop on a question you asked last week.", time: "1d" },
-];
-
-export default function ActivityScreen() {
-  return (
-    <AppScreen>
-      <Text style={styles.title}>Activity</Text>
-      <Text style={styles.subtitle}>Only updates that help you move a case forward.</Text>
-      {items.map((item) => (
-        <View key={item.title} style={styles.item}>
-          <View style={styles.icon}><Ionicons color={colors.accent} name={item.icon} size={22} /></View>
-          <View style={styles.copy}><Text style={styles.itemTitle}>{item.title}</Text><Text style={styles.detail}>{item.detail}</Text></View>
-          <Text style={styles.time}>{item.time}</Text>
-        </View>
-      ))}
-    </AppScreen>
-  );
-}
-
-const styles = StyleSheet.create({
-  title: { color: colors.ink, fontSize: 30, fontWeight: "700" },
-  subtitle: { color: colors.muted, fontSize: 15, marginBottom: spacing.sm },
-  item: { alignItems: "flex-start", backgroundColor: colors.surface, borderColor: colors.border, borderRadius: 17, borderWidth: 1, flexDirection: "row", gap: spacing.sm, padding: spacing.md },
-  icon: { alignItems: "center", backgroundColor: colors.accentSoft, borderRadius: 20, height: 40, justifyContent: "center", width: 40 },
-  copy: { flex: 1, gap: 4 },
-  itemTitle: { color: colors.ink, fontSize: 15, fontWeight: "700" },
-  detail: { color: colors.muted, fontSize: 13, lineHeight: 19 },
-  time: { color: colors.muted, fontSize: 11 },
-});
+const preview: ActivityItem[]=[{id:"p1",title:"Someone answered your question",detail:"A verified site professional shared an approach.",displayTime:"12m",read:false},{id:"p2",title:"What happened?",detail:"Close the loop on a question you asked last week.",displayTime:"1d",read:false}];
+export default function ActivityScreen(){const auth=useBtpAuth();const[items,setItems]=useState(preview);const[loading,setLoading]=useState(false);const[error,setError]=useState("");
+ const load=useCallback(async()=>{if(!liveApiConfigured||!auth.signedIn)return;setLoading(true);try{setItems(await api.activity.list(await auth.getToken()));setError("");}catch(e){setError(e instanceof Error?e.message:"Could not load activity");}finally{setLoading(false);}},[auth]);useEffect(()=>{void load();},[load]);
+ const open=async(item:ActivityItem)=>{if(liveApiConfigured&&auth.signedIn&&!item.read)await api.activity.markRead(await auth.getToken(),item.id).catch(()=>undefined);if(item.questionId)router.push({pathname:"/question/[id]",params:{id:item.questionId}});};
+ return <SafeAreaView edges={["top"]} style={s.safe}><ScrollView contentContainerStyle={s.content} refreshControl={<RefreshControl refreshing={loading} onRefresh={load}/>}><View style={s.header}><View><Text style={s.title}>Activity</Text><Text style={s.subtitle}>Only updates that move a case forward.</Text></View>{liveApiConfigured&&<Pressable onPress={async()=>{await api.activity.markAllRead(await auth.getToken());void load();}}><Text style={s.link}>Mark read</Text></Pressable>}</View>{error&&<Text style={s.error}>{error}</Text>}{items.map(item=><Pressable key={item.id} onPress={()=>void open(item)} style={[s.item,!item.read&&s.unread]}><View style={s.icon}><Ionicons color={colors.accent} name="notifications-outline" size={22}/></View><View style={s.copy}><Text style={s.itemTitle}>{item.title}</Text><Text style={s.detail}>{item.detail}</Text></View><Text style={s.time}>{item.displayTime}</Text></Pressable>)}</ScrollView></SafeAreaView>}
+const s=StyleSheet.create({safe:{backgroundColor:colors.background,flex:1},content:{gap:spacing.md,padding:spacing.lg},header:{alignItems:"flex-end",flexDirection:"row",justifyContent:"space-between"},title:{color:colors.ink,fontSize:30,fontWeight:"700"},subtitle:{color:colors.muted,fontSize:15},link:{color:colors.accent,fontWeight:"700"},item:{alignItems:"flex-start",backgroundColor:colors.surface,borderColor:colors.border,borderRadius:17,borderWidth:1,flexDirection:"row",gap:spacing.sm,padding:spacing.md},unread:{borderColor:colors.accent},icon:{alignItems:"center",backgroundColor:colors.accentSoft,borderRadius:20,height:40,justifyContent:"center",width:40},copy:{flex:1,gap:4},itemTitle:{color:colors.ink,fontSize:15,fontWeight:"700"},detail:{color:colors.muted,fontSize:13,lineHeight:19},time:{color:colors.muted,fontSize:11},error:{color:colors.danger}});

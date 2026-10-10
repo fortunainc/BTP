@@ -12,7 +12,7 @@ The shell follows the five surfaces in `../BTP_PRODUCT_CONSTITUTION.md`:
 - Activity
 - You
 
-Current screens contain representative preview data. The API client is ready to connect to the existing BTP routes after mobile-token authentication and members-only access are finalized in the backend.
+The app is wired to the authenticated BTP APIs for questions, safe review and posting, answers, following, outcomes, activity, and private-help requests. Without environment configuration it remains usable as a read-only visual preview.
 
 ## Run locally
 
@@ -25,12 +25,14 @@ Current screens contain representative preview data. The API client is ready to 
 2. Create the local environment file:
 
    ```bash
-   cp .env.example .env
+   cp env.example .env
    ```
 
 3. Set `EXPO_PUBLIC_API_URL` to a URL reachable from the device. `localhost` works in the iOS simulator; a physical phone generally needs the Mac's LAN address or a secure development tunnel.
 
-4. Start Expo:
+4. Add `EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY` from the existing BTP Clerk application. Clerk session tokens are cached with Expo Secure Store.
+
+5. Start Expo:
 
    ```bash
    npm start
@@ -40,8 +42,6 @@ Current screens contain representative preview data. The API client is ready to 
 
 - Replace the placeholder EAS project ID in `app.json`.
 - Confirm the final iOS bundle identifier and Android package name.
-- Add mobile-compatible Clerk authentication and secure token storage.
-- Connect screens to authenticated backend APIs.
 - Add app icons, splash assets, push notifications, and error/empty/loading states.
 - Run `npx expo-doctor` and `npm run typecheck`.
 
