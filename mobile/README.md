@@ -12,7 +12,7 @@ The shell follows the five surfaces in `../BTP_PRODUCT_CONSTITUTION.md`:
 - Activity
 - You
 
-The app is wired to the authenticated BTP APIs for questions, safe review and posting, answers, following, outcomes, activity, and private-help requests. Without environment configuration it remains usable as a read-only visual preview.
+The app is wired to the authenticated BTP APIs for questions, safe review and posting, answers, following, outcomes, activity, and private-help requests. Missing configuration fails closed. A read-only local preview is available only when a developer explicitly sets `EXPO_PUBLIC_ENABLE_LOCAL_PREVIEW=true`; the app displays a persistent warning banner in that mode.
 
 ## Run locally
 
@@ -31,6 +31,8 @@ The app is wired to the authenticated BTP APIs for questions, safe review and po
 3. Set `EXPO_PUBLIC_API_URL` to a URL reachable from the device. `localhost` works in the iOS simulator; a physical phone generally needs the Mac's LAN address or a secure development tunnel.
 
 4. Add `EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY` from the existing BTP Clerk application. Clerk session tokens are cached with Expo Secure Store.
+
+   For UI work without live services, explicitly set `EXPO_PUBLIC_ENABLE_LOCAL_PREVIEW=true`. `EXPO_PUBLIC_DEV_AUTH_TOKEN` is honored only in that local development mode. Both values are rejected from EAS device builds, and release bundles compile the bypass out.
 
 5. Start Expo:
 

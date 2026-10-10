@@ -9,7 +9,7 @@ export type QuestionSummary = {
   isAuthor?: boolean;
 };
 
-export type Answer = { id: string; text: string; role: string; timeLabel: string };
+export type Answer = { id: string; text: string; role: string; timeLabel: string; isAuthor?: boolean };
 export type QuestionDetail = QuestionSummary & { description: string; answers: Answer[] };
 export type AnswerSubmission = {
   success: boolean;

@@ -4,12 +4,11 @@ import { createContext, type PropsWithChildren, useCallback, useContext, useEffe
 import { ActivityIndicator, Alert, Pressable, StyleSheet, Text, TextInput, View } from "react-native";
 import { colors, spacing } from "@/constants/theme";
 import { api, ApiError, liveApiConfigured } from "@/lib/api";
+import { CLERK_PUBLISHABLE_KEY, configurationIssues, devAuthToken, localPreviewEnabled } from "@/lib/config";
 
 export type BtpMember = { id: string; handle: string; roleCategory?: string | null; companyCategory?: string | null; verificationStatus?: string | null; approved: boolean };
 type AuthState = { configured: boolean; ready: boolean; signedIn: boolean; member: BtpMember | null; getToken: () => Promise<string | null>; signOut: () => Promise<void> };
-const publishableKey = process.env.EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY;
-const devToken = process.env.EXPO_PUBLIC_DEV_AUTH_TOKEN;
-const AuthContext = createContext<AuthState>({ configured: Boolean(devToken), ready: true, signedIn: Boolean(devToken), member: null, getToken: async () => devToken ?? null, signOut: async () => undefined });
+const AuthContext = createContext<AuthState>({ configured: Boolean(devAuthToken), ready: true, signedIn: Boolean(devAuthToken), member: null, getToken: async () => devAuthToken ?? null, signOut: async () => undefined });
 const tokenCache = { getToken: (key: string) => SecureStore.getItemAsync(key), saveToken: (key: string, value: string) => SecureStore.setItemAsync(key, value) };
 
 function ClerkBridge({ children }: PropsWithChildren) {
@@ -55,9 +54,14 @@ function SignInScreen() {
 }
 
 export function BtpAuthProvider({ children }: PropsWithChildren) {
-  if (!publishableKey) return <>{children}</>;
-  return <ClerkProvider publishableKey={publishableKey} tokenCache={tokenCache}><ClerkBridge>{children}</ClerkBridge></ClerkProvider>;
+  if (localPreviewEnabled) {
+    return <View style={styles.previewShell}><View style={styles.previewBanner}><Text style={styles.previewBannerText}>LOCAL PREVIEW · MEMBERSHIP CHECKS DISABLED</Text></View><View style={styles.previewContent}>{children}</View></View>;
+  }
+  if (!CLERK_PUBLISHABLE_KEY || !liveApiConfigured) {
+    return <View style={styles.access}><Text style={styles.brand}>BTP</Text><Text style={styles.title}>App setup required</Text><Text style={styles.copy}>This build cannot connect securely because {configurationIssues.join(" and ")} {configurationIssues.length === 1 ? "is" : "are"} not configured. Install a correctly configured build or contact BTP.</Text></View>;
+  }
+  return <ClerkProvider publishableKey={CLERK_PUBLISHABLE_KEY} tokenCache={tokenCache}><ClerkBridge>{children}</ClerkBridge></ClerkProvider>;
 }
 export function useBtpAuth() { return useContext(AuthContext); }
 
-const styles=StyleSheet.create({center:{alignItems:"center",backgroundColor:colors.background,flex:1,gap:spacing.md,justifyContent:"center",padding:spacing.lg},checking:{color:colors.muted,fontSize:14},access:{backgroundColor:colors.background,flex:1,gap:spacing.md,justifyContent:"center",padding:spacing.lg},signIn:{backgroundColor:colors.background,flex:1,gap:spacing.md,justifyContent:"center",padding:spacing.lg},brand:{color:colors.accent,fontSize:14,fontWeight:"900",letterSpacing:3},title:{color:colors.ink,fontSize:32,fontWeight:"700"},copy:{color:colors.muted,fontSize:15,lineHeight:22,marginBottom:spacing.sm},input:{backgroundColor:colors.surface,borderColor:colors.border,borderRadius:14,borderWidth:1,color:colors.ink,fontSize:16,padding:15},button:{alignItems:"center",backgroundColor:colors.accent,borderRadius:14,padding:16},buttonText:{color:colors.white,fontSize:16,fontWeight:"700"},secondary:{alignItems:"center",borderColor:colors.border,borderRadius:14,borderWidth:1,padding:15},secondaryText:{color:colors.ink,fontSize:15,fontWeight:"700"},disabled:{opacity:.45},note:{color:colors.muted,fontSize:12,lineHeight:18,textAlign:"center"}});
+const styles=StyleSheet.create({center:{alignItems:"center",backgroundColor:colors.background,flex:1,gap:spacing.md,justifyContent:"center",padding:spacing.lg},checking:{color:colors.muted,fontSize:14},access:{backgroundColor:colors.background,flex:1,gap:spacing.md,justifyContent:"center",padding:spacing.lg},signIn:{backgroundColor:colors.background,flex:1,gap:spacing.md,justifyContent:"center",padding:spacing.lg},brand:{color:colors.accent,fontSize:14,fontWeight:"900",letterSpacing:3},title:{color:colors.ink,fontSize:32,fontWeight:"700"},copy:{color:colors.muted,fontSize:15,lineHeight:22,marginBottom:spacing.sm},input:{backgroundColor:colors.surface,borderColor:colors.border,borderRadius:14,borderWidth:1,color:colors.ink,fontSize:16,padding:15},button:{alignItems:"center",backgroundColor:colors.accent,borderRadius:14,padding:16},buttonText:{color:colors.white,fontSize:16,fontWeight:"700"},secondary:{alignItems:"center",borderColor:colors.border,borderRadius:14,borderWidth:1,padding:15},secondaryText:{color:colors.ink,fontSize:15,fontWeight:"700"},disabled:{opacity:.45},note:{color:colors.muted,fontSize:12,lineHeight:18,textAlign:"center"},previewShell:{flex:1},previewContent:{flex:1},previewBanner:{alignItems:"center",backgroundColor:"#7C2D12",paddingHorizontal:spacing.sm,paddingVertical:6},previewBannerText:{color:colors.white,fontSize:10,fontWeight:"900",letterSpacing:.5}});

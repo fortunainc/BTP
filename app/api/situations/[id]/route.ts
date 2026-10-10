@@ -128,6 +128,7 @@ export const GET = withAuth(async (req, user) => {
           ? verifiedRoleLabel(interaction.user.roleCategory)
           : 'BTP member',
         timeLabel: bucketTimestamp(interaction.createdAt).label,
+        isAuthor: interaction.userId === user.id,
       })),
   });
 }, { requireAuth: true });

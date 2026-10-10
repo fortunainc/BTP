@@ -1,7 +1,7 @@
 import type { ActivityItem, AnswerSubmission, HelpType, OutcomeType, PrivateHelpRequest, QuestionDetail, QuestionSummary } from "@/types/question";
+import { API_URL } from "@/lib/config";
 
-const API_URL = process.env.EXPO_PUBLIC_API_URL;
-export const liveApiConfigured = Boolean(API_URL);
+export { liveApiConfigured } from "@/lib/config";
 export class ApiError extends Error { constructor(public status: number, message: string) { super(message); this.name = "ApiError"; } }
 type RequestOptions = RequestInit & { token?: string | null };
 
