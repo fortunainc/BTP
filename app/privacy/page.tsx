@@ -293,7 +293,7 @@ export default function PrivacyPage() {
                   />
                 </svg>
                 <span>
-                  <strong>Content</strong> - Threads, replies, polls, etc. (all redacted before storage)
+                  <strong>Content</strong> - Questions, answers, reports, and outcome updates. Automated safeguards reduce identifying details, but members must not submit confidential study information, patient information, or protected health information.
                 </span>
               </li>
             </ul>
@@ -311,7 +311,7 @@ export default function PrivacyPage() {
                   />
                 </svg>
                 <p>
-                  <strong>Moderators cannot see your email</strong> - Moderators review content only. Identity database is completely separate.
+                  <strong>Email is kept off community posts</strong> - BTP and its authentication provider retain the email associated with your account for sign-in, verification, safety, support, and administration. Other members do not see it with your questions or answers. Authorized administrators may access it when required to operate and protect the service.
                 </p>
               </div>
               <div className="flex items-start gap-3">
@@ -323,7 +323,7 @@ export default function PrivacyPage() {
                   />
                 </svg>
                 <p>
-                  <strong>No raw data exports</strong> - Moderators cannot export raw user data or identify users.
+                  <strong>Restricted identity access</strong> - Community content is presented under a protected identity. Access to account identity data is limited to authorized administration and support needs.
                 </p>
               </div>
               <div className="flex items-start gap-3">

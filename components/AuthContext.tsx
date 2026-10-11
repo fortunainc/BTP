@@ -104,7 +104,22 @@ export function AuthProvider({ children }: AuthProviderProps) {
 export function useAuthContext(): AuthContextType {
   const context = useContext(AuthContext);
   if (context === undefined) {
-    throw new Error('useAuthContext must be used within an AuthProvider');
+    // Allow production builds and maintenance renders to fail closed when
+    // Clerk is intentionally unavailable. Live authenticated environments
+    // still receive the AuthProvider value from the root layout.
+    return {
+      user: null,
+      userId: null,
+      userRole: null,
+      verificationStatus: null,
+      handle: null,
+      anonymousHandle: null,
+      isAuthenticated: false,
+      isAdmin: false,
+      isOperator: false,
+      isOrganization: false,
+      loading: false,
+    };
   }
   return context;
 }
