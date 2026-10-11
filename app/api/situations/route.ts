@@ -245,8 +245,14 @@ export const POST = withAuth(async (req, user) => {
       } = body;
       
       // Validate required fields - only description needed
-      if (!description) {
+      if (typeof description !== 'string' || description.trim().length === 0) {
         return createErrorResponse('Description is required', 400);
+      }
+
+      // The review endpoint enforces the same cap, but this route must defend
+      // itself because an API client can bypass the preview step entirely.
+      if (description.length > 5000) {
+        return createErrorResponse('Description is too long (max 5000 characters)', 400);
       }
 
       // Must confirm they reviewed the redacted version
@@ -257,7 +263,7 @@ export const POST = withAuth(async (req, user) => {
       // ─── TRANSLATION ENGINE ───
       // The approved sanitized question is the source of truth. Raw preview
       // text is not processed or retained after the user approves the preview.
-      const rawText = description;
+      const rawText = description.trim();
       const { signal, structured } = translateAndStructure(rawText);
       
       // ─── REDACTION ───
@@ -267,12 +273,12 @@ export const POST = withAuth(async (req, user) => {
       
       if (confirmedRedaction) {
         // Re-run redaction on the approved text for defense in depth.
-        const redactionResult = applyAutomaticRedaction(description);
+        const redactionResult = applyAutomaticRedaction(rawText);
         redactedDescription = redactionResult.redactedContent;
         redactions = redactionResult.redactions;
       } else {
         // Fallback: redact the provided description
-        redactedDescription = description;
+        redactedDescription = rawText;
         redactions = [];
       }
       
