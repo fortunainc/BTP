@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
-import { ActivityIndicator, Pressable, StyleSheet, Text, View } from "react-native";
+import { ActivityIndicator, Alert, Linking, Pressable, StyleSheet, Text, View } from "react-native";
 
 import { AppScreen } from "@/components/AppScreen";
 import { colors, spacing } from "@/constants/theme";
@@ -8,6 +8,7 @@ import { useBtpAuth } from "@/lib/auth";
 import type { PrivateHelpRequest } from "@/types/question";
 
 const rows = ["Verification and role", "Expertise and topics", "Privacy", "Notifications"];
+const ACCOUNT_DELETION_EMAIL = "mailto:fortunaindustriesinc@gmail.com?subject=BTP%20account%20deletion%20request&body=Please%20delete%20my%20BTP%20account%20and%20associated%20personal%20data.%20My%20account%20email%20is%3A%20";
 
 export default function YouScreen() {
   const auth = useBtpAuth();
@@ -22,6 +23,13 @@ export default function YouScreen() {
   useEffect(() => { void load(); }, [load]);
   const profileName = member?.handle?.trim() || "BTP member";
   const profileDetails = [generalizedRole(member?.roleCategory), generalizedCompany(member?.companyCategory), verificationLabel(member?.verificationStatus)].filter(Boolean).join(" · ");
+  const requestAccountDeletion = async () => {
+    try {
+      await Linking.openURL(ACCOUNT_DELETION_EMAIL);
+    } catch {
+      Alert.alert("Could not open email", "Email fortunaindustriesinc@gmail.com with the subject “BTP account deletion request.”");
+    }
+  };
   return (
     <AppScreen>
       <Text style={styles.title}>You</Text>
@@ -38,6 +46,10 @@ export default function YouScreen() {
           </View>
         ))}
       </View>
+      <Pressable accessibilityRole="button" onPress={() => void requestAccountDeletion()} style={styles.deleteAccount}>
+        <Text style={styles.deleteAccountText}>Request account deletion</Text>
+      </Pressable>
+      <Text style={styles.deletionNote}>BTP will verify your request and delete your account and associated personal data. Community contributions may be retained only in de-identified form to protect shared discussions.</Text>
       <View style={styles.sectionHeader}><Text style={styles.sectionTitle}>Private help</Text>{loading && <ActivityIndicator color={colors.accent} size="small" />}</View>
       <Text style={styles.sectionCopy}>Requests are reviewed and matched by BTP privately during beta.</Text>
       {!liveApiConfigured || !auth.signedIn ? <View style={styles.helpCard}><Text style={styles.helpTitle}>No active requests</Text><Text style={styles.helpDetail}>Requests you make from a question will appear here.</Text></View> : requests.length === 0 && !loading ? <View style={styles.helpCard}><Text style={styles.helpTitle}>No active requests</Text><Text style={styles.helpDetail}>When a community answer is not enough, request dedicated help from the question.</Text></View> : requests.map(request => <View key={request.id} style={styles.helpCard}><View style={styles.helpTop}><Text style={styles.helpTitle}>{labelHelpType(request.helpType)}</Text><View style={styles.status}><Text style={styles.statusText}>{labelStatus(request.status)}</Text></View></View><Text numberOfLines={2} style={styles.helpDetail}>{request.details}</Text><Text style={styles.helpTime}>{new Date(request.createdAt).toLocaleDateString()}</Text></View>)}
@@ -86,6 +98,9 @@ const styles = StyleSheet.create({
   betaLabel: { fontFamily: "Geist", color: colors.muted, fontSize: 11, marginLeft: spacing.sm, textAlign: "right" },
   signOut: { alignItems: "center", borderColor: colors.border, borderRadius: 14, borderWidth: 1, padding: 14 },
   signOutText: { fontFamily: "Geist", color: colors.danger, fontWeight: "700" },
+  deleteAccount: { alignItems: "center", paddingHorizontal: spacing.sm, paddingVertical: 4 },
+  deleteAccountText: { fontFamily: "Geist", color: colors.danger, fontSize: 13, fontWeight: "700", textDecorationLine: "underline" },
+  deletionNote: { fontFamily: "Geist", color: colors.muted, fontSize: 11, lineHeight: 16, marginTop: -8, textAlign: "center" },
   sectionHeader: { alignItems: "center", flexDirection: "row", justifyContent: "space-between", marginTop: spacing.sm },
   sectionTitle: { fontFamily: "Geist", color: colors.ink, fontSize: 20, fontWeight: "700" },
   sectionCopy: { fontFamily: "Geist", color: colors.muted, fontSize: 13, lineHeight: 19, marginTop: -8 },
