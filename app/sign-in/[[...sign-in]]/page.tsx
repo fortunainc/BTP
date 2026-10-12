@@ -1,96 +1,87 @@
-import { SignIn } from '@clerk/nextjs';
-import Link from 'next/link';
+'use client';
+
+import { useSignIn } from '@clerk/nextjs';
+import Image from 'next/image';
+import { FormEvent, useState } from 'react';
+import appIcon from '../../../mobile/assets/brand/app-icon.png';
+
+const SUPPORT_EMAIL = 'fortunaindustriesinc@gmail.com';
+
+function clerkMessage(error: unknown): string {
+  const candidate = error as { errors?: Array<{ longMessage?: string; message?: string }> };
+  return candidate.errors?.[0]?.longMessage || candidate.errors?.[0]?.message || 'Check your email and password and try again.';
+}
 
 export default function SignInPage() {
-  const publishableKey = process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY;
+  const { isLoaded, signIn, setActive } = useSignIn();
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState('');
 
-  // Fallback if Clerk not configured
-  if (!publishableKey) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-950 via-slate-900 to-blue-950">
-        <div className="w-full max-w-md px-4 text-center">
-          <div className="w-20 h-20 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-2xl mx-auto mb-6 flex items-center justify-center shadow-lg">
-            <svg className="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8h2a2 2 0 012 2v6a2 2 0 01-2 2h-2v4l-4-4H9a1.994 1.994 0 01-1.414-.586m0 0L11 14h4a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2v4l.586-.586z" />
-            </svg>
-          </div>
-          <h1 className="text-4xl font-bold mb-3 bg-gradient-to-r from-blue-400 to-cyan-400 bg-clip-text text-transparent">
-            Welcome Back
-          </h1>
-          <p className="text-slate-400 text-lg mb-6">
-            Sign in to your account
-          </p>
-          <div className="bg-amber-900/30 border border-amber-700 rounded-lg p-4 mb-6">
-            <p className="text-amber-300 text-sm">
-              Authentication is currently being configured. Please check back shortly.
-            </p>
-          </div>
-          <Link href="/" className="text-blue-400 hover:text-blue-300 underline">
-            Return to Home
-          </Link>
-        </div>
-      </div>
-    );
+  async function submit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    if (!isLoaded || !signIn || !setActive || busy) return;
+
+    setBusy(true);
+    setError('');
+    try {
+      const result = await signIn.create({ identifier: email.trim(), password });
+      if (result.status !== 'complete' || !result.createdSessionId) {
+        setError('This account requires an additional verification step. Contact BTP support so we can complete your access.');
+        return;
+      }
+
+      await setActive({ session: result.createdSessionId });
+      const params = new URLSearchParams(window.location.search);
+      const destination = params.get('redirect_url');
+      window.location.replace(destination?.startsWith('/') ? destination : '/admin/analytics');
+    } catch (cause) {
+      setError(clerkMessage(cause));
+    } finally {
+      setBusy(false);
+    }
   }
 
+  const disabled = !isLoaded || busy || !email.trim() || !password;
+
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-950 via-slate-900 to-blue-950">
-      <div className="w-full max-w-md px-4">
-        <div className="text-center mb-8">
-          <div className="w-20 h-20 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-2xl mx-auto mb-6 flex items-center justify-center shadow-lg">
-            <svg className="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8h2a2 2 0 012 2v6a2 2 0 01-2 2h-2v4l-4-4H9a1.994 1.994 0 01-1.414-.586m0 0L11 14h4a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2v4l.586-.586z" />
-            </svg>
-          </div>
-          <h1 className="text-4xl font-bold mb-3 bg-gradient-to-r from-blue-400 to-cyan-400 bg-clip-text text-transparent">
-            Welcome Back
-          </h1>
-          <p className="text-slate-400 text-lg">
-            Sign in to your account
+    <main className="min-h-screen bg-[#EFE6D8] px-5 py-10 text-[#3A1A1E] sm:flex sm:items-center sm:justify-center">
+      <section className="mx-auto w-full max-w-md overflow-hidden rounded-[28px] border border-[#D8C7B8] bg-[#FFFDFC] shadow-[0_24px_70px_rgba(58,26,30,0.14)]">
+        <div className="bg-[#3A1A1E] px-8 py-8 text-center">
+          <Image src={appIcon} alt="Behind The Protocol" className="mx-auto h-20 w-20 rounded-[20px]" priority />
+          <p className="mt-5 font-serif text-2xl italic tracking-wide text-[#C9A66B]">Behind The Protocol</p>
+          <p className="mt-2 text-sm text-[#EFE6D8]/75">Founder and member access</p>
+        </div>
+
+        <div className="px-7 py-8 sm:px-9">
+          <h1 className="text-3xl font-semibold tracking-tight">Welcome back</h1>
+          <p className="mt-2 text-sm leading-6 text-[#715E5B]">Sign in with the email and password connected to your BTP account.</p>
+
+          <form onSubmit={submit} className="mt-7 space-y-5">
+            <label className="block text-sm font-semibold">
+              Email
+              <input type="email" autoComplete="email" autoCapitalize="none" value={email} onChange={(event) => setEmail(event.target.value)} placeholder="you@example.com" className="mt-2 w-full rounded-xl border border-[#D8C7B8] bg-white px-4 py-3.5 text-base text-[#3A1A1E] outline-none transition placeholder:text-[#9A8985] focus:border-[#9C7A3C] focus:ring-2 focus:ring-[#C9A66B]/30" required />
+            </label>
+
+            <label className="block text-sm font-semibold">
+              Password
+              <input type="password" autoComplete="current-password" value={password} onChange={(event) => setPassword(event.target.value)} placeholder="Your password" className="mt-2 w-full rounded-xl border border-[#D8C7B8] bg-white px-4 py-3.5 text-base text-[#3A1A1E] outline-none transition placeholder:text-[#9A8985] focus:border-[#9C7A3C] focus:ring-2 focus:ring-[#C9A66B]/30" required />
+            </label>
+
+            {error ? <div role="alert" className="rounded-xl border border-[#B54C4C]/30 bg-[#B54C4C]/10 px-4 py-3 text-sm leading-5 text-[#7D2F2F]">{error}</div> : null}
+
+            <button type="submit" disabled={disabled} className="w-full rounded-xl bg-[#3A1A1E] px-4 py-4 text-base font-bold text-white transition hover:bg-[#51242A] disabled:cursor-not-allowed disabled:opacity-45">
+              {busy ? 'Signing in…' : isLoaded ? 'Sign in' : 'Preparing secure sign-in…'}
+            </button>
+          </form>
+
+          <p className="mt-6 text-center text-xs leading-5 text-[#715E5B]">
+            BTP is invite-only. Need help?{' '}
+            <a className="font-semibold text-[#3A1A1E] underline decoration-[#C9A66B] underline-offset-4" href={`mailto:${SUPPORT_EMAIL}`}>Contact support</a>
           </p>
         </div>
-        
-        {/* Info banner about sign-in */}
-        <div className="bg-blue-900/30 border border-blue-700 rounded-lg p-4 mb-6">
-          <div className="flex items-start gap-3">
-            <div className="text-blue-400 mt-0.5">
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-            </div>
-            <div className="text-sm text-blue-300">
-              <p className="font-semibold mb-1">Sign-in Options</p>
-              <p className="text-blue-400">Use email/password for quickest access.</p>
-            </div>
-          </div>
-        </div>
-        
-        <div className="bg-slate-800/50 border border-slate-700 rounded-2xl shadow-2xl p-2">
-          <SignIn 
-            appearance={{
-              baseTheme: undefined,
-              elements: {
-                rootBox: "w-full",
-                card: "shadow-none border-0 w-full bg-transparent",
-                headerTitle: "hidden",
-                headerSubtitle: "hidden",
-                socialButtonsBlockButton: "border-2 border-slate-600 hover:bg-slate-700/50",
-                formButtonPrimary: "bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 shadow-lg",
-                footerActionLink: "text-blue-400 hover:text-blue-300",
-                identityPreview: "hidden",
-                formFieldInput: "bg-slate-900 border-slate-700",
-              }
-            }}
-            routing="path"
-            path="/sign-in"
-            fallbackRedirectUrl="/situations"
-            signUpUrl="/sign-up"
-          />
-        </div>
-        <div className="mt-6 text-center text-sm text-slate-500">
-          <p>Join thousands of clinical trial professionals sharing insights and finding opportunities</p>
-        </div>
-      </div>
-    </div>
+      </section>
+    </main>
   );
 }
