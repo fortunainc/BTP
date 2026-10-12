@@ -30,3 +30,4 @@ export type PrivateHelpRequest = {
   status: string;
   createdAt: string;
 };
+export type ContentReport = { id: string; contentType: string; reason: string; status: string; action?: string | null; createdAt: string; reviewedAt?: string | null };

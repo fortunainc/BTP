@@ -6,10 +6,11 @@
  * All access is comprehensively logged.
  */
 
-import { auth, clerkClient } from '@clerk/nextjs/server';
+import { auth } from '@clerk/nextjs/server';
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { logAdminAccess } from '@/lib/analytics-tracker';
+import { privacySafeAuditContext } from '@/lib/privacy-audit';
 
 // Admin roles that can access analytics and trust-safety panels
 const ADMIN_ROLES = ['admin', 'founder'];
@@ -21,6 +22,9 @@ export const VALID_INVESTIGATION_REASONS = [
   'legal_issue',
   'suspected_deanonymization_attack',
   'safety_escalation',
+  'content_report',
+  'user_complaint',
+  'security_incident',
 ] as const;
 
 export type InvestigationReason = typeof VALID_INVESTIGATION_REASONS[number];
@@ -93,9 +97,7 @@ export async function verifyAdminAccess(request: NextRequest): Promise<AdminAuth
     // Step 4: Verify admin role
     if (!ADMIN_ROLES.includes(user.userRole)) {
       // Log unauthorized access attempt
-      const ip = request.headers.get('x-forwarded-for') || 
-                  request.headers.get('x-real-ip') || 
-                  'unknown';
+      const auditContext = privacySafeAuditContext(request);
       
       await logAdminAccess({
         adminUserId: user.id,
@@ -103,8 +105,7 @@ export async function verifyAdminAccess(request: NextRequest): Promise<AdminAuth
         targetType: 'AdminPanel',
         targetId: request.nextUrl.pathname,
         fieldsAccessed: [],
-        ipAddress: ip,
-        userAgent: request.headers.get('user-agent') || undefined,
+        ...auditContext,
       });
 
       return {
@@ -115,9 +116,7 @@ export async function verifyAdminAccess(request: NextRequest): Promise<AdminAuth
     }
 
     // Step 5: Log successful admin access
-    const ip = request.headers.get('x-forwarded-for') || 
-                request.headers.get('x-real-ip') || 
-                'unknown';
+    const auditContext = privacySafeAuditContext(request);
 
     await logAdminAccess({
       adminUserId: user.id,
@@ -125,8 +124,7 @@ export async function verifyAdminAccess(request: NextRequest): Promise<AdminAuth
       targetType: 'AdminPanel',
       targetId: request.nextUrl.pathname,
       fieldsAccessed: ['dashboard_access'],
-      ipAddress: ip,
-      userAgent: request.headers.get('user-agent') || undefined,
+      ...auditContext,
     });
 
     return {
@@ -183,9 +181,7 @@ export async function verifyInvestigationAccess(
   }
 
   // Log the investigation access with reason
-  const ip = request.headers.get('x-forwarded-for') || 
-              request.headers.get('x-real-ip') || 
-              'unknown';
+  const auditContext = privacySafeAuditContext(request);
 
   await logAdminAccess({
     adminUserId: adminAuth.userId!,
@@ -193,9 +189,8 @@ export async function verifyInvestigationAccess(
     reason: reason,
     targetType: 'TrustSafetyPanel',
     targetId: request.nextUrl.pathname,
-    fieldsAccessed: ['identity_data'],
-    ipAddress: ip,
-    userAgent: request.headers.get('user-agent') || undefined,
+    fieldsAccessed: [],
+    ...auditContext,
   });
 
   return {

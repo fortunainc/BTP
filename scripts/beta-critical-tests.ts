@@ -15,6 +15,8 @@ import {
   bucketCount,
   normalizeInteractionType,
 } from '../lib/operator-return-loop';
+import { privacySafeAuditContext } from '../lib/privacy-audit';
+import { NextRequest } from 'next/server';
 
 function testQuestionAndAnswerSummary() {
   const summary = buildInteractionSummary([
@@ -96,9 +98,24 @@ function testInputSanitization() {
   assert.equal(InputSanitization.isValidURL('javascript:alert(1)'), false);
 }
 
+function testPrivacySafeAuditFingerprinting() {
+  process.env.ADMIN_AUDIT_HASH_SALT = 'test-only-audit-secret';
+  const request = new NextRequest('https://example.test/api/test', {
+    headers: { 'x-forwarded-for': '203.0.113.10', 'user-agent': 'Test Browser/1.0' },
+  });
+  const first = privacySafeAuditContext(request);
+  const second = privacySafeAuditContext(request);
+  assert.equal(first.ipAddress, second.ipAddress);
+  assert.equal(first.userAgent, second.userAgent);
+  assert.notEqual(first.ipAddress, '203.0.113.10');
+  assert.notEqual(first.userAgent, 'Test Browser/1.0');
+  assert.match(first.ipAddress || '', /^hmac:[a-f0-9]{24}$/);
+}
+
 testQuestionAndAnswerSummary();
 testInteractionTaxonomyAndCountPrivacy();
 testSensitiveContentRedaction();
 testInputSanitization();
+testPrivacySafeAuditFingerprinting();
 
 console.log('beta-critical tests: passed');

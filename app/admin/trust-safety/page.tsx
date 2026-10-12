@@ -19,7 +19,7 @@
  * - Safety escalations
  */
 
-import { useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 
@@ -121,7 +121,7 @@ export default function TrustSafetyPanel() {
   const [targetId, setTargetId] = useState('');
   const [investigationResult, setInvestigationResult] = useState<Record<string, unknown> | null>(null);
 
-  const fetchData = async (type: TabType) => {
+  const fetchData = useCallback(async (type: TabType) => {
     setLoading(true);
     setError(null);
     
@@ -157,7 +157,9 @@ export default function TrustSafetyPanel() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [router]);
+
+  useEffect(() => { void fetchData('flagged'); }, [fetchData]);
 
   const handleTabChange = (tab: TabType) => {
     setActiveTab(tab);

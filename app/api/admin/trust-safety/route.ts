@@ -63,7 +63,7 @@ export async function GET(request: NextRequest) {
  */
 export async function POST(request: NextRequest) {
   const body = await request.json();
-  const { reason, targetAnonymousId, investigationType } = body;
+  const { reason, reasonDetails, targetAnonymousId, investigationType, targetType, targetId } = body;
   
   // Verify investigation access with reason
   const investigationAuth = await verifyInvestigationAccess(request, reason);
@@ -73,6 +73,32 @@ export async function POST(request: NextRequest) {
       { error: investigationAuth.error },
       { status: investigationAuth.statusCode || 403 }
     );
+  }
+
+  if (investigationType !== 'identity_lookup') {
+    if (!targetType || !targetId) {
+      return NextResponse.json({ error: 'Investigation target is required.' }, { status: 400 });
+    }
+    await logAdminAccess({
+      adminUserId: investigationAuth.userId!,
+      action: 'trust_safety_investigation_opened',
+      reason,
+      targetType: String(targetType).slice(0, 50),
+      targetId: String(targetId).slice(0, 150),
+      fieldsAccessed: [],
+    });
+    if (typeof reasonDetails === 'string' && reasonDetails.trim()) {
+      await prisma.auditLog.create({
+        data: {
+          userId: investigationAuth.userId,
+          action: 'TRUST_SAFETY_CASE_NOTE',
+          resourceType: String(targetType).slice(0, 50),
+          resourceId: String(targetId).slice(0, 150),
+          details: { reason, note: reasonDetails.trim().slice(0, 500) },
+        },
+      });
+    }
+    return NextResponse.json({ success: true, message: 'Investigation opened and access logged.' });
   }
   
   // Perform identity lookup if requested
@@ -147,7 +173,6 @@ async function handleIdentityLookup(request: NextRequest, anonymousUserId: strin
  * Get safety overview
  */
 async function getSafetyOverview() {
-  const today = new Date().toISOString().split('T')[0];
   const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
   
   const recentMetrics = await prisma.dailyMetrics.findMany({
@@ -181,24 +206,20 @@ async function getSafetyOverview() {
  * Get flagged content
  */
 async function getFlaggedContent() {
-  // Get flagged content from analytics events
-  const flaggedEvents = await prisma.analyticsEvent.findMany({
-    where: {
-      eventType: 'content_flagged',
-    },
-    orderBy: { createdAt: 'desc' },
-    take: 50,
-  });
-  
+  const [contributions, flaggedReports] = await Promise.all([
+    prisma.contribution.findMany({
+      where: { isFlagged: true },
+      orderBy: { createdAt: 'desc' },
+      take: 50,
+      select: { id: true, contributionType: true, therapeuticArea: true, issueCategory: true, urgencyLevel: true, redactionCount: true, correlationRisk: true, flagReason: true, createdAt: true },
+    }),
+    prisma.flaggedContent.findMany({ orderBy: { createdAt: 'desc' }, take: 50, select: { id: true, contentType: true, contentId: true, reason: true, status: true, createdAt: true } }),
+  ]);
   return {
-    items: flaggedEvents.map(e => ({
-      id: e.id,
-      anonymousUserId: e.anonymousUserId,
-      objectType: e.objectType,
-      objectId: e.objectId,
-      dateBucket: e.createdAtBucket,
-    })),
-    total: flaggedEvents.length,
+    flaggedItems: flaggedReports.length,
+    flaggedContributions: contributions.length,
+    contributions: contributions.map(item => ({ id: item.id, type: item.contributionType, area: item.therapeuticArea, category: item.issueCategory, urgency: item.urgencyLevel, redactions: item.redactionCount, riskScore: item.correlationRisk, flagReason: item.flagReason, createdAt: item.createdAt })),
+    flaggedReports,
   };
 }
 

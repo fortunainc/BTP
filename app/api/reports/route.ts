@@ -92,3 +92,16 @@ export const POST = withAuth(async (request, user) => {
 
   return createApiResponse({ success: true, reportId: report.id }, 201);
 }, { requireAuth: true });
+
+export const GET = withAuth(async (_request, user) => {
+  if (user.verificationStatus !== 'Approved' && user.userRole !== 'admin') {
+    return createErrorResponse('Approved BTP membership is required', 403);
+  }
+  const reports = await prisma.flaggedContent.findMany({
+    where: { reportedBy: user.id },
+    orderBy: { createdAt: 'desc' },
+    take: 25,
+    select: { id: true, contentType: true, reason: true, status: true, action: true, createdAt: true, reviewedAt: true },
+  });
+  return createApiResponse({ reports });
+}, { requireAuth: true });

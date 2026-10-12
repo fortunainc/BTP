@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { verifyAdminAccess } from '@/lib/admin-auth';
+import { notifyReporter } from '@/lib/moderation-notifications';
 
 export async function POST(req: NextRequest) {
   try {
@@ -60,6 +61,7 @@ export async function POST(req: NextRequest) {
         },
       });
     });
+    await notifyReporter(flag.id, 'restored');
 
     return NextResponse.json({ success: true, message: 'Content restored successfully' });
   } catch (error) {

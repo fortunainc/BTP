@@ -2,6 +2,7 @@ import { auth } from '@clerk/nextjs/server';
 import { NextRequest, NextResponse } from 'next/server';
 import { AuditLogService, AuditEventType } from '@/lib/audit-logging';
 import { RateLimitService } from '@/lib/rate-limiting';
+import { privacySafeAuditContext } from '@/lib/privacy-audit';
 
 /**
  * Authentication result interface
@@ -49,16 +50,11 @@ export async function authenticateUser(request: NextRequest): Promise<AuthResult
       };
     }
 
-    // Get client IP for audit logging
-    const ip = request.headers.get('x-forwarded-for') || 
-              request.headers.get('x-real-ip') || 
-              'unknown';
-
     // Log successful authentication
     AuditLogService.log({
       eventType: AuditEventType.USER_LOGIN,
       userId,
-      ipAddress: ip,
+      ...privacySafeAuditContext(request),
       metadata: { endpoint: request.nextUrl.pathname },
       severity: 'low',
     });
@@ -71,14 +67,9 @@ export async function authenticateUser(request: NextRequest): Promise<AuthResult
   } catch (error) {
     console.error('[API Auth] Authentication error:', error);
     
-    // Get client IP for audit logging
-    const ip = request.headers.get('x-forwarded-for') || 
-              request.headers.get('x-real-ip') || 
-              'unknown';
-
     AuditLogService.log({
       eventType: AuditEventType.FAILED_AUTHENTICATION,
-      ipAddress: ip,
+      ...privacySafeAuditContext(request),
       metadata: { 
         endpoint: request.nextUrl.pathname,
         error: error instanceof Error ? error.message : 'Unknown error',
@@ -139,7 +130,7 @@ export async function applyRateLimit(
     if (!rateLimitResult.success) {
       AuditLogService.log({
         eventType: AuditEventType.RATE_LIMIT_EXCEEDED,
-        ipAddress: ip,
+        ...privacySafeAuditContext(request),
         metadata: { endpoint },
         severity: 'medium',
       });

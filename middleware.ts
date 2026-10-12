@@ -1,26 +1,28 @@
-import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
+import { clerkMiddleware } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
-
-// Public routes that don't require authentication
-const isPublicRoute = createRouteMatcher([
-  '/',
-  '/sign-in(.*)',
-  '/sign-up(.*)',
-  '/privacy',
-  '/situations',
-]);
 
 // Simplified middleware without auth() calls
 export default clerkMiddleware(
-  (auth, req) => {
-  // Route redirects
-  if (req.nextUrl.pathname.startsWith("/workforce")) {
-    const newPath = req.nextUrl.pathname.replace(/^\/workforce/, "/opportunities");
-    return NextResponse.redirect(new URL(newPath, req.url));
+  (_auth, req) => {
+  const dormantApiPrefixes = [
+    "/api/applications",
+    "/api/conversations",
+    "/api/cron/scan-opportunities",
+    "/api/fee-records",
+    "/api/hires",
+    "/api/job-postings",
+    "/api/micro-opportunities",
+    "/api/operator-profiles",
+    "/api/opportunities",
+  ];
+  if (dormantApiPrefixes.some(path => req.nextUrl.pathname === path || req.nextUrl.pathname.startsWith(`${path}/`))) {
+    return NextResponse.json({ error: "This feature is not available in the BTP beta." }, { status: 404 });
   }
 
-  if (req.nextUrl.pathname === "/marketplace") {
-    return NextResponse.redirect(new URL("/opportunities", req.url));
+  // Route redirects
+  // Dormant marketplace/workforce surfaces are intentionally unreachable in beta.
+  if (["/opportunities", "/workforce", "/marketplace", "/profile"].some(path => req.nextUrl.pathname === path || req.nextUrl.pathname.startsWith(`${path}/`))) {
+    return NextResponse.redirect(new URL("/situations", req.url));
   }
 
   if (req.nextUrl.pathname.startsWith("/signals")) {

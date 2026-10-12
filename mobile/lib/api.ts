@@ -1,4 +1,4 @@
-import type { ActivityItem, AnswerSubmission, HelpType, OutcomeType, PrivateHelpRequest, QuestionDetail, QuestionSummary } from "@/types/question";
+import type { ActivityItem, AnswerSubmission, ContentReport, HelpType, OutcomeType, PrivateHelpRequest, QuestionDetail, QuestionSummary } from "@/types/question";
 import { API_URL } from "@/lib/config";
 
 export { liveApiConfigured } from "@/lib/config";
@@ -42,6 +42,9 @@ export const api = {
   },
   help: {
     async list(token: string | null): Promise<PrivateHelpRequest[]> { const result = await apiRequest<{ requests: PrivateHelpRequest[] }>("/api/help-requests", { token }); return result.requests; },
+  },
+  reports: {
+    async list(token: string | null): Promise<ContentReport[]> { const result = await apiRequest<{ reports: ContentReport[] }>("/api/reports", { token }); return result.reports; },
   },
   activity: {
     async list(token: string | null): Promise<ActivityItem[]> {

@@ -4,6 +4,9 @@ import "./globals.css";
 import { ClerkProvider } from '@clerk/nextjs';
 import { AuthProvider } from "@/components/AuthContext";
 
+// Clerk-backed member and founder surfaces require request-time auth context.
+export const dynamic = "force-dynamic";
+
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
