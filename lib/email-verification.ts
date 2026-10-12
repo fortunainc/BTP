@@ -100,7 +100,7 @@ export class EmailVerificationService {
           <div style="background: #f8f9fa; padding: 40px 30px; border-radius: 0 0 10px 10px; border: 1px solid #e5e7eb;">
             <h2 style="color: #111827; margin-top: 0;">Verify Your Account</h2>
             <p style="color: #4b5563; margin-bottom: 20px;">
-              Welcome to BehindTheProtocol! You're creating an anonymous account with the handle <strong>${handle}</strong>.
+              Welcome to BehindTheProtocol! You're creating an identity-protected account with the handle <strong>${handle}</strong>.
             </p>
             <p style="color: #4b5563; margin-bottom: 20px;">
               Your verification code is:
@@ -116,7 +116,7 @@ export class EmailVerificationService {
             
             <div style="background: #fef3c7; border-left: 4px solid #f59e0b; padding: 15px; margin: 20px 0; border-radius: 4px;">
               <p style="color: #92400e; margin: 0; font-size: 14px;">
-                <strong>🔒 Privacy Notice:</strong> Your email address will be <strong>immediately deleted</strong> after verification. We never store your email or personal information.
+                <strong>🔒 Privacy Notice:</strong> Your email is used privately for verification, authentication, safety, and account support. It is never shown with your community questions or answers.
               </p>
             </div>
             

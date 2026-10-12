@@ -68,7 +68,6 @@ export const POST = withAuth(async (req, user) => {
         metadata: {
           userRole,
           hasLinkedinUrl: Boolean(sanitizedLinkedinUrl),
-          handle: sanitizedHandle,
           roleCategory: sanitizedRoleCategory,
           companyCategory: sanitizedCompanyType,
         },

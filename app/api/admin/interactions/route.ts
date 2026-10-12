@@ -116,7 +116,8 @@ export async function POST(request: NextRequest) {
       interactionType: normalizedType,
       weight: Number(body.weight || 1),
       context: contextResult.blockedFromDisplay ? null : contextResult.displayContext,
-      originalContext: contextResult.originalContext,
+      // Retain the privacy-safe display context, not the readable source text.
+      originalContext: null,
       correlationRisk: contextResult.correlationRisk,
       displayStatus: contextResult.blockedFromDisplay ? 'PENDING_REVIEW' : String(body.displayStatus || 'VISIBLE'),
       isSeeded: true,

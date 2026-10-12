@@ -30,6 +30,7 @@ export default function AdminVerificationsPage() {
   const [selectedUser, setSelectedUser] = useState<UserWithProfile | null>(null);
   const [actionLoading, setActionLoading] = useState(false);
   const [rejectionReason, setRejectionReason] = useState('');
+  const [verificationMethods, setVerificationMethods] = useState<Record<string, string>>({});
 
   useEffect(() => {
     if (!isAdmin) {
@@ -54,10 +55,14 @@ export default function AdminVerificationsPage() {
   };
 
   const handleApprove = async (userId: string) => {
+    const verificationMethod = verificationMethods[userId];
+    if (!verificationMethod) return;
     setActionLoading(true);
     try {
       const response = await fetch(`/api/admin/verifications/${userId}/approve`, {
         method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ verificationMethod }),
       });
       if (!response.ok) throw new Error('Failed to approve user');
       await fetchUsers();
@@ -202,9 +207,21 @@ export default function AdminVerificationsPage() {
                   <div className="flex gap-2">
                     {u.verificationStatus === 'Pending' && (
                       <>
+                        <select
+                          aria-label={`Verification method for ${u.anonymousHandle}`}
+                          value={verificationMethods[u.id] || ''}
+                          onChange={(event) => setVerificationMethods((current) => ({ ...current, [u.id]: event.target.value }))}
+                          className="px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg text-sm"
+                        >
+                          <option value="">How verified?</option>
+                          <option value="linkedin">LinkedIn history</option>
+                          <option value="work_email">Work email</option>
+                          <option value="member_endorsement">Verified member endorsement</option>
+                          <option value="manual_evidence">Other evidence reviewed</option>
+                        </select>
                         <button
                           onClick={() => handleApprove(u.id)}
-                          disabled={actionLoading}
+                          disabled={actionLoading || !verificationMethods[u.id]}
                           className="px-4 py-2 bg-green-600 hover:bg-green-700 disabled:bg-gray-600 rounded-lg text-sm transition-colors"
                         >
                           Approve

@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
 import { withAuth } from '@/lib/api-auth';
 import { prisma } from '@/lib/prisma';
 import { logAuditEvent, AuditEventType } from '@/lib/audit-logging';
@@ -14,6 +14,15 @@ export const POST = withAuth(async (req, user) => {
       const url = new URL(req.url);
       const pathSegments = url.pathname.split('/');
       const userId = pathSegments[4]; // /api/admin/verifications/[id]/approve
+      const body = await req.json().catch(() => ({}));
+      const verificationMethod = typeof body.verificationMethod === 'string'
+        ? body.verificationMethod.trim().toLowerCase()
+        : '';
+      const allowedMethods = ['linkedin', 'work_email', 'member_endorsement', 'manual_evidence'];
+
+      if (!allowedMethods.includes(verificationMethod)) {
+        return NextResponse.json({ error: 'Select how professional experience was verified' }, { status: 400 });
+      }
 
       // Get the target user
       const targetUser = await prisma.user.findUnique({
@@ -29,6 +38,7 @@ export const POST = withAuth(async (req, user) => {
         where: { id: userId },
         data: {
           verificationStatus: 'Approved',
+          verificationMethod,
           verifiedBy: user.id,
           verifiedAt: new Date(),
         },
@@ -44,7 +54,7 @@ export const POST = withAuth(async (req, user) => {
         metadata: {
           targetUserId: userId,
           targetHandle: targetUser.handle,
-          verificationMethod: targetUser.verificationMethod,
+          verificationMethod,
         },
       });
 

@@ -21,6 +21,7 @@ export default function RootLayout() {
       <Stack screenOptions={{ headerShown: false }}>
         <Stack.Screen name="(tabs)" />
         <Stack.Screen name="question/[id]" />
+        <Stack.Screen name="trust-center" options={{ presentation: "modal" }} />
       </Stack>
     </BtpAuthProvider>
   );

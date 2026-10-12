@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import { ActivityIndicator, Alert, Linking, Pressable, StyleSheet, Text, View } from "react-native";
+import { router } from "expo-router";
 
 import { AppScreen } from "@/components/AppScreen";
 import { colors, spacing } from "@/constants/theme";
@@ -7,7 +8,11 @@ import { api, liveApiConfigured } from "@/lib/api";
 import { useBtpAuth } from "@/lib/auth";
 import type { PrivateHelpRequest } from "@/types/question";
 
-const rows = ["Verification and role", "Expertise and topics", "Privacy", "Notifications"];
+const rows = [
+  { label: "Professional verification", detail: "Approved privately for beta" },
+  { label: "Trust Center", detail: "How identity and reporting work", action: "trust" },
+  { label: "Notifications", detail: "Managed by BTP for beta" },
+];
 const ACCOUNT_DELETION_EMAIL = "mailto:fortunaindustriesinc@gmail.com?subject=BTP%20account%20deletion%20request&body=Please%20delete%20my%20BTP%20account%20and%20associated%20personal%20data.%20My%20account%20email%20is%3A%20";
 
 export default function YouScreen() {
@@ -40,10 +45,10 @@ export default function YouScreen() {
       {auth.configured && <Pressable onPress={() => void auth.signOut()} style={styles.signOut}><Text style={styles.signOutText}>Sign out</Text></Pressable>}
       <View style={styles.list}>
         {rows.map((row, index) => (
-          <View key={row} style={[styles.row, index < rows.length - 1 && styles.divider]}>
-            <Text style={styles.rowText}>{row}</Text>
-            <Text style={styles.betaLabel}>Managed by BTP for beta</Text>
-          </View>
+          <Pressable disabled={!row.action} key={row.label} onPress={() => row.action === "trust" && router.push("/trust-center")} style={[styles.row, index < rows.length - 1 && styles.divider]}>
+            <View style={styles.rowCopy}><Text style={styles.rowText}>{row.label}</Text><Text style={styles.betaLabel}>{row.detail}</Text></View>
+            {row.action && <Text style={styles.chevron}>›</Text>}
+          </Pressable>
         ))}
       </View>
       <Pressable accessibilityRole="button" onPress={() => void requestAccountDeletion()} style={styles.deleteAccount}>
@@ -93,9 +98,11 @@ const styles = StyleSheet.create({
   privacy: { fontFamily: "Geist", color: colors.muted, fontSize: 11, lineHeight: 16, marginTop: 3 },
   list: { backgroundColor: colors.surface, borderColor: colors.border, borderRadius: 18, borderWidth: 1, overflow: "hidden" },
   row: { alignItems: "center", flexDirection: "row", justifyContent: "space-between", marginHorizontal: spacing.md, paddingVertical: 17 },
+  rowCopy: { flex: 1, gap: 3 },
   divider: { borderBottomColor: colors.border, borderBottomWidth: 1 },
   rowText: { fontFamily: "Geist", color: colors.ink, fontSize: 15, fontWeight: "600" },
-  betaLabel: { fontFamily: "Geist", color: colors.muted, fontSize: 11, marginLeft: spacing.sm, textAlign: "right" },
+  betaLabel: { fontFamily: "Geist", color: colors.muted, fontSize: 11 },
+  chevron: { color: colors.muted, fontFamily: "Geist", fontSize: 25, marginLeft: spacing.sm },
   signOut: { alignItems: "center", borderColor: colors.border, borderRadius: 14, borderWidth: 1, padding: 14 },
   signOutText: { fontFamily: "Geist", color: colors.danger, fontWeight: "700" },
   deleteAccount: { alignItems: "center", paddingHorizontal: spacing.sm, paddingVertical: 4 },

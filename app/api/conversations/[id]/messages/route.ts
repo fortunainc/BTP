@@ -1,6 +1,6 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
-import { withAuth, createApiResponse, createErrorResponse } from '@/lib/api-auth';
+import { withAuth, createErrorResponse } from '@/lib/api-auth';
 import { AuditLogService, AuditEventType } from '@/lib/audit-logging';
 import { InputSanitization } from '@/lib/input-sanitization';
 import { redactContent } from '@/lib/redaction';
@@ -115,7 +115,8 @@ export const POST = withAuth(async (req, user) => {
         senderId: user.id,
         recipientId,
         content: redactedContent,
-        originalContent: body.content,
+        // Never retain the readable pre-redaction message. The safe copy is the record.
+        originalContent: null,
         wasRedacted: redactedContent !== sanitizedContent,
       },
       include: {

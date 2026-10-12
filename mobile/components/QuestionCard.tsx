@@ -9,7 +9,7 @@ export function QuestionCard({ question }: { question: QuestionSummary }) {
   return (
     <Pressable accessibilityRole="button" onPress={() => router.push({ pathname: "/question/[id]", params: { id: question.id } })} style={({ pressed }) => [styles.card, pressed && styles.pressed]}>
       <View style={styles.metaRow}>
-        <Text style={styles.role}>{question.role}</Text>
+        <View style={styles.verifiedRole}><Ionicons color={colors.accent} name="checkmark-circle" size={14} /><Text style={styles.role}>{question.role}</Text></View>
         <Text style={styles.time}>{question.createdLabel}</Text>
       </View>
       <Text numberOfLines={3} style={styles.title}>{question.title}</Text>
@@ -28,6 +28,7 @@ const styles = StyleSheet.create({
   card: { backgroundColor: colors.surface, borderColor: colors.border, borderRadius: 18, borderWidth: 1, gap: spacing.sm, padding: spacing.md },
   pressed: { opacity: 0.72 },
   metaRow: { alignItems: "center", flexDirection: "row", justifyContent: "space-between" },
+  verifiedRole: { alignItems: "center", flexDirection: "row", gap: 4 },
   role: { fontFamily: "Geist", color: colors.accent, fontSize: 12, fontWeight: "700" },
   time: { fontFamily: "Geist", color: colors.muted, fontSize: 12 },
   title: { fontFamily: "Geist", color: colors.ink, fontSize: 16, fontWeight: "600", lineHeight: 23 },
