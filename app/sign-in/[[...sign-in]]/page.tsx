@@ -13,7 +13,7 @@ function clerkMessage(error: unknown): string {
 }
 
 export default function SignInPage() {
-  const { isLoaded, signIn, setActive } = useSignIn();
+  const { signIn, fetchStatus } = useSignIn();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [busy, setBusy] = useState(false);
@@ -21,21 +21,37 @@ export default function SignInPage() {
 
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    if (!isLoaded || !signIn || !setActive || busy) return;
+    if (fetchStatus === 'fetching' || busy) return;
 
     setBusy(true);
     setError('');
     try {
-      const result = await signIn.create({ identifier: email.trim(), password });
-      if (result.status !== 'complete' || !result.createdSessionId) {
+      const { error: signInError } = await signIn.password({
+        emailAddress: email.trim(),
+        password,
+      });
+      if (signInError) {
+        setError(signInError.longMessage || signInError.message || 'Check your email and password and try again.');
+        return;
+      }
+
+      if (signIn.status !== 'complete') {
         setError('This account requires an additional verification step. Contact BTP support so we can complete your access.');
         return;
       }
 
-      await setActive({ session: result.createdSessionId });
       const params = new URLSearchParams(window.location.search);
       const destination = params.get('redirect_url');
-      window.location.replace(destination?.startsWith('/') ? destination : '/admin/analytics');
+      const redirectTo = destination?.startsWith('/') ? destination : '/admin/analytics';
+      await signIn.finalize({
+        navigate: ({ session, decorateUrl }) => {
+          if (session?.currentTask) {
+            setError('Your account requires one additional security step. Contact BTP support to complete access.');
+            return;
+          }
+          window.location.replace(decorateUrl(redirectTo));
+        },
+      });
     } catch (cause) {
       setError(clerkMessage(cause));
     } finally {
@@ -43,7 +59,8 @@ export default function SignInPage() {
     }
   }
 
-  const disabled = !isLoaded || busy || !email.trim() || !password;
+  const loading = fetchStatus === 'fetching';
+  const disabled = loading || busy || !email.trim() || !password;
 
   return (
     <main className="min-h-screen bg-[#EFE6D8] px-5 py-10 text-[#3A1A1E] sm:flex sm:items-center sm:justify-center">
@@ -72,7 +89,7 @@ export default function SignInPage() {
             {error ? <div role="alert" className="rounded-xl border border-[#B54C4C]/30 bg-[#B54C4C]/10 px-4 py-3 text-sm leading-5 text-[#7D2F2F]">{error}</div> : null}
 
             <button type="submit" disabled={disabled} className="w-full rounded-xl bg-[#3A1A1E] px-4 py-4 text-base font-bold text-white transition hover:bg-[#51242A] disabled:cursor-not-allowed disabled:opacity-45">
-              {busy ? 'Signing in…' : isLoaded ? 'Sign in' : 'Preparing secure sign-in…'}
+              {busy || loading ? 'Signing in…' : 'Sign in'}
             </button>
           </form>
 

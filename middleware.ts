@@ -11,7 +11,8 @@ const isPublicRoute = createRouteMatcher([
 ]);
 
 // Simplified middleware without auth() calls
-export default clerkMiddleware((auth, req) => {
+export default clerkMiddleware(
+  (auth, req) => {
   // Route redirects
   if (req.nextUrl.pathname.startsWith("/workforce")) {
     const newPath = req.nextUrl.pathname.replace(/^\/workforce/, "/opportunities");
@@ -26,8 +27,18 @@ export default clerkMiddleware((auth, req) => {
     const newPath = req.nextUrl.pathname.replace(/^\/signals/, "/situations");
     return NextResponse.redirect(new URL(newPath, req.url));
   }
-});
+  },
+  {
+    frontendApiProxy: {
+      enabled: true,
+    },
+  },
+);
 
 export const config = {
-  matcher: ["/((?!.*\\..*|_next).*)"],
+  matcher: [
+    "/((?!_next|[^?]*\\.(?:html?|css|js(?!on)|jpe?g|webp|png|gif|svg|ttf|woff2?|ico|csv|docx?|xlsx?|zip|webmanifest)).*)",
+    "/(api|trpc)(.*)",
+    "/__clerk/(.*)",
+  ],
 };

@@ -32,6 +32,7 @@ export default function RootLayout({
   return (
     <ClerkProvider
       publishableKey={publishableKey}
+      proxyUrl="/__clerk"
       signInUrl="/sign-in"
       signUpUrl="/sign-up"
       signInFallbackRedirectUrl="/situations"
