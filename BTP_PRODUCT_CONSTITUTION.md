@@ -3,6 +3,29 @@
 **Status:** Controlling source of truth for the BTP beta  
 **Objective:** Ship a useful mobile beta as quickly as possible without rebuilding working infrastructure or drifting into a broader platform.
 
+## Strategic amendment — locked October 13, 2026
+
+The existing ask–answer–outcome product remains the beta trust-formation layer and must ship without a restart. Its purpose is to prove that verified clinical-trial professionals will participate candidly, help one another, return, and build credible relationships.
+
+The commercial expansion wedge, after that trust loop is working, is:
+
+> **A private, trusted availability network for experienced clinical-development and clinical-trial professionals—especially during layoffs, career transitions, and periods of industry instability.**
+
+The long-term asset is not a feed or résumé database. It is a consent-aware professional trust graph combining verified identity, structured capability, current availability, credible working relationships, opportunity fit, and outcomes.
+
+This amendment means:
+
+- Do not restart or discard the working mobile beta.
+- Do not turn the beta into a generic job board, recruiting agency, LinkedIn clone, or public consultant directory.
+- Use the community help loop to establish trust and learn what members actually need.
+- Add availability, capability, attestations, controlled introductions, and opportunity workflows progressively after the first cohort demonstrates trust.
+- Layoff response is an acquisition wedge, not a permanent identity assigned to a member.
+- Never expose employment or availability status without explicit member consent.
+- Preserve dormant marketplace infrastructure, but do not reactivate broad workforce features until real member and employer demand validates them.
+- Interview preparation is an approved early paid-help offering under Section 6, with the controls defined there.
+
+If a later section conflicts with this amendment, this amendment controls strategic sequencing while the existing beta scope continues to control the build currently in TestFlight.
+
 ## 1. Mission
 
 BTP is the trusted place where people across the clinical-trial ecosystem help each other safely.
@@ -10,6 +33,10 @@ BTP is the trusted place where people across the clinical-trial ecosystem help e
 ## 2. Core promise
 
 > Ask the clinical-trial question you cannot Google or comfortably ask at work. Get practical answers from verified people who have handled similar situations.
+
+As BTP expands beyond the initial trust loop, the broader promise becomes:
+
+> Be candid, become discoverable on your own terms, and access credible help and opportunity through verified professional relationships.
 
 ## 3. The beta has one job
 
@@ -84,6 +111,41 @@ Beta flow:
 During beta, matching may be manual. Payment may also be handled manually or through a simple payment link. A fully automated marketplace is not required to validate demand.
 
 BTP earns revenue from a transparent fee on paid assistance. Asking, answering, following cases, and reporting outcomes remain free.
+
+### Approved early offering: BTP Interview Prep
+
+Interview preparation is a natural extension of private help because experienced professionals frequently struggle to translate strong operating experience into a clear interview performance. It may be offered during beta without building a separate career platform.
+
+The initial service is:
+
+- Private and role-specific for clinical-development and clinical-trial positions
+- A structured intake followed by a realistic mock interview
+- Feedback on clarity, examples, decision-making, leadership, communication, and gaps
+- Help converting real experience into concise, credible stories
+- Optional preparation for panel, case, presentation, sponsor, CRO, site, vendor, or cross-functional interviews
+- Delivered initially through founder-mediated matching with Sasha or another verified interviewer who has genuine hiring or interview experience
+- Priced transparently as an optional service; no member is charged merely because she is laid off or transitioning
+- Tracked through completion, private feedback, and member-reported interview outcomes
+
+BTP Interview Prep must not:
+
+- Promise employment or interview success
+- Request or disclose proprietary employer interview questions, scorecards, candidate information, or confidential hiring practices
+- Imply representation of Sasha's employer or use confidential employer knowledge
+- Become generic résumé rewriting, mass coaching, or a course library before live demand is proven
+- Publicly reveal that a member is interviewing or seeking work
+
+The free community may still provide general peer guidance. Paid interview preparation is for dedicated time, individualized practice, and structured feedback.
+
+### Strategic monetization sequence
+
+1. Optional paid private help, including role-specific interview preparation
+2. Founder-mediated expert consultations and defined project help
+3. Verified opportunity submissions and consented introductions
+4. Marketplace fees or selective employer-side fees after transactions are validated
+5. Employer access, transition programs, and privacy-safe aggregate intelligence only after explicit consent and sufficient network density
+
+Do not make laid-off professionals the primary monetization target. Long-term revenue should come primarily from opportunity owners, employers, paid engagements, and transactions that create real member value.
 
 ## 7. Safety rules
 
@@ -184,6 +246,17 @@ These are not beta requirements:
 - Aggregate industry intelligence products
 - Public launch outside the invite-only cohort
 
+Also deferred until the trust loop demonstrates demand:
+
+- Broad searchable talent directory
+- Automated job matching
+- Public availability profiles
+- Recruiter self-service access
+- Automated references or public professional ratings
+- Complex payment, escrow, placement, or employer-dashboard infrastructure
+
+The narrow, founder-mediated interview-preparation offering is not deferred because it reuses the existing private-help flow and can be validated manually.
+
 They may be added only after the core help loop works and members demonstrate demand.
 
 ## 12. Beta success criteria
@@ -197,10 +270,13 @@ BTP shows meaningful validation when:
 - At least 30% of askers return to report an outcome
 - Members answer questions without repeated founder prompting
 - At least 3–5 users request deeper private help
+- At least 3 members express interest in interview preparation or another defined form of paid help
 
 The primary metric is:
 
 > **Percentage of questions receiving a useful answer within 48 hours.**
+
+The next-stage proof metrics, once availability is introduced, are profile completion, explicit availability adoption, trusted invitations, attestations, consented introduction requests, introduction acceptance, and meaningful outcomes—not registrations or feed engagement.
 
 ## 13. Anti-drift rule
 
@@ -210,8 +286,9 @@ Before adding a feature, answer:
 2. Does it improve the likelihood or quality of an answer?
 3. Does it help close the loop with a real outcome?
 4. Does it create aligned revenue from additional work rather than exploiting trust?
+5. Does it strengthen the verified capability, availability, trust, or outcome graph without exposing members?
 
-If the answer is no to all four, it does not belong in the beta.
+If the answer is no to all five, it does not belong in the beta or immediate expansion path.
 
 ## 14. Build directive
 
