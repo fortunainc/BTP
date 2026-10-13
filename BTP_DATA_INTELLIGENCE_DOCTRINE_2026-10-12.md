@@ -4,6 +4,8 @@
 **Locked:** October 12, 2026 at 9:06 PM PDT
 **Relationship to existing source of truth:** `BTP_PRODUCT_CONSTITUTION.md` continues to control the beta product. `BTP_STRATEGIC_DIRECTION.md` continues to control the expansion from trusted community to availability and opportunity network. This document controls how BTP develops its long-term data, intelligence, and forecasting asset. It does not authorize a restart or expansion of the current beta.
 
+The canonical running list of monetization options is maintained in `BTP_FUTURE_REVENUE_STREAMS.md`.
+
 ## Long-term thesis
 
 BTP can become the trusted human-signal network that detects where clinical trials are breaking before conventional systems can see it.
