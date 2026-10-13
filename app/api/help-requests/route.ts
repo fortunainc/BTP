@@ -4,7 +4,7 @@ import { applyAutomaticRedaction } from '@/lib/anti-correlation';
 import { buildLedgerEvent } from '@/lib/knowledge-ledger';
 import { prisma } from '@/lib/prisma';
 
-const HELP_TYPES = ['CONSULTATION', 'WRITTEN_REVIEW', 'DOCUMENT_REVIEW', 'PROJECT_HELP'];
+const HELP_TYPES = ['CONSULTATION', 'INTERVIEW_PREP', 'WRITTEN_REVIEW', 'DOCUMENT_REVIEW', 'PROJECT_HELP'];
 
 export const GET = withAuth(async (_req, user) => {
   if (user.verificationStatus !== 'Approved' && user.userRole !== 'admin') {

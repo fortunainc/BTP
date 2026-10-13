@@ -365,6 +365,7 @@ export default function SituationDetailPage({ params }: { params: Promise<{ id: 
                       className="w-full bg-slate-900 border border-slate-700 rounded-md px-3 py-2 text-sm text-white"
                     >
                       <option value="CONSULTATION">Expert consultation</option>
+                      <option value="INTERVIEW_PREP">Interview preparation</option>
                       <option value="WRITTEN_REVIEW">Written resolution review</option>
                       <option value="DOCUMENT_REVIEW">Document or workflow review</option>
                       <option value="PROJECT_HELP">Defined project help</option>

@@ -66,7 +66,7 @@ export default function YouScreen() {
   );
 }
 
-const labelHelpType = (value: string) => ({ CONSULTATION: "Private consultation", WRITTEN_REVIEW: "Written review", DOCUMENT_REVIEW: "Document or workflow review", PROJECT_HELP: "Defined project help" }[value] || "Private help");
+const labelHelpType = (value: string) => ({ CONSULTATION: "Private consultation", INTERVIEW_PREP: "Interview preparation", WRITTEN_REVIEW: "Written review", DOCUMENT_REVIEW: "Document or workflow review", PROJECT_HELP: "Defined project help" }[value] || "Private help");
 const labelStatus = (value: string) => ({ NEW: "Received", REVIEWING: "In review", MATCHING: "Finding a match", MATCHED: "Matched", COMPLETED: "Completed", CLOSED: "Closed" }[value] || value.replaceAll("_", " ").toLowerCase());
 const labelReportReason = (value: string) => ({ IDENTIFYING_INFORMATION: "Identifying information", CONFIDENTIAL_INFORMATION: "Confidential information", PATIENT_INFORMATION: "Patient information", HARASSMENT: "Harassment", MISINFORMATION: "Potentially unsafe information", URGENT_SAFETY_OR_MISCONDUCT: "Urgent safety or misconduct", OTHER: "Other concern" }[value] || "Reported concern");
 const initials = (handle: string) => handle.split(/[^A-Za-z0-9]+/).filter(Boolean).slice(0, 2).map(part => part[0]).join("").toUpperCase() || "BM";

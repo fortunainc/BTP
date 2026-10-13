@@ -10,7 +10,7 @@ import { useBtpAuth } from "@/lib/auth";
 import type { HelpType, OutcomeType, QuestionDetail } from "@/types/question";
 
 const outcomeOptions: Array<{value:OutcomeType;label:string}>=[{value:"resolution",label:"Resolved"},{value:"validation",label:"Confirmed accurate"},{value:"correction",label:"Needed correction"},{value:"incomplete",label:"Incomplete"},{value:"misleading",label:"Misleading"}];
-const helpOptions: Array<{value:HelpType;label:string}>=[{value:"CONSULTATION",label:"Expert consultation"},{value:"WRITTEN_REVIEW",label:"Written review"},{value:"DOCUMENT_REVIEW",label:"Document review"},{value:"PROJECT_HELP",label:"Project help"}];
+const helpOptions: Array<{value:HelpType;label:string}>=[{value:"CONSULTATION",label:"Expert consultation"},{value:"INTERVIEW_PREP",label:"Interview preparation"},{value:"WRITTEN_REVIEW",label:"Written review"},{value:"DOCUMENT_REVIEW",label:"Document review"},{value:"PROJECT_HELP",label:"Project help"}];
 const reportOptions=[{value:"IDENTIFYING_INFORMATION",label:"Identifying details"},{value:"CONFIDENTIAL_INFORMATION",label:"Confidential information"},{value:"PATIENT_INFORMATION",label:"Patient information"},{value:"HARASSMENT",label:"Harassment"},{value:"MISINFORMATION",label:"Unsafe information"},{value:"OTHER",label:"Other"}];
 
 export default function QuestionScreen(){
