@@ -1,7 +1,7 @@
 # BTP Data Intelligence Doctrine
 
 **Status:** Locked strategic doctrine  
-**Locked:** October 12, 2026 (America/Los_Angeles)  
+**Locked:** October 12, 2026 at 9:06 PM PDT
 **Relationship to existing source of truth:** `BTP_PRODUCT_CONSTITUTION.md` continues to control the beta product. `BTP_STRATEGIC_DIRECTION.md` continues to control the expansion from trusted community to availability and opportunity network. This document controls how BTP develops its long-term data, intelligence, and forecasting asset. It does not authorize a restart or expansion of the current beta.
 
 ## Long-term thesis
@@ -126,12 +126,93 @@ No intelligence product may undermine the community that created it.
 
 Potential buyers include biotech and pharmaceutical sponsors, CROs, research-site organizations, vendors, investors, insurers, consultants, and other organizations making clinical-development capital and operating decisions. Buyer demand must be validated before building enterprise dashboards.
 
+## Approved future revenue stream: BTP Operator Intelligence
+
+**BTP Operator Intelligence** is an approved future business model that uses BTP's verified member network to deliver rapid, structured operational research for organizations making clinical-trial decisions.
+
+It is an additional revenue stream—not a replacement for the trusted member community, not a new immediate beta requirement, and not authorization to build separate infrastructure before the current plan establishes verified users, participation, trust, and consent controls.
+
+### Future offering
+
+A buyer may submit a legitimate operational decision such as:
+
+- Whether sites or trial teams are likely to adopt a proposed product or workflow
+- Where an operational model, vendor strategy, or clinical technology is likely to fail
+- What prevents successful adoption or implementation
+- How site, CRO, sponsor, and vendor perspectives differ
+- Which unmet needs deserve investment or product development
+- What an investor or emerging company should understand before committing capital
+
+BTP may assemble a relevant, separately opted-in group of verified operators; compensate them for their time; collect structured feedback and interviews; and produce an aggregated, de-identified, decision-ready report or briefing.
+
+An initial manual product may be called **BTP Operator Reality Check** and include:
+
+- Buyer-question refinement and research design
+- Approximately 5–15 relevant verified operators
+- Structured research questions and selected interviews
+- Cross-role agreement and disagreement analysis
+- Key risks, adoption barriers, and practical recommendations
+- Aggregated evidence with clear limitations
+- A final report or briefing delivered in approximately 5–10 business days
+
+Initial pricing hypotheses to validate—not fixed promises—are approximately $7,500–$15,000 for a focused sprint and $20,000–$40,000 for deeper protocol, product, workflow, or market review. Operators must be compensated transparently. BTP should test willingness to pay and repeat demand before automating delivery.
+
+### Initial buyers
+
+Prioritize buyers with urgent questions and relatively fast purchasing cycles:
+
+1. Clinical-trial technology startups
+2. Clinical service and specialty vendors
+3. Emerging biotechnology companies
+4. Life-sciences investors and diligence teams
+5. Consultants requiring specialized primary research
+6. CRO product, innovation, and strategy teams
+
+Large-pharma procurement should not be the first dependency.
+
+### Required trust firewall
+
+- Community participation never constitutes consent for paid research.
+- Paid research requires a separate, explicit, project-specific opt-in.
+- Community questions, answers, activity, availability, and identity cannot be shown or sold to buyers.
+- Members must know the research topic, participation expectations, compensation, and permitted use before accepting.
+- No patient information, confidential study information, proprietary employer materials, unpublished results, or employer-specific allegations may be requested or disclosed.
+- Reports must be aggregated and reviewed for re-identification risk.
+- Buyers may not use BTP to investigate a named employer, study, team, or individual.
+- Members may decline without affecting community standing, verification, visibility, or access.
+
+### Sequencing and validation gate
+
+The current infrastructure plan comes first: trusted membership, verification, safe questions and answers, outcomes, private help, consent, moderation, and reliable administration.
+
+BTP Operator Intelligence should begin manually only after BTP can reliably recruit relevant verified participants and administer separate consent. It should not trigger an enterprise dashboard or research-platform build.
+
+A meaningful initial validation target is:
+
+- 25 or more verified operators who explicitly opt into paid research
+- 10 qualified buyer interviews
+- 3 paid research engagements within approximately 60 days of active selling
+- At least 1 repeat or expanded engagement
+- Evidence of healthy contribution margins after operator compensation
+- Recurring buyer questions that strengthen BTP's privacy-safe taxonomy and future intelligence roadmap
+
+If buyers do not pay, participants cannot be recruited reliably, or engagements do not repeat, keep the capability dormant and continue the core BTP plan.
+
+### Strategic value
+
+This model can create early B2B revenue while giving members compensated opportunities and generating consented, structured evidence. It is the manual bridge between the community and future signal reports, benchmarks, early warnings, and forecasting products.
+
+Its positioning is:
+
+> **Before you build, buy, or invest in a clinical-trial product or operating model, let verified people who execute the work show you where it may break.**
+
 ## Commercial principle
 
 BTP's long-term intelligence revenue should come from organizations that benefit from earlier, better operational decisions. Members should receive a safe and useful professional community; they should not become an unknowingly exploited dataset.
 
 Possible future revenue includes:
 
+- BTP Operator Intelligence research sprints and briefings
 - Paid Clinical Trial Operator Signal reports
 - Recurring operational-risk intelligence subscriptions
 - Custom, privacy-safe research
@@ -176,4 +257,3 @@ If the answer is no, defer it.
 ## Locked north star
 
 > **BTP earns trust by helping clinical-trial operators help one another. It converts repeated, independently corroborated experience and measured outcomes—not private conversations or vanity engagement—into earlier, safer, and more useful operational intelligence for the industry.**
-
