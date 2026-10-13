@@ -4,6 +4,8 @@
 **Locked:** October 13, 2026  
 **Relationship to the product constitution:** `BTP_PRODUCT_CONSTITUTION.md` controls the beta currently being built. This document controls the direction of expansion after the initial trust loop is validated. The product must evolve from the existing build; it must not be restarted.
 
+**Data and forecasting doctrine:** `BTP_DATA_INTELLIGENCE_DOCTRINE_2026-10-12.md` locks the long-term path from operator questions and outcomes to privacy-safe benchmarks, early warnings, and eventually calibrated operational forecasts. It does not expand the current beta scope.
+
 ## Strategic thesis
 
 BTP begins as the trusted place where verified clinical-trial professionals can ask questions they cannot comfortably ask at work and receive practical answers from people who have handled similar situations.
