@@ -10,12 +10,13 @@ type Step = 1 | 2 | 3;
 export default function OnboardingPage() {
   const router = useRouter();
   const { user, loading: authLoading } = useAuth();
-  const [step, setStep] = useState<Step>(1);
+  // Beta onboarding is for individual professionals; the organization path is dormant.
+  const [step, setStep] = useState<Step>(2);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string>('');
   
   // Step 1: Role selection
-  const [selectedRole, setSelectedRole] = useState<UserRole | null>(null);
+  const [selectedRole, setSelectedRole] = useState<UserRole | null>('operator');
   
   // Step 2: Professional information
   const [formData, setFormData] = useState({
@@ -30,7 +31,7 @@ export default function OnboardingPage() {
   useEffect(() => {
     if (authLoading) return;
     // Redirect if user is already verified (onboarding is complete)
-    if (user?.verificationStatus === 'Approved') {
+    if (user?.verificationStatus === 'Approved' && user.roleCategory && user.roleCategory !== 'unspecified') {
       router.push('/situations');
     }
   }, [user, authLoading, router]);
@@ -55,12 +56,12 @@ export default function OnboardingPage() {
     // }
     
     if (!formData.anonymousHandle) {
-      setError('Anonymous handle is required');
+      setError('Display handle is required');
       return false;
     }
     
     if (formData.anonymousHandle.length < 3) {
-      setError('Anonymous handle must be at least 3 characters');
+      setError('Display handle must be at least 3 characters');
       return false;
     }
     
@@ -116,7 +117,7 @@ export default function OnboardingPage() {
           <h1 className="text-3xl font-bold mb-2">Complete Your Profile</h1>
           <p className="text-gray-400">
             {step === 1 && 'Choose your role in the clinical trials ecosystem'}
-            {step === 2 && 'Provide your professional information'}
+            {step === 2 && 'Tell us your role and choose how you appear to members'}
             {step === 3 && 'Professional verification review'}
           </p>
         </div>
@@ -229,7 +230,7 @@ export default function OnboardingPage() {
 
             <div>
               <label className="block text-sm font-medium mb-2">
-                LinkedIn URL <span className="text-slate-500 text-xs">(optional during alpha)</span>
+                LinkedIn URL <span className="text-slate-500 text-xs">(optional)</span>
               </label>
               <input
                 type="url"
@@ -239,13 +240,13 @@ export default function OnboardingPage() {
                 className="w-full p-3 bg-gray-800 border border-gray-700 rounded-lg focus:border-blue-500 focus:outline-none"
               />
               <p className="text-xs text-gray-500 mt-1">
-                Required for account verification
+                Helps BTP verify your experience privately. Never shown to members. Prefer not to share it? Leave it blank and we will follow up by email about another way to verify, such as a reference from a verified member.
               </p>
             </div>
 
             <div>
               <label className="block text-sm font-medium mb-2">
-                Anonymous Handle <span className="text-red-500">*</span>
+                Display handle <span className="text-red-500">*</span>
               </label>
               <input
                 type="text"
@@ -256,7 +257,7 @@ export default function OnboardingPage() {
                 className="w-full p-3 bg-gray-800 border border-gray-700 rounded-lg focus:border-blue-500 focus:outline-none"
               />
               <p className="text-xs text-gray-500 mt-1">
-                This will be your public identifier (min 3 characters)
+                Shown to members instead of your name. Do not use your real name or employer (min 3 characters).
               </p>
             </div>
 
@@ -270,7 +271,7 @@ export default function OnboardingPage() {
           </div>
         )}
 
-        {step === 3 && <div className="space-y-4 rounded-lg bg-slate-800 p-6"><h2 className="text-xl">Profile submitted for review</h2><p>BTP reviews professional verification privately during beta. Signing in verifies your account access; membership approval is a separate review.</p><button onClick={() => router.push('/dashboard')} className="rounded bg-blue-600 px-4 py-2">Check membership status</button></div>}
+        {step === 3 && <div className="space-y-4 rounded-lg bg-slate-800 p-6"><h2 className="text-xl">Profile submitted for review</h2><p>BTP reviews professional verification privately during beta. Signing in verifies your account access; membership approval is a separate review. BTP will contact you by email once your membership has been reviewed.</p><button onClick={() => router.push('/situations')} className="rounded bg-blue-600 px-4 py-2">Continue</button></div>}
 
         {/* Footer Info */}
         <div className="mt-8 text-center text-sm text-gray-500">

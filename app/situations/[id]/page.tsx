@@ -46,7 +46,7 @@ interface PublicAnswer {
 const INTERACTION_BUTTONS = [
   { type: 'SEEN_THIS', label: "I've seen this", helper: 'Validates that this is not isolated', icon: '👀' },
   { type: 'TRIED_SIMILAR', label: 'We tried something similar', helper: 'Adds attempted-action context', icon: '🔁' },
-  { type: 'WORKED_FOR_US', label: 'What worked for us', helper: 'Share a useful direction anonymously', icon: '✅', needsContext: true },
+  { type: 'WORKED_FOR_US', label: 'What worked for us', helper: 'Share a useful direction', icon: '✅', needsContext: true },
   { type: 'DIDNT_HOLD_UP', label: "What didn't hold up", helper: 'Separates temporary fixes from durable ones', icon: '⚠️', needsContext: true },
   { type: 'CAUSED_OTHER_ISSUES', label: 'This caused other issues', helper: 'Flags downstream risk', icon: '🧩', needsContext: true },
   { type: 'GOT_WORSE_LATER', label: 'This got worse later', helper: 'Shows progression risk', icon: '📈' },
@@ -134,11 +134,11 @@ export default function SituationDetailPage({ params }: { params: Promise<{ id: 
         fetchSituation();
         setTimeout(() => setSuccessMessage(null), 4500);
       } else {
-        setError(data.error || 'Failed to record anonymous context');
+        setError(data.error || 'Failed to record your response');
       }
     } catch (err) {
       console.error('Error recording interaction:', err);
-      setError('Failed to record anonymous context');
+      setError('Failed to record your response');
     } finally {
       setSubmitting(false);
     }
@@ -400,9 +400,9 @@ export default function SituationDetailPage({ params }: { params: Promise<{ id: 
 
               <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-3 mb-5">
                 <div>
-                  <h2 className="text-lg font-semibold text-white">Add anonymous operator context</h2>
+                  <h2 className="text-lg font-semibold text-white">Add your experience</h2>
                   <p className="text-sm text-slate-400 mt-1">
-                    Choose a structured response. Keep it general, anonymous, and separate from public identity.
+                    Choose a structured response. Keep it general and free of identifying details.
                   </p>
                 </div>
                 {interactionStatus?.maturityLabel && (
@@ -473,7 +473,7 @@ export default function SituationDetailPage({ params }: { params: Promise<{ id: 
                   />
                   <div className="mt-2 flex items-center justify-between text-xs text-slate-500">
                     <span>{contextText.length}/200</span>
-                    <span>Anonymous context only</span>
+                    <span>Identity protected; no identifying details</span>
                   </div>
                   <div className="mt-3 flex justify-end gap-2">
                     <button
@@ -490,7 +490,7 @@ export default function SituationDetailPage({ params }: { params: Promise<{ id: 
                       disabled={submitting || !contextText.trim()}
                       className="px-4 py-2 bg-cyan-600 text-white text-sm font-medium rounded-md hover:bg-cyan-700 disabled:opacity-50"
                     >
-                      {submitting ? 'Submitting...' : 'Submit anonymously'}
+                      {submitting ? 'Submitting...' : 'Submit response'}
                     </button>
                   </div>
                 </div>
@@ -567,7 +567,7 @@ export default function SituationDetailPage({ params }: { params: Promise<{ id: 
                         onChange={(e) => setOutcomeData({ ...outcomeData, outcomeNotes: e.target.value })}
                         rows={3}
                         className="w-full bg-slate-900 border border-slate-700 rounded-md px-3 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-emerald-500"
-                        placeholder="What happened? Keep it anonymous."
+                        placeholder="What happened? Leave out identifying details."
                       />
                     </div>
 

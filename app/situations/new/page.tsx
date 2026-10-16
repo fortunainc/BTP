@@ -96,7 +96,7 @@ export default function NewSituationPage() {
         const response = await fetch('/api/user/status');
         if (response.ok) {
           const data = await response.json();
-          setOnboardingComplete(data.onboardingCompleted === 1);
+          setOnboardingComplete(data.onboardingCompleted === true);
         } else {
           setOnboardingComplete(false);
         }
@@ -133,7 +133,7 @@ export default function NewSituationPage() {
             Sign in to ask the BTP community.
           </h1>
           <p className="text-slate-400 mb-8 leading-relaxed">
-            BTP requires sign-in so each submission can be protected, reviewed, and connected to your anonymous handle. Your identity is not displayed with community posts. Authorized BTP staff can access account information for verification and safety.
+            BTP requires sign-in so each submission can be protected, reviewed, and connected to your display handle. Your identity is not displayed with community posts. Authorized BTP staff can access account information for verification and safety.
           </p>
           <div className="flex flex-col gap-3">
             <Link
@@ -166,7 +166,7 @@ export default function NewSituationPage() {
             Complete your profile to share
           </h1>
           <p className="text-slate-400 mb-8 leading-relaxed">
-            Before you can submit, we need a few details to connect your submissions to your anonymous handle.
+            Before you can submit, we need a few details to connect your submissions to your display handle.
           </p>
           <Link
             href="/onboarding"
@@ -281,7 +281,7 @@ export default function NewSituationPage() {
           <p>Identifying workarounds others have used</p>
           <p>Protecting your identity</p>
         </div>
-        <p className="text-xs text-slate-600 mt-6">You'll receive a full reflection within 48 hours</p>
+        
       </div>
     );
   }
@@ -440,8 +440,8 @@ export default function NewSituationPage() {
           <div className="bg-cyan-500/10 border border-cyan-500/30 rounded-lg p-6 mb-6">
             <h3 className="text-cyan-400 font-medium mb-2">What happens next</h3>
             <p className="text-sm text-slate-300 mb-3">
-              This is being compared with similar anonymous context from other operators.
-              You'll receive a detailed reflection within 48 hours.
+              Your question is visible to approved members. You will see responses here as peers answer;
+              during the early beta, responses may take time.
             </p>
             {result.reflection?.patternName && (
               <p className="text-xs text-cyan-400/80 italic mb-3">
@@ -449,8 +449,7 @@ export default function NewSituationPage() {
               </p>
             )}
             <p className="text-sm text-slate-400">
-              In about a week, we'll check back: did this stay manageable, get worse, or turn into something real?
-              Your answer helps us learn what patterns actually matter.
+              Later, you can return and record what happened. Outcomes help other members learn what actually worked.
             </p>
           </div>
 
@@ -527,7 +526,7 @@ export default function NewSituationPage() {
               disabled={submitting}
               className="flex-1 py-3 bg-cyan-600 text-white rounded-lg font-medium hover:bg-cyan-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
             >
-              {submitting ? 'Posting...' : 'Post Anonymously'}
+              {submitting ? 'Posting...' : 'Post with your handle'}
             </button>
           </div>
         </main>
@@ -551,7 +550,7 @@ export default function NewSituationPage() {
           What question do you need help answering?
         </h1>
         <p className="text-slate-500 text-sm mb-6">
-          Keep it anonymous. No names, sponsors, sites, protocol IDs, or patient details.
+          Protect identities. No names, sponsors, sites, protocol IDs, or patient details.
         </p>
 
         {/* Main Form — SINGLE TEXT FIELD */}

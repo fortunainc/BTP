@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
-import { prisma } from '@/lib/prisma';
+import { ensureMemberRecord } from '@/lib/member-provisioning';
 
 export async function GET(request: NextRequest) {
   try {
@@ -10,20 +10,8 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    // Fetch user details from database
-    const user = await prisma.user.findUnique({
-      where: { clerkId: userId },
-      select: {
-        id: true,
-        clerkId: true,
-        handle: true,
-        userRole: true,
-        roleCategory: true,
-        companyCategory: true,
-        verificationStatus: true,
-        isSuspended: true,
-      },
-    });
+    // Fetch (or provision a pending) member record
+    const user = await ensureMemberRecord(userId);
 
     if (!user) {
       return NextResponse.json({ error: 'User not found' }, { status: 404 });

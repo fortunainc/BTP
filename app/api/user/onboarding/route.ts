@@ -21,7 +21,7 @@ export const POST = withAuth(async (req, user) => {
       }
 
       if (!anonymousHandle || anonymousHandle.length < 3) {
-        return NextResponse.json({ error: 'Anonymous handle must be at least 3 characters' }, { status: 400 });
+        return NextResponse.json({ error: 'Display handle must be at least 3 characters' }, { status: 400 });
       }
 
       if (userRole === 'operator' && !roleCategory) {
@@ -38,7 +38,7 @@ export const POST = withAuth(async (req, user) => {
       });
 
       if (existingUser && existingUser.id !== user.id) {
-        return NextResponse.json({ error: 'Anonymous handle is already taken' }, { status: 409 });
+        return NextResponse.json({ error: 'That display handle is already taken' }, { status: 409 });
       }
 
       // Update user profile
@@ -55,7 +55,7 @@ export const POST = withAuth(async (req, user) => {
           handle: sanitizedHandle,
           roleCategory: sanitizedRoleCategory,
           companyCategory: sanitizedCompanyType,
-          verificationStatus: 'Pending',
+          ...(user.verificationStatus === 'Approved' ? {} : { verificationStatus: 'Pending' }),
         },
       });
 

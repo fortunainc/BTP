@@ -93,23 +93,8 @@ export async function authenticateUser(request: NextRequest): Promise<AuthResult
  */
 export async function getUserDetails(clerkId: string) {
   try {
-    const { prisma } = await import('@/lib/prisma');
-    const user = await prisma.user.findUnique({
-      where: { clerkId },
-      select: {
-        id: true,
-        clerkId: true,
-        handle: true,
-        userRole: true,
-        roleCategory: true,
-        companyCategory: true,
-        verificationStatus: true,
-        isSuspended: true,
-        trustScore: true,
-      },
-    });
-
-    return user;
+    const { ensureMemberRecord } = await import('@/lib/member-provisioning');
+    return await ensureMemberRecord(clerkId);
   } catch (error) {
     console.error('[API Auth] Error fetching user details:', error);
     return null;
