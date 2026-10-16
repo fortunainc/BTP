@@ -160,6 +160,7 @@ async function getOverviewData(dataSources: DataSource[]) {
   }), { posts: 0, reflections: 0, consults: 0, revenue: 0 });
   
   return {
+    latestSnapshot: latestMetrics?.dateBucket ?? null,
     users: {
       total: latestMetrics?.totalUsers || 0,
       verifiedOperators: latestMetrics?.verifiedOperators || 0,
