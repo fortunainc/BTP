@@ -252,5 +252,3 @@ function determineConfidence(similarCount: number, interactionCount: number): Re
   if (similarCount >= 3 || interactionCount >= 3) return 'emerging';
   return 'low';
 }
-
-export default { GET };

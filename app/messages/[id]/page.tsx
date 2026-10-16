@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { use, useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/components/AuthContext';
 
@@ -29,7 +29,8 @@ type Conversation = {
   } | null;
 };
 
-export default function ConversationPage({ params }: { params: { id: string } }) {
+export default function ConversationPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = use(params);
   const router = useRouter();
   const { user, isAuthenticated, loading: authLoading } = useAuth();
   const [conversation, setConversation] = useState<Conversation | null>(null);
@@ -52,7 +53,7 @@ export default function ConversationPage({ params }: { params: { id: string } })
     // Poll for new messages every 5 seconds
     const interval = setInterval(fetchMessages, 5000);
     return () => clearInterval(interval);
-  }, [isAuthenticated, router, params.id]);
+  }, [isAuthenticated, router, id]);
 
   useEffect(() => {
     if (authLoading) return;
@@ -65,7 +66,7 @@ export default function ConversationPage({ params }: { params: { id: string } })
 
   async function fetchConversation() {
     try {
-      const response = await fetch(`/api/conversations/${params.id}`);
+      const response = await fetch(`/api/conversations/${id}`);
       if (!response.ok) {
         throw new Error('Conversation not found');
       }
@@ -78,7 +79,7 @@ export default function ConversationPage({ params }: { params: { id: string } })
 
   async function fetchMessages() {
     try {
-      const response = await fetch(`/api/conversations/${params.id}/messages`);
+      const response = await fetch(`/api/conversations/${id}/messages`);
       if (!response.ok) {
         throw new Error('Failed to fetch messages');
       }
@@ -100,7 +101,7 @@ export default function ConversationPage({ params }: { params: { id: string } })
     setNewMessage('');
 
     try {
-      const response = await fetch(`/api/conversations/${params.id}/messages`, {
+      const response = await fetch(`/api/conversations/${id}/messages`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ content: messageToSend }),
