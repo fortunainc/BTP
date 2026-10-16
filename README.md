@@ -1,53 +1,27 @@
 # Behind the Protocol
 
-Professional Network and Operational Marketplace for Clinical Trial Professionals
+BTP connects clinical-trial professionals to practical peer experience, private help, and useful outcomes.
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Next.js](https://img.shields.io/badge/Next.js-16.1-black)](https://nextjs.org/)
-[![TypeScript](https://img.shields.io/badge/TypeScript-5.0-blue)](https://www.typescriptlang.org/)
+## Start here: source of truth
 
-## 🚀 Quick Deploy to Vercel
+- [Final company vision - locked October 16, 2026](docs/vision/BTP_FINAL_VISION.md)
+- [Download the final vision PDF](output/pdf/BTP_Final_Vision_2026-10-16.pdf)
+- [Current beta product constitution](BTP_PRODUCT_CONSTITUTION.md)
+- [Strategic direction](BTP_STRATEGIC_DIRECTION.md)
+- [Data and prediction doctrine](BTP_DATA_INTELLIGENCE_DOCTRINE_2026-10-12.md)
+- [Revenue opportunity registry](BTP_FUTURE_REVENUE_STREAMS.md)
 
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/YOUR_USERNAME/behind-the-protocol)
+The final vision controls strategy conflicts in older documents. Archived analyses and financial scenarios are not current product specifications or founder commitments.
 
-> ⚡ **Fastest deployment**: Click the button above to deploy to Vercel in under 2 minutes
+## Product baseline
 
-## 📋 What is Behind the Protocol?
+The existing Next.js web/backend and Expo/React Native iOS beta support verified, identity-protected questions, answers, follow-up outcomes, private-help requests, and administration. The core loop is Ask -> Answer -> Apply -> Outcome. Membership approval is separate from authentication. Identity protection is not a guarantee of anonymity.
 
-Behind the Protocol is a professional platform built by operators, for operators in the clinical trial industry. It provides two core modules:
+The company direction includes paid expertise, operator research, and permissioned operational intelligence and prediction. These ambitions are not claims of current revenue or a validated prediction model. Workforce modules retained in source are not the current beta's primary product.
 
-### 1. Operator Network
-- **Anonymous Discussions**: Verified professionals can ask questions and share experiences anonymously
-- **Helpful Score System**: Reputation system to surface the most valuable contributions
-- **Voting Mechanism**: Community-driven quality control
-- **Category Filtering**: Organize discussions by topic
+## Technology
 
-### 2. Workforce Exchange
-- **Job Posting**: Organizations can post operational roles
-- **Anonymized Profiles**: Operators can browse opportunities while maintaining privacy
-- **Direct Messaging**: Secure in-platform communication
-- **Application Tracking**: Streamlined hiring workflow
-
-## ✨ Key Features
-
-- ✅ **Verified Professionals**: Work email verification + LinkedIn review
-- ✅ **Anonymous Activity**: Public contributions remain anonymous with verified badges
-- ✅ **Helpful Voting**: Most helpful answers get recognition
-- ✅ **Founding Operator Badge**: First 500 verified users get special status
-- ✅ **Email Notifications**: Stay informed of replies, messages, and job matches
-- ✅ **Admin Dashboard**: Complete moderation and management tools
-- ✅ **Security First**: Built with security headers, rate limiting, and input sanitization
-
-## 🛠️ Tech Stack
-
-- **Framework**: Next.js 16.1.2 with App Router
-- **Language**: TypeScript
-- **Database**: PostgreSQL with Prisma ORM
-- **Authentication**: Clerk
-- **Styling**: Tailwind CSS
-- **Email**: Resend
-- **UI Components**: shadcn/ui
-- **Error Tracking**: Sentry
+Next.js / React / TypeScript; Expo / React Native; PostgreSQL / Prisma; Clerk; Vercel and EAS. Consult package manifests for current dependency versions. Never commit credentials, member data, or plaintext investor briefing content.
 
 ## 📦 Installation
 
@@ -60,8 +34,8 @@ Behind the Protocol is a professional platform built by operators, for operators
 
 1. **Clone the repository**
    ```bash
-   git clone https://github.com/YOUR_USERNAME/behind-the-protocol.git
-   cd behind-the-protocol
+   git clone https://github.com/fortunainc/BTP.git
+   cd BTP
    ```
 
 2. **Install dependencies**
@@ -144,15 +118,6 @@ npx prisma db push        # Push schema changes
 npm run lint         # Run ESLint
 ```
 
-## 🔒 Security Features
-
-- **Input Sanitization**: All user inputs are sanitized
-- **Rate Limiting**: API endpoints protected from abuse
-- **Security Headers**: Comprehensive security headers via middleware
-- **CORS Config**: Properly configured cross-origin requests
-- **SQL Injection Protection**: Prisma ORM prevents SQL injection
-- **XSS Prevention**: DOMPurify sanitizes user-generated content
-
 ## 👥 Contributing
 
 Contributions are welcome! Please feel free to submit a Pull Request.
@@ -174,19 +139,14 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - UI components from [shadcn/ui](https://ui.shadcn.com/)
 - Icons from [Lucide](https://lucide.dev/)
 
-## 📞 Support
+## Support and roadmap
 
-For support, email support@behindtheprotocol.com or open an issue on GitHub.
+Use the application's support page for the current contact route. The canonical vision and beta constitution define the roadmap; dormant repository modules are not promises of public availability.
 
-## 🗺️ Roadmap
+Regenerate the vision PDF after changing its canonical Markdown source:
 
-- [ ] Mobile app (React Native)
-- [ ] Advanced analytics dashboard
-- [ ] AI-powered thread recommendations
-- [ ] Integration with clinical trial registries
-- [ ] Compliance documentation module
-- [ ] Multi-language support
+```bash
+python3 scripts/docs/render-vision.py
+```
 
----
-
-**Behind the Protocol** - Where Clinical Trial Operators Tell the Truth
+The renderer requires ReportLab. Visually check the resulting PDF before publishing.

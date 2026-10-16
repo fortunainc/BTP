@@ -10,8 +10,8 @@ export const dynamic = "force-dynamic";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "BehindTheProtocol - Where Clinical Trial Operators Tell the Truth",
-  description: "Anonymous operational intelligence network for clinical trial operators. Get real answers, share experiences, and navigate the field safely.",
+  title: "BTP | Clinical trial experience, connected.",
+  description: "Practical peer experience and private help for clinical research professionals. Ask questions, learn from peers, and follow up on what helped.",
 };
 
 export default function RootLayout({

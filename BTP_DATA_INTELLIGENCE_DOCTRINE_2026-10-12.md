@@ -1,10 +1,19 @@
 # BTP Data Intelligence Doctrine
 
 **Status:** Locked strategic doctrine  
-**Locked:** October 12, 2026 at 9:06 PM PDT
-**Relationship to existing source of truth:** `BTP_PRODUCT_CONSTITUTION.md` continues to control the beta product. `BTP_STRATEGIC_DIRECTION.md` continues to control the expansion from trusted community to availability and opportunity network. This document controls how BTP develops its long-term data, intelligence, and forecasting asset. It does not authorize a restart or expansion of the current beta.
+**Originally locked:** October 12, 2026 at 9:06 PM PDT
+**Reconciled:** October 16, 2026 under [BTP Final Company Vision](docs/vision/BTP_FINAL_VISION.md), which controls conflicts.
+**Relationship to existing source of truth:** `BTP_PRODUCT_CONSTITUTION.md` continues to control the beta product. `BTP_STRATEGIC_DIRECTION.md` continues to control expansion across expertise, research, intelligence, and consented opportunities. This document controls how BTP develops its long-term data, intelligence, and forecasting asset. It does not authorize a restart or expansion of the current beta.
 
 The canonical running list of monetization options is maintained in `BTP_FUTURE_REVENUE_STREAMS.md`.
+
+## October 16 clarification: design now, validate before sale
+
+Prediction modeling is a core long-term ambition, not an incidental option. Dataset design and small feasibility experiments may proceed in parallel with member and paid-demand validation. This does not require a forecasting launch or enterprise infrastructure in beta.
+
+Community participation is not commercial research or training consent. Use separately consented longitudinal panels, structured research with explicit reuse rights, and authorized partner or licensed data where useful. Community cases surface hypotheses; they do not automatically become a customer-facing model dataset. Establish prediction time, event time, reporting/availability time, outcome confirmation, provenance, reuse permissions, and correction/withdrawal handling.
+
+Activation and amendment delays are candidate first targets, not locked choices. Choose one actionable operational decision based on buyer and operator feedback and accessible outcome evidence. Thresholds elsewhere in this historical doctrine are illustrative planning references, not mandatory waiting periods, proof of validity, or automatic stop rules. Use baseline comparisons, prospective or later-time evaluation, appropriate group separation, calibration, uncertainty, and decision value.
 
 ## Long-term thesis
 
@@ -18,9 +27,9 @@ BTP must earn this position through member trust and high-quality longitudinal d
 
 ## Why BTP can create differentiated intelligence
 
-Traditional clinical-trial data sources primarily capture official, retrospective events: registrations, milestones, enrollment figures, protocol amendments, regulatory disclosures, and company announcements.
+Some conventional clinical-trial sources emphasize official events such as registrations, milestones, enrollment figures, protocol amendments, regulatory disclosures, and company announcements.
 
-BTP can capture privacy-safe precursor signals from the people doing the work:
+BTP aims to collect permissioned precursor signals from the people doing the work:
 
 - Repeated questions arising across independent organizations
 - Trial stage or workflow where friction occurs

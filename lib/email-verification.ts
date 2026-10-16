@@ -94,7 +94,7 @@ export class EmailVerificationService {
         <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px;">
           <div style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); padding: 30px; text-align: center; border-radius: 10px 10px 0 0;">
             <h1 style="color: white; margin: 0; font-size: 28px;">BehindTheProtocol</h1>
-            <p style="color: rgba(255,255,255,0.9); margin: 10px 0 0 0;">Where clinical trial operators tell the truth</p>
+            <p style="color: rgba(255,255,255,0.9); margin: 10px 0 0 0;">Clinical trial experience, connected.</p>
           </div>
           
           <div style="background: #f8f9fa; padding: 40px 30px; border-radius: 0 0 10px 10px; border: 1px solid #e5e7eb;">

@@ -18,7 +18,7 @@ export default function TrustCenterScreen() {
       <Text style={styles.headerTitle}>Trust Center</Text><View style={styles.placeholder} />
     </View>
     <ScrollView contentContainerStyle={styles.content}>
-      <View style={styles.hero}><Text style={styles.eyebrow}>THE BTP PROMISE</Text><Text style={styles.title}>Anonymous to members. Verified privately by BTP.</Text><Text style={styles.intro}>BTP keeps limited confidential account information for verification, authentication, safety, and support. Your community identity is designed to protect your real-world identity from other members.</Text></View>
+      <View style={styles.hero}><Text style={styles.eyebrow}>THE BTP PROMISE</Text><Text style={styles.title}>Identity protected in discussions. Verified privately by BTP.</Text><Text style={styles.intro}>BTP keeps limited confidential account information for verification, authentication, safety, and support. Your community identity is designed to protect your real-world identity from other members.</Text></View>
       {sections.map((section) => <View key={section.title} style={styles.card}><Ionicons color={colors.accent} name={section.icon} size={23} /><View style={styles.cardCopy}><Text style={styles.cardTitle}>{section.title}</Text><Text style={styles.cardText}>{section.copy}</Text></View></View>)}
       <View style={styles.note}><Text style={styles.noteTitle}>A precise promise</Text><Text style={styles.noteText}>BTP does not promise absolute anonymity. Details a member shares can sometimes identify them. BTP minimizes that risk with generalized labels, redaction, controlled access, and private moderation.</Text></View>
     </ScrollView>

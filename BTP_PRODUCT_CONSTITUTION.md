@@ -3,28 +3,15 @@
 **Status:** Controlling source of truth for the BTP beta  
 **Objective:** Ship a useful mobile beta as quickly as possible without rebuilding working infrastructure or drifting into a broader platform.
 
-## Strategic amendment — locked October 13, 2026
+## Strategic amendment - locked October 16, 2026
 
-The existing ask–answer–outcome product remains the beta trust-formation layer and must ship without a restart. Its purpose is to prove that verified clinical-trial professionals will participate candidly, help one another, return, and build credible relationships.
+The [canonical final company vision](docs/vision/BTP_FINAL_VISION.md) controls company direction. The existing Ask -> Answer -> Apply -> Outcome product remains the beta foundation and must evolve without a restart.
 
-The commercial expansion wedge, after that trust loop is working, is:
+BTP combines a trusted professional network, paid expertise and operator research, and a long-term operational intelligence and prediction business. Prediction-data design can proceed alongside member and commercial validation; it is not a requirement to ship a forecasting product in beta. Research and vendor evaluations are a principal early B2B path to test alongside private help, with separate consent and compensated participation.
 
-> **A private, trusted availability network for experienced clinical-development and clinical-trial professionals—especially during layoffs, career transitions, and periods of industry instability.**
+This supersedes the October 13 availability-first commercial hierarchy. Private availability, consented opportunities, interview preparation, and trusted relationships remain meaningful expansion paths. Do not expose availability without consent or reactivate broad workforce modules without demand.
 
-The long-term asset is not a feed or résumé database. It is a consent-aware professional trust graph combining verified identity, structured capability, current availability, credible working relationships, opportunity fit, and outcomes.
-
-This amendment means:
-
-- Do not restart or discard the working mobile beta.
-- Do not turn the beta into a generic job board, recruiting agency, LinkedIn clone, or public consultant directory.
-- Use the community help loop to establish trust and learn what members actually need.
-- Add availability, capability, attestations, controlled introductions, and opportunity workflows progressively after the first cohort demonstrates trust.
-- Layoff response is an acquisition wedge, not a permanent identity assigned to a member.
-- Never expose employment or availability status without explicit member consent.
-- Preserve dormant marketplace infrastructure, but do not reactivate broad workforce features until real member and employer demand validates them.
-- Interview preparation is an approved early paid-help offering under Section 6, with the controls defined there.
-
-If a later section conflicts with this amendment, this amendment controls strategic sequencing while the existing beta scope continues to control the build currently in TestFlight.
+The canonical vision controls strategic conflicts. The narrow beta scope below remains in force; routine progress within it does not require new strategic approval.
 
 ## 1. Mission
 
@@ -137,15 +124,14 @@ BTP Interview Prep must not:
 
 The free community may still provide general peer guidance. Paid interview preparation is for dedicated time, individualized practice, and structured feedback.
 
-### Strategic monetization sequence
+### Strategic monetization paths
 
-1. Optional paid private help, including role-specific interview preparation
-2. Founder-mediated expert consultations and defined project help
-3. Verified opportunity submissions and consented introductions
-4. Marketplace fees or selective employer-side fees after transactions are validated
-5. Employer access, transition programs, and privacy-safe aggregate intelligence only after explicit consent and sufficient network density
+- Optional paid private help, including interview preparation, consultations, and defined reviews or projects.
+- Separately opted-in, compensated expert calls, operator research, and independent product/vendor evaluations. Manual commercial validation can proceed alongside the beta; a research platform is not a beta prerequisite.
+- Repeatable research, reports, benchmarks, monitoring, and validated forecasts as outcome evidence and buyer demand develop. Begin data design early; launch claims remain evidence-based.
+- Private availability, consented introductions, and opportunity transactions as meaningful demand-led expansion.
 
-Do not make laid-off professionals the primary monetization target. Long-term revenue should come primarily from opportunity owners, employers, paid engagements, and transactions that create real member value.
+These are connected paths rather than a rigid waterfall. Community participation remains free. Do not make laid-off professionals the primary monetization target. See the canonical vision and revenue registry for controlling direction and candidate streams.
 
 ## 7. Safety rules
 
@@ -241,7 +227,7 @@ These are not beta requirements:
 - General networking or open direct messages
 - Automated expert marketplace
 - Public professional profiles
-- Paid panels and sponsored questions
+- Automated panel infrastructure and sponsored community questions (separate manual, opted-in research validation may proceed alongside beta)
 - Enterprise dashboards
 - Aggregate industry intelligence products
 - Public launch outside the invite-only cohort
@@ -257,7 +243,7 @@ Also deferred until the trust loop demonstrates demand:
 
 The narrow, founder-mediated interview-preparation offering is not deferred because it reuses the existing private-help flow and can be validated manually.
 
-They may be added only after the core help loop works and members demonstrate demand.
+Product expansion should follow demonstrated need. Separate research and data-feasibility experiments may proceed in parallel without expanding beta requirements.
 
 ## 12. Beta success criteria
 
