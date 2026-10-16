@@ -1,0 +1,39 @@
+name: Beta quality checks
+on:
+  push:
+    branches: [main]
+  pull_request:
+permissions:
+  contents: read
+jobs:
+  web:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - run: npm run db:validate
+      - run: npm run typecheck
+      - run: npm run lint
+      - run: npm run test:quality
+      - run: node --import tsx scripts/beta-critical-tests.ts
+      - run: node --import tsx scripts/return-loop-simulation.ts
+      - run: npm audit --omit=dev --audit-level=high
+  mobile:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: mobile
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: mobile/package-lock.json
+      - run: npm ci
+      - run: npm run typecheck
+      - run: npx expo install --check

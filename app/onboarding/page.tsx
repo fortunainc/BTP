@@ -26,10 +26,6 @@ export default function OnboardingPage() {
   });
   
   // Step 3: Email verification
-  const [email, setEmail] = useState('');
-  const [verificationCode, setVerificationCode] = useState('');
-  const [codeSent, setCodeSent] = useState(false);
-  const [verifying, setVerifying] = useState(false);
 
   useEffect(() => {
     if (authLoading) return;
@@ -112,82 +108,6 @@ export default function OnboardingPage() {
     }
   };
 
-  const sendVerificationEmail = async () => {
-    if (!email) {
-      setError('Please enter your work email');
-      return;
-    }
-
-    // Reject personal email domains
-    const personalDomains = ['gmail.com', 'yahoo.com', 'hotmail.com', 'outlook.com', 'aol.com'];
-    const domain = email.split('@')[1]?.toLowerCase();
-    if (personalDomains.includes(domain)) {
-      setError('Please use your work email address (personal emails not accepted)');
-      return;
-    }
-
-    const emailRegex = /^[^\s@]+@[^\s@]+.[^\s@]+$/;
-    if (!emailRegex.test(email)) {
-      setError('Please enter a valid email address');
-      return;
-    }
-
-    setLoading(true);
-    setError('');
-    
-    try {
-      const response = await fetch('/api/user/send-verification-email', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email }),
-      });
-
-      if (!response.ok) {
-        const data = await response.json();
-        throw new Error(data.error || 'Failed to send verification email');
-      }
-
-      setCodeSent(true);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to send verification code');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const verifyCode = async () => {
-    if (!verificationCode || verificationCode.length !== 6) {
-      setError('Please enter the 6-digit verification code');
-      return;
-    }
-
-    setVerifying(true);
-    setError('');
-    
-    try {
-      const response = await fetch('/api/user/verify-email', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          email,
-          code: verificationCode,
-        }),
-      });
-
-      if (!response.ok) {
-        const data = await response.json();
-        throw new Error(data.error || 'Verification failed');
-      }
-
-      // Redirect to dashboard, account will be in "Pending" status
-      router.push('/dashboard');
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Verification failed');
-    } finally {
-      setVerifying(false);
-    }
-  };
-
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-slate-900 to-black text-white">
       <div className="container mx-auto px-4 py-12 max-w-2xl">
@@ -197,7 +117,7 @@ export default function OnboardingPage() {
           <p className="text-gray-400">
             {step === 1 && 'Choose your role in the clinical trials ecosystem'}
             {step === 2 && 'Provide your professional information'}
-            {step === 3 && 'Verify your work email address'}
+            {step === 3 && 'Professional verification review'}
           </p>
         </div>
 
@@ -350,83 +270,12 @@ export default function OnboardingPage() {
           </div>
         )}
 
-        {/* Step 3: Email Verification */}
-        {step === 3 && (
-          <div className="space-y-6">
-            <div>
-              <label className="block text-sm font-medium mb-2">
-                Work Email <span className="text-red-500">*</span>
-              </label>
-              <div className="flex gap-2">
-                <input
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="your.name@company.com"
-                  disabled={codeSent}
-                  className="flex-1 p-3 bg-gray-800 border border-gray-700 rounded-lg focus:border-blue-500 focus:outline-none disabled:opacity-50"
-                />
-                {!codeSent && (
-                  <button
-                    onClick={sendVerificationEmail}
-                    disabled={loading}
-                    className="px-6 py-3 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-600 rounded-lg font-medium transition-colors"
-                  >
-                    {loading ? 'Sending...' : 'Send Code'}
-                  </button>
-                )}
-              </div>
-              <p className="text-xs text-gray-500 mt-1">
-                Personal email domains (gmail, yahoo, etc.) are not accepted
-              </p>
-            </div>
-
-            {codeSent && (
-              <>
-                <div>
-                  <label className="block text-sm font-medium mb-2">
-                    Verification Code <span className="text-red-500">*</span>
-                  </label>
-                  <input
-                    type="text"
-                    value={verificationCode}
-                    onChange={(e) => setVerificationCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
-                    placeholder="Enter 6-digit code"
-                    maxLength={6}
-                    className="w-full p-3 bg-gray-800 border border-gray-700 rounded-lg focus:border-blue-500 focus:outline-none text-center tracking-widest text-xl font-mono"
-                  />
-                  <p className="text-xs text-gray-500 mt-1">
-                    Enter the code sent to {email}
-                  </p>
-                </div>
-
-                <button
-                  onClick={verifyCode}
-                  disabled={verifying || !verificationCode || verificationCode.length !== 6}
-                  className="w-full py-3 bg-green-600 hover:bg-green-700 disabled:bg-gray-600 rounded-lg font-medium transition-colors"
-                >
-                  {verifying ? 'Verifying...' : 'Complete Verification'}
-                </button>
-
-                <button
-                  onClick={() => {
-                    setCodeSent(false);
-                    setEmail('');
-                    setVerificationCode('');
-                  }}
-                  className="w-full py-3 text-gray-400 hover:text-white transition-colors"
-                >
-                  Change Email Address
-                </button>
-              </>
-            )}
-          </div>
-        )}
+        {step === 3 && <div className="space-y-4 rounded-lg bg-slate-800 p-6"><h2 className="text-xl">Profile submitted for review</h2><p>BTP reviews professional verification privately during beta. Signing in verifies your account access; membership approval is a separate review.</p><button onClick={() => router.push('/dashboard')} className="rounded bg-blue-600 px-4 py-2">Check membership status</button></div>}
 
         {/* Footer Info */}
         <div className="mt-8 text-center text-sm text-gray-500">
-          <p>Your account will be reviewed by our team after verification.</p>
-          <p>You will have read-only access until approved.</p>
+          <p>Your profile is reviewed privately before community access is approved.</p>
+          <p>Community access requires approval.</p>
         </div>
       </div>
     </div>

@@ -46,7 +46,7 @@ export default function MatchesPage() {
     fetchMatches();
   }, [filterStatus]);
 
-  const fetchMatches = async () => {
+  async function fetchMatches() {
     try {
       const response = await fetch('/api/work-matches');
       const data = await response.json();
@@ -56,7 +56,7 @@ export default function MatchesPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }
 
   const filteredMatches = matches.filter(match => {
     if (filterStatus && match.status !== filterStatus) return false;

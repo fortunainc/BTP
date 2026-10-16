@@ -10,6 +10,7 @@
  * - State-change detection
  */
 
+import { prisma } from '@/lib/prisma';
 import { randomUUID } from 'crypto';
 import {
   Notification,
@@ -272,12 +273,17 @@ export class ReturnEngine {
    * Schedule notification delivery
    */
   private async scheduleDelivery(notification: Notification): Promise<void> {
-    // In production, this would:
-    // 1. Store notification in database
-    // 2. Queue for delivery at scheduled time
-    // 3. Trigger push/email at appropriate time
-    
-    console.log(`[ReturnEngine] Scheduling notification ${notification.id} for ${notification.scheduledFor}`);
+    // Persist in-app delivery across serverless restarts. External delivery is not enabled.
+    const data = {
+      id: notification.id, userId: notification.userId, variantId: notification.variantId,
+      notificationClass: getVariantById(notification.variantId)?.class || 'VALIDATION',
+      priority: notification.priority, copy: notification.copy,
+      contextSnippet: notification.contextSnippet, relatedPostId: notification.relatedPostId,
+      relatedThreadId: notification.relatedThreadId, relatedOpportunityId: notification.relatedOpportunityId,
+      relatedPatternId: notification.relatedPatternId,
+      surfaces: ['in_app'], deliveredTo: [], scheduledFor: notification.scheduledFor,
+    };
+    await prisma.notification.upsert({ where: { id: notification.id }, create: data, update: {} });
   }
 
   // ==========================================

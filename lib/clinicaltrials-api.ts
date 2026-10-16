@@ -37,11 +37,13 @@ interface TrialData {
 }
 
 interface PredictionData {
+  method: "UNVALIDATED_PHASE_HEURISTIC";
+  validated: false;
   predictedEnrollment: number;
   actualEnrollment: number | null;
   predictedDuration: number; // months
   actualDuration: number | null; // months
-  predictedSuccess: number; // percentage
+  predictedSuccess: null; // No validated efficacy prediction exists
   actualSuccess: boolean | null;
 }
 
@@ -175,8 +177,8 @@ export function calculateDuration(startDate: string | null, endDate: string | nu
 }
 
 /**
- * Generate AI predictions for a trial
- * (Simplified version - in production, this would use ML models)
+ * Legacy exploratory phase heuristics, not a trained or validated predictive model.
+ * Not exposed by the beta API. Do not use for clinical or investment decisions.
  */
 export function generatePredictions(trial: TrialData): PredictionData {
   // Simplified prediction logic
@@ -196,18 +198,17 @@ export function generatePredictions(trial: TrialData): PredictionData {
   else if (trial.phase.includes('PHASE3')) predictedDuration = 36;
   else if (trial.phase.includes('PHASE4')) predictedDuration = 24;
   
-  // Predict success rate (simplified)
-  let predictedSuccess = 50;
-  if (trial.phase.includes('PHASE1')) predictedSuccess = 70;
-  else if (trial.phase.includes('PHASE2')) predictedSuccess = 50;
-  else if (trial.phase.includes('PHASE3')) predictedSuccess = 40;
-  
+  const predictedSuccess = null;
+
   // Calculate actual values
   const actualEnrollment = trial.enrollmentCount;
   const actualDuration = calculateDuration(trial.startDate, trial.completionDate);
-  const actualSuccess = trial.status === 'COMPLETED' && trial.hasResults ? true : null;
+  // Completion and posted results do not establish efficacy or trial success.
+  const actualSuccess = null;
   
   return {
+    method: "UNVALIDATED_PHASE_HEURISTIC",
+    validated: false,
     predictedEnrollment,
     actualEnrollment,
     predictedDuration,

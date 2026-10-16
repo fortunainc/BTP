@@ -1,0 +1,28 @@
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { NextRequest } from 'next/server';
+const state = vi.hoisted(() => ({ clerkId: null as string | null, member: null as null | Record<string, unknown>, allowed: true, fail: false }));
+vi.mock('@clerk/nextjs/server', () => ({ auth: async () => ({ userId: state.clerkId }) }));
+vi.mock('@/lib/prisma', () => ({ prisma: { user: { findUnique: async () => state.member } } }));
+vi.mock('@/lib/write-rate-limit', () => ({ checkWriteRateLimit: async () => { if (state.fail) throw new Error('offline'); return { allowed: state.allowed, retryAfter: 12 }; } }));
+vi.mock('@/lib/audit-logging', () => ({ AuditEventType: {}, AuditLogService: { log: vi.fn() } }));
+vi.mock('@/lib/privacy-audit', () => ({ privacySafeAuditContext: () => ({}) }));
+import { withAuth, createApiResponse } from '@/lib/api-auth';
+import { isAdminMember, isApprovedMember } from '@/lib/access-policy';
+import { isOutcomeType, OUTCOME_POLICY } from '@/lib/outcome-policy';
+import { GET as patterns } from '@/app/api/patterns/route';
+import { POST as legacyCode } from '@/app/api/auth/verify-code/route';
+const handler = vi.fn(async () => createApiResponse({ ok: true }));
+const route = withAuth(handler);
+const request = (method = 'GET') => new NextRequest('https://btp.test/api/situations', { method });
+beforeEach(() => { state.clerkId = 'clerk-test'; state.member = { id: 'member-test', userRole: 'operator', verificationStatus: 'Approved', isSuspended: false }; state.allowed = true; state.fail = false; handler.mockClear(); });
+describe('authenticated API boundary', () => {
+  it('rejects anonymous callers before executing the handler', async () => { state.clerkId = null; expect((await route(request())).status).toBe(401); expect(handler).not.toHaveBeenCalled(); });
+  it('rejects a valid Clerk session without a provisioned member', async () => { state.member = null; expect((await route(request())).status).toBe(404); });
+  it.each([{ isSuspended: true }, { verificationStatus: 'Suspended' }])('denies either suspension representation %j', async patch => { Object.assign(state.member!, patch); expect((await route(request())).status).toBe(403); expect(handler).not.toHaveBeenCalled(); });
+  it('permits privacy requests from suspended users only when configured', async () => { state.member!.isSuspended = true; expect((await withAuth(handler, { allowSuspended: true })(request('POST'))).status).toBe(200); });
+  it('limits writes with a retry header', async () => { state.allowed = false; const response = await route(request('POST')); expect(response.status).toBe(429); expect(response.headers.get('retry-after')).toBe('12'); expect(handler).not.toHaveBeenCalled(); });
+  it('fails closed when the limiter is unavailable, but keeps reads available', async () => { state.fail = true; expect((await route(request('POST'))).status).toBe(503); expect((await route(request())).status).toBe(200); });
+});
+it('founder and admin access never overrides suspension', () => { for (const userRole of ['founder','admin']) for (const verificationStatus of ['Approved','Pending','Suspended']) for (const isSuspended of [true,false]) { const user = { userRole, verificationStatus, isSuspended }; expect(isAdminMember(user)).toBe(!isSuspended && verificationStatus !== 'Suspended'); } expect(isApprovedMember({ userRole: 'operator', verificationStatus: 'Pending' })).toBe(false); });
+it('correction and incomplete outcomes never count as helpful', () => { expect(OUTCOME_POLICY.correction.wasHelpful).toBe(false); expect(OUTCOME_POLICY.incomplete.wasHelpful).toBe(false); expect(isOutcomeType('__proto__')).toBe(false); expect(isOutcomeType('toString')).toBe(false); });
+it('legacy code and pattern endpoints cannot expose data or claim success', async () => { expect((await patterns()).status).toBe(404); expect((await legacyCode()).status).toBe(404); });

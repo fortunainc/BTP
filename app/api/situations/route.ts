@@ -1,3 +1,4 @@
+import { isApprovedMember } from '@/lib/access-policy';
 /**
  * Situations API - Intelligence Realm
  * 
@@ -86,11 +87,14 @@ const ISSUE_CATEGORIES = [
  */
 export const GET = withAuth(async (request: NextRequest, user) => {
   try {
-    if (user.verificationStatus !== 'Approved' && user.userRole !== 'admin') {
+    if (!isApprovedMember(user)) {
       return createErrorResponse('Approved BTP membership is required', 403);
     }
 
     const { searchParams } = new URL(request.url);
+    const query = (searchParams.get('q') || '').trim().slice(0, 200);
+    const cursor = searchParams.get('cursor');
+    const limit = 30;
     const therapeuticArea = searchParams.get('therapeuticArea');
     const issueCategory = searchParams.get('issueCategory');
     const timeBucket = searchParams.get('timeBucket'); // 'today', 'week', 'month'
@@ -105,6 +109,8 @@ export const GET = withAuth(async (request: NextRequest, user) => {
       forceExcludeFromPatterns: false,
     };
     
+    if (query) where.OR = ['title', 'description', 'issueCategory'].map(field => ({ [field]: { contains: query, mode: 'insensitive' } }));
+
     if (therapeuticArea && THERAPEUTIC_AREAS.includes(therapeuticArea)) {
       where.therapeuticArea = therapeuticArea;
     }
@@ -159,14 +165,13 @@ export const GET = withAuth(async (request: NextRequest, user) => {
           }
         }
       },
-      orderBy: {
-        createdAt: 'desc'
-      },
-      take: 50
+      orderBy: [{ createdAt: 'desc' }, { id: 'desc' }],
+      ...(cursor ? { cursor: { id: cursor }, skip: 1 } : {}),
+      take: limit + 1
     });
     
     // Transform for output (apply time bucketing, remove timestamps)
-    const transformedSituations = situations.map(situation => {
+    const transformedSituations = situations.slice(0, limit).map(situation => {
       // Bucket the timestamp
       const timeBucketInfo = bucketTimestamp(situation.createdAt);
       
@@ -194,6 +199,7 @@ export const GET = withAuth(async (request: NextRequest, user) => {
     
     return createApiResponse({
       situations: transformedSituations,
+      nextCursor: situations.length > limit ? situations[limit - 1].id : null,
       filters: {
         therapeuticArea,
         issueCategory,
@@ -223,7 +229,7 @@ export const GET = withAuth(async (request: NextRequest, user) => {
  *  - role: Optional role hint (legacy)
  */
 export const POST = withAuth(async (req, user) => {
-      if (user.verificationStatus !== 'Approved' && user.userRole !== 'admin') {
+      if (!isApprovedMember(user)) {
         return createErrorResponse('Approved BTP membership is required', 403);
       }
 

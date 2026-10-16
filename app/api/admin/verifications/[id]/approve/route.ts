@@ -1,3 +1,4 @@
+import { isAdminMember } from '@/lib/access-policy';
 import { NextResponse } from 'next/server';
 import { withAuth } from '@/lib/api-auth';
 import { prisma } from '@/lib/prisma';
@@ -6,7 +7,7 @@ import { logAuditEvent, AuditEventType } from '@/lib/audit-logging';
 export const POST = withAuth(async (req, user) => {
     try {
       // Check if user is admin
-      if (user.userRole !== 'admin') {
+      if (!isAdminMember(user)) {
         return NextResponse.json({ error: 'Unauthorized' }, { status: 403 });
       }
 
@@ -38,6 +39,7 @@ export const POST = withAuth(async (req, user) => {
         where: { id: userId },
         data: {
           verificationStatus: 'Approved',
+          isSuspended: false,
           verificationMethod,
           verifiedBy: user.id,
           verifiedAt: new Date(),

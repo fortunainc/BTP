@@ -37,7 +37,7 @@ export default function AdminUsersPage() {
     fetchUsers();
   }, [isAdmin, router]);
 
-  const fetchUsers = async () => {
+  async function fetchUsers() {
     try {
       const response = await fetch('/api/admin/users');
       if (!response.ok) throw new Error('Failed to fetch users');
@@ -48,7 +48,7 @@ export default function AdminUsersPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }
 
   const toggleUserStatus = async (userId: string, currentStatus: boolean) => {
     if (!confirm(

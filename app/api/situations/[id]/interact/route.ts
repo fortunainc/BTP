@@ -1,3 +1,4 @@
+import { isApprovedMember } from '@/lib/access-policy';
 /**
  * Structured Situation Interactions API
  *
@@ -42,7 +43,7 @@ const INTERACTION_BASE_WEIGHTS: Record<OperatorInteractionType, number> = {
  * Record one structured, anonymous operator interaction.
  */
 export const POST = withAuth(async (req, user) => {
-  if (user.verificationStatus !== 'Approved' && user.userRole !== 'admin') {
+  if (!isApprovedMember(user)) {
     return createErrorResponse('Approved BTP membership is required', 403);
   }
 
@@ -224,7 +225,7 @@ export const POST = withAuth(async (req, user) => {
  */
 export const GET = withAuth(async (request: NextRequest, user) => {
   try {
-    if (user.verificationStatus !== 'Approved' && user.userRole !== 'admin') {
+    if (!isApprovedMember(user)) {
       return createErrorResponse('Approved BTP membership is required', 403);
     }
 

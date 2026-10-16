@@ -50,7 +50,7 @@ export default function ManageApplicationsPage() {
     fetchApplications();
   }, [isAuthenticated, user, router]);
 
-  const fetchApplications = async () => {
+  async function fetchApplications() {
     try {
       const response = await fetch('/api/applications/organization-applications');
       if (!response.ok) {
@@ -70,7 +70,7 @@ export default function ManageApplicationsPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }
 
   const handleStatusUpdate = async (applicationId: string, newStatus: string) => {
     try {

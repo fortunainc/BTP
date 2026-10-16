@@ -6,6 +6,8 @@
  * All access is comprehensively logged.
  */
 
+import { isSuspendedMember, isAdminMember } from '@/lib/access-policy';
+import { checkWriteRateLimit } from '@/lib/write-rate-limit';
 import { auth } from '@clerk/nextjs/server';
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
@@ -13,7 +15,7 @@ import { logAdminAccess } from '@/lib/analytics-tracker';
 import { privacySafeAuditContext } from '@/lib/privacy-audit';
 
 // Admin roles that can access analytics and trust-safety panels
-const ADMIN_ROLES = ['admin', 'founder'];
+
 
 // Valid reasons for trust-safety investigation access
 export const VALID_INVESTIGATION_REASONS = [
@@ -86,7 +88,7 @@ export async function verifyAdminAccess(request: NextRequest): Promise<AdminAuth
     }
 
     // Step 3: Check if user is suspended
-    if (user.isSuspended) {
+    if (isSuspendedMember(user)) {
       return {
         success: false,
         error: 'Account is suspended.',
@@ -95,7 +97,7 @@ export async function verifyAdminAccess(request: NextRequest): Promise<AdminAuth
     }
 
     // Step 4: Verify admin role
-    if (!ADMIN_ROLES.includes(user.userRole)) {
+    if (!isAdminMember(user)) {
       // Log unauthorized access attempt
       const auditContext = privacySafeAuditContext(request);
       
@@ -115,6 +117,10 @@ export async function verifyAdminAccess(request: NextRequest): Promise<AdminAuth
       };
     }
 
+    if (!['GET', 'HEAD', 'OPTIONS'].includes(request.method)) {
+      const budget = await checkWriteRateLimit(user.id, request.nextUrl.pathname);
+      if (!budget.allowed) return { success: false, error: 'Too many requests; retry shortly.', statusCode: 429 };
+    }
     // Step 5: Log successful admin access
     const auditContext = privacySafeAuditContext(request);
 

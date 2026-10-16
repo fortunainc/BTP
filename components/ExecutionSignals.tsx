@@ -82,7 +82,7 @@ export default function ExecutionSignals() {
     fetchSignals();
   }, []);
 
-  const fetchSignals = async () => {
+  async function fetchSignals() {
     try {
       // In production, this would fetch real data
       // For now, use mock data
@@ -95,7 +95,7 @@ export default function ExecutionSignals() {
     } finally {
       setLoading(false);
     }
-  };
+  }
 
   const getSignalIcon = (type: Signal['type']) => {
     switch (type) {

@@ -15,7 +15,7 @@ export default function PatternSignals({ contributionId }: PatternSignalsProps) 
     fetchPatterns();
   }, [contributionId]);
 
-  const fetchPatterns = async () => {
+  async function fetchPatterns() {
     try {
       const response = await fetch(`/api/situations/${contributionId}/patterns`);
       if (response.ok) {
@@ -27,7 +27,7 @@ export default function PatternSignals({ contributionId }: PatternSignalsProps) 
     } finally {
       setLoading(false);
     }
-  };
+  }
 
   if (loading || patterns.length === 0) {
     return null;

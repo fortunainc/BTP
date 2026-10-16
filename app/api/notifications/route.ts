@@ -1,3 +1,4 @@
+import { isApprovedMember, isAdminMember } from '@/lib/access-policy';
 /**
  * Notifications API - Return Engine
  * 
@@ -32,7 +33,7 @@ import { TriggerContext, TriggerEvent } from '@/lib/return-engine/types';
 
 export const GET = withAuth(async (request, user) => {
     try {
-      if (user.verificationStatus !== 'Approved' && user.userRole !== 'admin') {
+      if (!isApprovedMember(user)) {
         return createErrorResponse('Approved BTP membership is required', 403);
       }
 
@@ -132,7 +133,7 @@ export const GET = withAuth(async (request, user) => {
 
 export const POST = withAuth(async (request, user) => {
   try {
-    if (user.userRole !== 'admin') {
+    if (!isAdminMember(user)) {
       return createErrorResponse('Admin access required', 403);
     }
 

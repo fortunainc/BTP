@@ -1,3 +1,5 @@
+import { OUTCOME_POLICY, isOutcomeType } from '@/lib/outcome-policy';
+import { isApprovedMember, isAdminMember } from '@/lib/access-policy';
 /**
  * Contribution Outcome API - Intelligence Realm
  * 
@@ -32,7 +34,7 @@ const OUTCOME_TYPES = [
  * Record an outcome for a contribution
  */
 export const POST = withAuth(async (req, user) => {
-      if (user.verificationStatus !== 'Approved' && user.userRole !== 'admin') {
+      if (!isApprovedMember(user)) {
         return createErrorResponse('Approved BTP membership is required', 403);
       }
 
@@ -48,7 +50,7 @@ export const POST = withAuth(async (req, user) => {
       } = body;
 
       // Validate outcome type
-      if (!OUTCOME_TYPES.includes(outcomeType)) {
+      if (!isOutcomeType(outcomeType)) {
         return createErrorResponse(
           `Invalid outcome type. Must be one of: ${OUTCOME_TYPES.join(', ')}`,
           400
@@ -79,7 +81,7 @@ export const POST = withAuth(async (req, user) => {
         return createErrorResponse('Contribution not found', 404);
       }
 
-      if (contribution.userId !== user.id && user.userRole !== 'admin') {
+      if (contribution.userId !== user.id && !isAdminMember(user)) {
         return createErrorResponse('Only the question author can report what happened', 403);
       }
 
@@ -100,19 +102,11 @@ export const POST = withAuth(async (req, user) => {
 
       // Impact is derived from the validated outcome type. Never trust a
       // client-supplied score because it feeds trust and quality signals.
-      const defaultImpactScores: Record<string, number> = {
-        resolution: 1.0,
-        validation: 0.8,
-        correction: 0.3,
-        incomplete: 0.2,
-        misleading: -0.5
-      };
-      const finalImpactScore = defaultImpactScores[outcomeType];
+      const { impactScore: finalImpactScore, wasHelpful: finalWasHelpful } = OUTCOME_POLICY[outcomeType];
 
       const sanitizedOutcomeData = typeof outcomeData === 'string'
         ? applyAutomaticRedaction(outcomeData.slice(0, 2000)).redactedContent
         : null;
-      const finalWasHelpful = finalImpactScore > 0;
 
       // Create contribution outcome
       const outcomeId = randomUUID();
@@ -181,7 +175,7 @@ export const POST = withAuth(async (req, user) => {
  */
 export const GET = withAuth(async (request: NextRequest, user) => {
   try {
-    if (user.verificationStatus !== 'Approved' && user.userRole !== 'admin') {
+    if (!isApprovedMember(user)) {
       return createErrorResponse('Approved BTP membership is required', 403);
     }
 

@@ -7,6 +7,10 @@ const eslintConfig = defineConfig([
   ...nextTs,
   {
     rules: {
+      // New compiler diagnostics remain visible while legacy screens migrate.
+      // React Compiler is not enabled. Existing hook correctness rules are unchanged.
+      "react-hooks/set-state-in-effect": "warn",
+      "react-hooks/immutability": "warn",
       "@typescript-eslint/no-explicit-any": "warn",
       "@typescript-eslint/no-require-imports": "warn",
       "@typescript-eslint/no-empty-object-type": "warn",

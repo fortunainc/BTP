@@ -58,7 +58,7 @@ export default function OpportunitiesPage() {
     }
   }, [isLoaded, isSignedIn]);
 
-  const fetchOpportunities = async () => {
+  async function fetchOpportunities() {
     try {
       setLoading(true);
       const response = await fetch('/api/opportunities');
@@ -82,7 +82,7 @@ export default function OpportunitiesPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }
 
   // Show sign-in prompt for unauthenticated users
   if (isLoaded && !isSignedIn) {

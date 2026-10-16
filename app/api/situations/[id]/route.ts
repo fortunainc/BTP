@@ -1,3 +1,4 @@
+import { isApprovedMember, isAdminMember } from '@/lib/access-policy';
 /**
  * Single Situation API
  *
@@ -15,7 +16,7 @@ import { getOrCreateUserMetrics, trackEvent, EVENT_TYPES } from '@/lib/analytics
  * GET /api/situations/[id]
  */
 export const GET = withAuth(async (req, user) => {
-  if (user.verificationStatus !== 'Approved' && user.userRole !== 'admin') {
+  if (!isApprovedMember(user)) {
     return createErrorResponse('Approved BTP membership is required', 403);
   }
 
@@ -58,7 +59,7 @@ export const GET = withAuth(async (req, user) => {
   }
 
   if (situation.isHidden || situation.isFlagged || situation.forceExcludeFromPatterns) {
-    if (situation.userId !== user?.id && user?.userRole !== 'admin') {
+    if (situation.userId !== user?.id && !isAdminMember(user)) {
       return createErrorResponse('Situation not found', 404);
     }
   }

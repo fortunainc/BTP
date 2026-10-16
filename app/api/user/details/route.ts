@@ -21,6 +21,7 @@ export async function GET(request: NextRequest) {
         roleCategory: true,
         companyCategory: true,
         verificationStatus: true,
+        isSuspended: true,
       },
     });
 

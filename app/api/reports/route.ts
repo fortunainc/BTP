@@ -1,3 +1,4 @@
+import { isApprovedMember } from '@/lib/access-policy';
 import { prisma } from '@/lib/prisma';
 import { withAuth, createApiResponse, createErrorResponse } from '@/lib/api-auth';
 import { InputSanitization } from '@/lib/input-sanitization';
@@ -13,7 +14,7 @@ const ALLOWED_REASONS = [
 ];
 
 export const POST = withAuth(async (request, user) => {
-  if (user.verificationStatus !== 'Approved' && user.userRole !== 'admin') {
+  if (!isApprovedMember(user)) {
     return createErrorResponse('Approved BTP membership is required', 403);
   }
 
@@ -94,7 +95,7 @@ export const POST = withAuth(async (request, user) => {
 }, { requireAuth: true });
 
 export const GET = withAuth(async (_request, user) => {
-  if (user.verificationStatus !== 'Approved' && user.userRole !== 'admin') {
+  if (!isApprovedMember(user)) {
     return createErrorResponse('Approved BTP membership is required', 403);
   }
   const reports = await prisma.flaggedContent.findMany({

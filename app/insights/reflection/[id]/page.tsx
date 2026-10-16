@@ -60,7 +60,7 @@ export default function ReflectionPage() {
     }
   }, [isLoaded, isSignedIn, params.id]);
 
-  const fetchReflectionData = async (id: string) => {
+  async function fetchReflectionData(id: string) {
     try {
       setLoading(true);
       const response = await fetch(`/api/insights/reflection/${id}`);
@@ -77,7 +77,7 @@ export default function ReflectionPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }
 
   if (isLoaded && !isSignedIn) {
     return (

@@ -41,7 +41,7 @@ export default function AdminModerationPage() {
     fetchData();
   }, [isAdmin, router]);
 
-  const fetchData = async () => {
+  async function fetchData() {
     try {
       const [flaggedRes, auditRes] = await Promise.all([
         fetch('/api/admin/flagged-content'),
@@ -62,7 +62,7 @@ export default function AdminModerationPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }
 
   const handleDismissFlag = async (flagId: string) => {
     if (!confirm('Dismiss this flagged content?')) return;

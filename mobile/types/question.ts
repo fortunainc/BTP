@@ -23,7 +23,8 @@ export type HelpType = "CONSULTATION" | "INTERVIEW_PREP" | "WRITTEN_REVIEW" | "D
 export type ActivityItem = { id: string; title: string; detail: string; displayTime: string; read: boolean; questionId?: string | null };
 export type PrivateHelpRequest = {
   id: string;
-  contributionId: string;
+  contributionId: string | null;
+  memberUpdate?: string | null;
   helpType: string;
   details: string;
   timing?: string | null;

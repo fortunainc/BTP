@@ -1,3 +1,4 @@
+import { isApprovedMember } from '@/lib/access-policy';
 import { prisma } from '@/lib/prisma';
 import { withAuth, createApiResponse, createErrorResponse } from '@/lib/api-auth';
 
@@ -18,7 +19,7 @@ async function visibleAnswer(answerId: string) {
 }
 
 export const GET = withAuth(async (request, user) => {
-  if (user.verificationStatus !== 'Approved' && user.userRole !== 'admin') {
+  if (!isApprovedMember(user)) {
     return createErrorResponse('Approved BTP membership is required', 403);
   }
   const answerId = answerIdFrom(request);
@@ -32,7 +33,7 @@ export const GET = withAuth(async (request, user) => {
 }, { requireAuth: true });
 
 export const POST = withAuth(async (request, user) => {
-  if (user.verificationStatus !== 'Approved' && user.userRole !== 'admin') {
+  if (!isApprovedMember(user)) {
     return createErrorResponse('Approved BTP membership is required', 403);
   }
   const answerId = answerIdFrom(request);
@@ -67,7 +68,7 @@ export const POST = withAuth(async (request, user) => {
 }, { requireAuth: true });
 
 export const DELETE = withAuth(async (request, user) => {
-  if (user.verificationStatus !== 'Approved' && user.userRole !== 'admin') {
+  if (!isApprovedMember(user)) {
     return createErrorResponse('Approved BTP membership is required', 403);
   }
   const answerId = answerIdFrom(request);

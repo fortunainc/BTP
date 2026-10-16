@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
-import { ActivityIndicator, Alert, Linking, Pressable, StyleSheet, Text, View } from "react-native";
+import { ActivityIndicator, Alert, Pressable, StyleSheet, Text, View } from "react-native";
 import { router } from "expo-router";
 
 import { AppScreen } from "@/components/AppScreen";
@@ -11,31 +11,31 @@ import type { ContentReport, PrivateHelpRequest } from "@/types/question";
 const rows = [
   { label: "Professional verification", detail: "Approved privately for beta" },
   { label: "Trust Center", detail: "How identity and reporting work", action: "trust" },
-  { label: "Notifications", detail: "Managed by BTP for beta" },
+  { label: "Notifications", detail: "In-app Activity; push and email are not enabled" },
 ];
-const ACCOUNT_DELETION_EMAIL = "mailto:fortunaindustriesinc@gmail.com?subject=BTP%20account%20deletion%20request&body=Please%20delete%20my%20BTP%20account%20and%20associated%20personal%20data.%20My%20account%20email%20is%3A%20";
 
 export default function YouScreen() {
   const auth = useBtpAuth();
   const { getToken, member, signedIn } = auth;
   const [requests, setRequests] = useState<PrivateHelpRequest[]>([]);
   const [reports, setReports] = useState<ContentReport[]>([]);
+  const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const load = useCallback(async () => {
     if (!liveApiConfigured || !signedIn) return;
-    setLoading(true);
-    try { const token = await getToken(); const [helpItems, reportItems] = await Promise.all([api.help.list(token), api.reports.list(token)]); setRequests(helpItems); setReports(reportItems); } catch { setRequests([]); setReports([]); } finally { setLoading(false); }
+    setLoading(true); setError("");
+    try { const token = await getToken(); const [helpItems, reportItems] = await Promise.all([api.help.list(token), api.reports.list(token)]); setRequests(helpItems); setReports(reportItems); } catch { setError("Could not refresh your history. Your previous results are still shown."); } finally { setLoading(false); }
   }, [getToken, signedIn]);
   useEffect(() => { void load(); }, [load]);
   const profileName = member?.handle?.trim() || "BTP member";
   const profileDetails = [generalizedRole(member?.roleCategory), generalizedCompany(member?.companyCategory), verificationLabel(member?.verificationStatus)].filter(Boolean).join(" · ");
-  const requestAccountDeletion = async () => {
-    try {
-      await Linking.openURL(ACCOUNT_DELETION_EMAIL);
-    } catch {
-      Alert.alert("Could not open email", "Email fortunaindustriesinc@gmail.com with the subject “BTP account deletion request.”");
-    }
-  };
+  const requestAccountDeletion = () => Alert.alert("Request account deletion?", "BTP will receive a private request for your signed-in account. A request does not immediately delete your account.", [
+    { text: "Cancel", style: "cancel" },
+    { text: "Submit request", style: "destructive", onPress: () => { void (async () => {
+      try { await api.requestDeletion(await getToken()); Alert.alert("Request received", "BTP will review and fulfill your deletion request. Contact support if you need an update."); }
+      catch (e) { Alert.alert("Request not submitted", e instanceof Error ? e.message : "Please retry."); }
+    })(); } },
+  ]);
   return (
     <AppScreen>
       <Text style={styles.title}>You</Text>
@@ -56,12 +56,13 @@ export default function YouScreen() {
         <Text style={styles.deleteAccountText}>Request account deletion</Text>
       </Pressable>
       <Text style={styles.deletionNote}>BTP will verify your request and delete your account and associated personal data. Community contributions may be retained only in de-identified form to protect shared discussions.</Text>
+      <>{error && <Pressable onPress={() => void load()}><Text style={styles.deleteAccountText}>{error} Tap to retry.</Text></Pressable>}</>
       <View style={styles.sectionHeader}><Text style={styles.sectionTitle}>Your reports</Text></View>
       <Text style={styles.sectionCopy}>Only you and BTP can see these report outcomes.</Text>
-      {reports.length === 0 ? <View style={styles.helpCard}><Text style={styles.helpTitle}>No reports submitted</Text><Text style={styles.helpDetail}>If something threatens privacy or trust, report it from the question or answer.</Text></View> : reports.slice(0, 5).map(report => <View key={report.id} style={styles.helpCard}><View style={styles.helpTop}><Text style={styles.helpTitle}>{labelReportReason(report.reason)}</Text><View style={styles.status}><Text style={styles.statusText}>{labelStatus(report.status)}</Text></View></View><Text style={styles.helpDetail}>{report.status === "Pending" ? "Received by BTP for private review." : report.action === "hidden" ? "Reviewed. The content was hidden." : report.action === "restored" ? "Reviewed again. The content was restored." : "Reviewed. No removal was required."}</Text><Text style={styles.helpTime}>{new Date(report.createdAt).toLocaleDateString()}</Text></View>)}
+      {reports.length === 0 && !error && !loading ? <View style={styles.helpCard}><Text style={styles.helpTitle}>No reports submitted</Text><Text style={styles.helpDetail}>If something threatens privacy or trust, report it from the question or answer.</Text></View> : reports.slice(0, 5).map(report => <View key={report.id} style={styles.helpCard}><View style={styles.helpTop}><Text style={styles.helpTitle}>{labelReportReason(report.reason)}</Text><View style={styles.status}><Text style={styles.statusText}>{labelStatus(report.status)}</Text></View></View><Text style={styles.helpDetail}>{report.status === "Pending" ? "Received by BTP for private review." : report.action === "hidden" ? "Reviewed. The content was hidden." : report.action === "restored" ? "Reviewed again. The content was restored." : "Reviewed. No removal was required."}</Text><Text style={styles.helpTime}>{new Date(report.createdAt).toLocaleDateString()}</Text></View>)}
       <View style={styles.sectionHeader}><Text style={styles.sectionTitle}>Private help</Text>{loading && <ActivityIndicator color={colors.accent} size="small" />}</View>
-      <Text style={styles.sectionCopy}>Requests are reviewed and matched by BTP privately during beta.</Text>
-      {!liveApiConfigured || !auth.signedIn ? <View style={styles.helpCard}><Text style={styles.helpTitle}>No active requests</Text><Text style={styles.helpDetail}>Requests you make from a question will appear here.</Text></View> : requests.length === 0 && !loading ? <View style={styles.helpCard}><Text style={styles.helpTitle}>No active requests</Text><Text style={styles.helpDetail}>When a community answer is not enough, request dedicated help from the question.</Text></View> : requests.map(request => <View key={request.id} style={styles.helpCard}><View style={styles.helpTop}><Text style={styles.helpTitle}>{labelHelpType(request.helpType)}</Text><View style={styles.status}><Text style={styles.statusText}>{labelStatus(request.status)}</Text></View></View><Text numberOfLines={2} style={styles.helpDetail}>{request.details}</Text><Text style={styles.helpTime}>{new Date(request.createdAt).toLocaleDateString()}</Text></View>)}
+      <Text style={styles.sectionCopy}>Requests are reviewed and matched by BTP privately during beta.</Text><Pressable onPress={() => router.push("/private-help")} style={styles.signOut}><Text style={styles.rowText}>Request interview preparation</Text></Pressable>
+      {!liveApiConfigured || !auth.signedIn ? <View style={styles.helpCard}><Text style={styles.helpTitle}>No active requests</Text><Text style={styles.helpDetail}>Requests you make from a question will appear here.</Text></View> : requests.length === 0 && !loading && !error ? <View style={styles.helpCard}><Text style={styles.helpTitle}>No active requests</Text><Text style={styles.helpDetail}>When a community answer is not enough, request dedicated help from the question.</Text></View> : requests.map(request => <View key={request.id} style={styles.helpCard}><View style={styles.helpTop}><Text style={styles.helpTitle}>{labelHelpType(request.helpType)}</Text><View style={styles.status}><Text style={styles.statusText}>{labelStatus(request.status)}</Text></View></View><Text numberOfLines={2} style={styles.helpDetail}>{request.details}</Text>{request.memberUpdate && <Text style={styles.helpDetail}>{request.memberUpdate}</Text>}<Text style={styles.helpTime}>{new Date(request.createdAt).toLocaleDateString()}</Text></View>)}
     </AppScreen>
   );
 }
