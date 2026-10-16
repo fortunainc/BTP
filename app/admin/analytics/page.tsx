@@ -121,6 +121,10 @@ export default function FounderAnalyticsDashboard() {
         fetch(`/api/admin/analytics?section=return-loop&dataSource=${dataSources.join(',')}`),
       ]);
       
+      if (![kpisRes, funnelsRes, readinessRes, returnLoopRes].every(response => response.ok)) {
+        throw new Error("Some analytics sections could not load. Please retry.");
+      }
+
       const kpis = kpisRes.ok ? await kpisRes.json() : { kpis: [], summary: {} };
       const funnels = funnelsRes.ok ? await funnelsRes.json() : {};
       const readiness = readinessRes.ok ? await readinessRes.json() : {};
@@ -166,7 +170,6 @@ export default function FounderAnalyticsDashboard() {
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
           <div className="text-red-500 text-6xl mb-4">🚫</div>
-          <a href="/admin/help-requests" className="underline">Private help and deletion queue</a>
           <h1 className="text-2xl font-bold text-gray-900 mb-2">Access Denied</h1>
           <p className="text-gray-600">You need admin privileges to access this dashboard.</p>
           <Link href="/dashboard" className="mt-4 inline-block text-indigo-600 hover:underline">
@@ -190,6 +193,7 @@ export default function FounderAnalyticsDashboard() {
               </p>
             </div>
             <div className="flex items-center gap-4">
+              <Link href="/admin/help-requests" className="underline">Private help and deletion queue</Link>
               <Link
                 href="/admin/trust-safety"
                 className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700"
@@ -307,12 +311,13 @@ function OverviewSection({ data }: { data: any }) {
   return (
     <div className="space-y-6">
       <h2 className="text-xl font-semibold text-gray-900">Executive Overview</h2>
+      <p className="text-sm text-gray-600">Analytics aggregates, not a live member census. {data.latestSnapshot ? `Latest daily snapshot: ${data.latestSnapshot}.` : "No daily snapshot is available; user counts are unavailable."} Activity totals depend on recorded analytics events.</p>
       
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        <MetricCard label="Total Users" value={data.users?.total || 0} />
-        <MetricCard label="Verified Operators" value={data.users?.verifiedOperators || 0} />
-        <MetricCard label="Verified Orgs" value={data.users?.verifiedOrgs || 0} />
-        <MetricCard label="7-Day Retention" value={`${data.retention?.sevenDay || 0}%`} />
+        <MetricCard label="Total Users" value={data.latestSnapshot ? data.users?.total ?? 0 : "Unavailable"} />
+        <MetricCard label="Verified Operators" value={data.latestSnapshot ? data.users?.verifiedOperators ?? 0 : "Unavailable"} />
+        <MetricCard label="Verified Orgs" value={data.latestSnapshot ? data.users?.verifiedOrgs ?? 0 : "Unavailable"} />
+        <MetricCard label="Daily Active / Total Users" value={data.latestSnapshot ? `${data.retention?.sevenDay || 0}%` : "Unavailable"} />
       </div>
       
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
