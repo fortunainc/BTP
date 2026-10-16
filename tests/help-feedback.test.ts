@@ -1,0 +1,12 @@
+import { beforeEach, expect, it, vi } from 'vitest';
+import { NextRequest } from 'next/server';
+const state = vi.hoisted(() => ({ count: 1, update: vi.fn(), ledger: vi.fn() }));
+vi.mock('@/lib/api-auth', () => ({ withAuth: (handler: (req: NextRequest, user: object) => Promise<Response>) => (req: NextRequest) => handler(req, { id: 'member', userRole: 'operator', verificationStatus: 'Approved' }), createApiResponse: (body: object) => Response.json(body), createErrorResponse: (error: string, status: number) => Response.json({ error }, { status }) }));
+vi.mock('@/lib/anti-correlation', () => ({ applyAutomaticRedaction: () => ({ redactedContent: 'sanitized feedback' }) }));
+vi.mock('@/lib/prisma', () => ({ prisma: { $transaction: (handler: (tx: object) => Promise<boolean>) => handler({ privateHelpRequest: { updateMany: async (data: object) => { state.update(data); return { count: state.count }; } }, knowledgeLedgerEvent: { findFirst: async () => ({ sequence: 3, rowHash: 'prior' }), create: async (data: object) => state.ledger(data) } }) } }));
+import { PATCH } from '@/app/api/help-requests/route';
+const call = (feedback = 'Helpful') => PATCH(new NextRequest('https://btp.test/api/help-requests', { method: 'PATCH', body: JSON.stringify({ id: 'help', feedback }) }));
+beforeEach(() => { state.count = 1; state.update.mockClear(); state.ledger.mockClear(); });
+it('scopes feedback to the current owner, completed status, and first submission', async () => { expect((await call()).status).toBe(200); expect(state.update).toHaveBeenCalledWith({ where: { id: 'help', userId: 'member', status: 'COMPLETED', feedback: null }, data: { feedback: 'sanitized feedback' } }); expect(state.ledger.mock.calls[0][0].data).toMatchObject({ sequence: 4, previousEventHash: 'prior' }); });
+it('does not create an event for unavailable or duplicate feedback', async () => { state.count = 0; expect((await call()).status).toBe(409); expect(state.ledger).not.toHaveBeenCalled(); });
+it('rejects empty feedback', async () => { expect((await call(' ')).status).toBe(400); expect(state.update).not.toHaveBeenCalled(); });

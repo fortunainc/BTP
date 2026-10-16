@@ -1,8 +1,8 @@
 import { clerkMiddleware } from "@clerk/nextjs/server";
-import { NextResponse } from "next/server";
+import { NextResponse, type NextRequest, type NextFetchEvent } from "next/server";
 
 // Simplified middleware without auth() calls
-export default clerkMiddleware(
+const clerkHandler = clerkMiddleware(
   (_auth, req) => {
   const dormantApiPrefixes = [
     "/api/applications",
@@ -36,6 +36,15 @@ export default clerkMiddleware(
     },
   },
 );
+
+// Preview builds must not read or mutate the shared production database.
+// Enable only after provisioning and verifying an independent preview database.
+export default function middleware(req: NextRequest, event: NextFetchEvent) {
+  if (process.env.VERCEL_ENV === 'preview' && process.env.BTP_PREVIEW_DATABASE_ISOLATED !== 'true' && req.nextUrl.pathname.startsWith('/api/')) {
+    return NextResponse.json({ error: 'Preview data access is disabled until an isolated database is configured.' }, { status: 503 });
+  }
+  return clerkHandler(req, event);
+}
 
 export const config = {
   matcher: [

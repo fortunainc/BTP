@@ -25,6 +25,7 @@ export type PrivateHelpRequest = {
   id: string;
   contributionId: string | null;
   memberUpdate?: string | null;
+  feedback?: string | null;
   helpType: string;
   details: string;
   timing?: string | null;

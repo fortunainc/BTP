@@ -91,3 +91,20 @@ export const POST = withAuth(async (req, user) => {
 
   return createApiResponse({ success: true, id: helpRequest.id });
 }, { requireAuth: true });
+
+export const PATCH = withAuth(async (req, user) => {
+  if (!isApprovedMember(user)) return createErrorResponse('Approved BTP membership is required', 403);
+  const body = await req.json();
+  if (typeof body.id !== 'string' || typeof body.feedback !== 'string' || !body.feedback.trim() || body.feedback.length > 2000) return createErrorResponse('Request ID and feedback (1–2,000 characters) are required', 400);
+  const feedback = applyAutomaticRedaction(body.feedback.trim()).redactedContent;
+  const saved = await prisma.$transaction(async tx => {
+    const changed = await tx.privateHelpRequest.updateMany({ where: { id: body.id, userId: user.id, status: 'COMPLETED', feedback: null }, data: { feedback } });
+    if (!changed.count) return false;
+    const event = { aggregateType: 'HELP_REQUEST' as const, aggregateId: body.id, eventType: 'FEEDBACK_RECORDED', actorUserId: user.id, payload: { feedback } };
+    const ref = buildLedgerEvent(event).aggregateRefHash;
+    const previous = await tx.knowledgeLedgerEvent.findFirst({ where: { aggregateType: 'HELP_REQUEST', aggregateRefHash: ref }, orderBy: { sequence: 'desc' } });
+    await tx.knowledgeLedgerEvent.create({ data: buildLedgerEvent({ ...event, sequence: previous ? previous.sequence + 1 : 0, previousEventHash: previous?.rowHash }) });
+    return true;
+  });
+  return saved ? createApiResponse({ success: true }) : createErrorResponse('This completed request is unavailable or already has feedback', 409);
+}, { requireAuth: true });
