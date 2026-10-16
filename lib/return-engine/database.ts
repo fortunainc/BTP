@@ -271,6 +271,47 @@ export async function createBatch(batch: {
 }
 
 /**
+ * Durably count a batched event for a user and notification class.
+ * Survives process restarts and serverless cold starts. Returns ready=true
+ * (and closes the batch) once the count reaches minBatchSize.
+ */
+export async function recordBatchedEvent(params: {
+  userId: string;
+  variantId: string;
+  notificationClass: string;
+  relatedId?: string | null;
+  minBatchSize: number;
+}): Promise<{ ready: boolean; count: number }> {
+  return prisma.$transaction(async (tx) => {
+    const open = await tx.notificationBatch.findFirst({
+      where: { userId: params.userId, notificationClass: params.notificationClass, status: 'pending' },
+      orderBy: { createdAt: 'asc' },
+    });
+    const related = params.relatedId ? [params.relatedId] : [];
+    const batch = open
+      ? await tx.notificationBatch.update({
+          where: { id: open.id },
+          data: { count: { increment: 1 }, relatedIds: { push: related }, variantId: params.variantId },
+        })
+      : await tx.notificationBatch.create({
+          data: {
+            userId: params.userId,
+            variantId: params.variantId,
+            notificationClass: params.notificationClass,
+            count: 1,
+            relatedIds: related,
+            scheduledFor: new Date(),
+          },
+        });
+    const ready = batch.count >= params.minBatchSize;
+    if (ready) {
+      await tx.notificationBatch.update({ where: { id: batch.id }, data: { status: 'sent' } });
+    }
+    return { ready, count: batch.count };
+  });
+}
+
+/**
  * Get pending batches ready to send
  */
 export async function getPendingBatches(): Promise<any[]> {
