@@ -69,7 +69,7 @@ export default function DashboardPage() {
     }
   }, [isSignedIn, isLoaded]);
 
-  const fetchMetrics = async () => {
+  async function fetchMetrics() {
     try {
       const response = await fetch("/api/user/signal-metrics");
       const data = await response.json();
@@ -79,7 +79,7 @@ export default function DashboardPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }
 
   if (!isLoaded || loading) {
     return (

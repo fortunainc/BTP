@@ -89,7 +89,7 @@ export default function SituationDetailPage({ params }: { params: Promise<{ id: 
     fetchSituation();
   }, [id]);
 
-  const fetchSituation = async () => {
+  async function fetchSituation() {
     try {
       setLoading(true);
       const response = await fetch(`/api/situations/${id}`);
@@ -108,11 +108,11 @@ export default function SituationDetailPage({ params }: { params: Promise<{ id: 
     } finally {
       setLoading(false);
     }
-  };
+  }
 
   const submitInteraction = async (interactionType: string, context?: string) => {
     if (!isSignedIn) {
-      window.location.href = '/sign-in';
+      window.location.assign('/sign-in');
       return;
     }
 
@@ -167,7 +167,7 @@ export default function SituationDetailPage({ params }: { params: Promise<{ id: 
 
   const handleSubmitHelpRequest = async () => {
     if (!isSignedIn) {
-      window.location.href = '/sign-in';
+      window.location.assign('/sign-in');
       return;
     }
     if (!helpDetails.trim()) return;

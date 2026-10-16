@@ -50,7 +50,7 @@ export default function MyApplicationsPage() {
     fetchApplications();
   }, [isAuthenticated, user, router]);
 
-  const fetchApplications = async () => {
+  async function fetchApplications() {
     try {
       const response = await fetch('/api/applications/my-applications');
       if (!response.ok) {
@@ -63,7 +63,7 @@ export default function MyApplicationsPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }
 
   const getStatusBadge = (status: string) => {
     const styles = {

@@ -60,7 +60,7 @@ export default function WorkforcePage() {
     }
   }, [isAuthenticated, authLoading]);
 
-  const fetchUserRole = async () => {
+  async function fetchUserRole() {
     try {
       const response = await fetch('/api/user/me');
       if (response.ok) {
@@ -70,9 +70,9 @@ export default function WorkforcePage() {
     } catch (error) {
       console.error('Error fetching user role:', error);
     }
-  };
+  }
 
-  const fetchAccessMetrics = async () => {
+  async function fetchAccessMetrics() {
     try {
       const response = await fetch('/api/user/signal-metrics');
       if (response.ok) {
@@ -82,12 +82,12 @@ export default function WorkforcePage() {
     } catch (error) {
       console.error('Error fetching access metrics:', error);
     }
-  };
+  }
 
   const getAccessLevelName = (accessLevel: number) => ACCESS_LEVEL_NAMES[accessLevel] || 'Observer';
   const getAccessLevelColor = (accessLevel: number) => ACCESS_LEVEL_COLORS[accessLevel] || ACCESS_LEVEL_COLORS[0];
 
-  const fetchJobPostings = async () => {
+  async function fetchJobPostings() {
     try {
       const response = await fetch('/api/job-postings');
       if (response.ok) {
@@ -99,7 +99,7 @@ export default function WorkforcePage() {
     } finally {
       setLoading(false);
     }
-  };
+  }
 
   const getStatusBadge = (status: string) => {
     const styles = {

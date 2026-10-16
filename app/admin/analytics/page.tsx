@@ -94,7 +94,7 @@ export default function FounderAnalyticsDashboard() {
     }
   }, [isSignedIn, isAdmin, dataSources]);
 
-  const fetchDashboardData = async () => {
+  async function fetchDashboardData() {
     setLoading(true);
     setError(null);
     
@@ -138,7 +138,7 @@ export default function FounderAnalyticsDashboard() {
     } finally {
       setLoading(false);
     }
-  };
+  }
 
   const toggleDataSource = (ds: DataSource) => {
     setDataSources(prev => 
@@ -166,6 +166,7 @@ export default function FounderAnalyticsDashboard() {
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
           <div className="text-red-500 text-6xl mb-4">🚫</div>
+          <a href="/admin/help-requests" className="underline">Private help and deletion queue</a>
           <h1 className="text-2xl font-bold text-gray-900 mb-2">Access Denied</h1>
           <p className="text-gray-600">You need admin privileges to access this dashboard.</p>
           <Link href="/dashboard" className="mt-4 inline-block text-indigo-600 hover:underline">
@@ -615,7 +616,7 @@ function UsersSection({ dataSources }: { dataSources: DataSource[] }) {
     fetchUsers();
   }, [dataSources]);
 
-  const fetchUsers = async () => {
+  async function fetchUsers() {
     try {
       const res = await fetch(`/api/admin/analytics?section=users&dataSource=${dataSources.join(',')}`);
       const data = await res.json();
@@ -625,7 +626,7 @@ function UsersSection({ dataSources }: { dataSources: DataSource[] }) {
     } finally {
       setLoading(false);
     }
-  };
+  }
 
   if (loading) return <div>Loading users...</div>;
 
@@ -723,7 +724,7 @@ function SafetySection({ dataSources }: { dataSources: DataSource[] }) {
     fetchSafetyData();
   }, [dataSources]);
 
-  const fetchSafetyData = async () => {
+  async function fetchSafetyData() {
     try {
       const res = await fetch(`/api/admin/analytics?section=safety&dataSource=${dataSources.join(',')}`);
       const data = await res.json();
@@ -733,7 +734,7 @@ function SafetySection({ dataSources }: { dataSources: DataSource[] }) {
     } finally {
       setLoading(false);
     }
-  };
+  }
 
   if (loading) return <div>Loading safety data...</div>;
 

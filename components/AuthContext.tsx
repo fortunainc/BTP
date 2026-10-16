@@ -1,5 +1,6 @@
 'use client';
 
+import { isAdminMember } from '@/lib/access-policy';
 import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
 import { useAuth as useClerkAuth } from '@clerk/nextjs';
 
@@ -92,7 +93,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
     handle: dbUser?.handle || null,
     anonymousHandle: dbUser?.handle || null,
     isAuthenticated: !!dbUser && !!isSignedIn,
-    isAdmin: dbUser?.userRole === 'admin',
+    isAdmin: !!dbUser && isAdminMember(dbUser),
     isOperator: dbUser?.userRole === 'operator',
     isOrganization: dbUser?.userRole === 'organization',
     loading: loading || !clerkLoaded,

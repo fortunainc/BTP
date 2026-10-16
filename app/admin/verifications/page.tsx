@@ -40,7 +40,7 @@ export default function AdminVerificationsPage() {
     fetchUsers();
   }, [isAdmin, router]);
 
-  const fetchUsers = async () => {
+  async function fetchUsers() {
     try {
       const response = await fetch('/api/admin/verifications');
       if (!response.ok) throw new Error('Failed to fetch users');
@@ -52,7 +52,7 @@ export default function AdminVerificationsPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }
 
   const handleApprove = async (userId: string) => {
     const verificationMethod = verificationMethods[userId];

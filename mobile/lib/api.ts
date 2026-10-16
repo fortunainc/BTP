@@ -22,11 +22,13 @@ type SituationApi = { id: string; title: string; description?: string; issueCate
 const toSummary = (item: SituationApi): QuestionSummary => ({ id: item.id, title: item.title, description: item.description, role: "Verified BTP member", topic: item.issueCategory || "Clinical trials", hasVisibleAnswer: item.hasVisibleAnswer ?? false, createdLabel: item.timeLabel || "Recently", isAuthor: item.isAuthor });
 
 export const api = {
+  requestDeletion: (token: string | null) => apiRequest("/api/account/deletion", { token, method: "POST", body: "{}" }),
   session: (token: string | null) => apiRequest<{
     authenticated: boolean;
     member: { id: string; handle: string; roleCategory?: string | null; companyCategory?: string | null; verificationStatus?: string | null; approved: boolean };
   }>("/api/mobile/session", { token }),
   questions: {
+    async page(token: string | null, query = "", cursor?: string | null) { const params = new URLSearchParams({ q: query }); if (cursor) params.set("cursor", cursor); const result = await apiRequest<{ situations: SituationApi[]; nextCursor: string | null }>(`/api/situations?${params}`, { token }); return { items: result.situations.map(toSummary), nextCursor: result.nextCursor }; },
     async list(token: string | null) { const result = await apiRequest<{ situations: SituationApi[] }>("/api/situations", { token }); return result.situations.map(toSummary); },
     async detail(token: string | null, id: string): Promise<QuestionDetail> { const result = await apiRequest<{ situation: SituationApi; answers: QuestionDetail["answers"]; isAuthor?: boolean }>(`/api/situations/${id}`, { token }); const q = toSummary(result.situation); return { ...q, isAuthor: result.situation.isAuthor ?? result.isAuthor ?? false, description: result.situation.description || result.situation.title, answers: result.answers || [] }; },
     review: (token: string | null, description: string) => apiRequest<{ redactedContent: string; redactionsApplied: number; message: string; piiWarning?: string | null }>("/api/situations/review", { token, method: "POST", body: JSON.stringify({ description }) }),

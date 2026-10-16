@@ -130,10 +130,10 @@ export default function NewSituationPage() {
             <Shield className="w-8 h-8 text-cyan-500" />
           </div>
           <h1 className="text-2xl font-bold text-white mb-3">
-            Create an account to share anonymously.
+            Sign in to ask the BTP community.
           </h1>
           <p className="text-slate-400 mb-8 leading-relaxed">
-            BTP requires sign-in so each submission can be protected, reviewed, and connected to your anonymous handle. Your identity remains hidden.
+            BTP requires sign-in so each submission can be protected, reviewed, and connected to your anonymous handle. Your identity is not displayed with community posts. Authorized BTP staff can access account information for verification and safety.
           </p>
           <div className="flex flex-col gap-3">
             <Link
@@ -306,7 +306,7 @@ export default function NewSituationPage() {
               <div>
                 <h3 className="text-white font-medium">Your identity is protected</h3>
                 <p className="text-slate-400 text-sm mt-1">
-                  No employer visibility · No identity attached · All data anonymized
+                  Identity protected in community discussions · Review redactions before posting
                 </p>
               </div>
             </div>
@@ -602,7 +602,7 @@ export default function NewSituationPage() {
           {/* Anonymity reminder */}
           <div className="flex items-center gap-2 text-xs text-slate-600">
             <Shield className="w-3.5 h-3.5" />
-            <span>Auto-redaction active · No employer visibility · Anonymous by default</span>
+            <span>Auto-redaction active · Review your text for identifying details</span>
           </div>
 
           {/* SUBMIT — Single button */}

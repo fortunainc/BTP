@@ -1,3 +1,4 @@
+import { isApprovedMember } from '@/lib/access-policy';
 import { withAuth, createApiResponse } from '@/lib/api-auth';
 
 /**
@@ -12,6 +13,6 @@ export const GET = withAuth(async (_request, user) => createApiResponse({
     roleCategory: user.roleCategory,
     companyCategory: user.companyCategory,
     verificationStatus: user.verificationStatus,
-    approved: user.verificationStatus === 'Approved' || user.userRole === 'admin',
+    approved: isApprovedMember(user),
   },
 }), { requireAuth: true });

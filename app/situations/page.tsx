@@ -68,7 +68,7 @@ export default function SituationsPage() {
     fetchSituations();
   }, [therapeuticArea, timeBucket]);
 
-  const fetchSituations = async () => {
+  async function fetchSituations() {
     try {
       setLoading(true);
       const params = new URLSearchParams();
@@ -90,7 +90,7 @@ export default function SituationsPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }
 
   return (
     <div className="min-h-screen bg-slate-900">

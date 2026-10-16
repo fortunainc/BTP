@@ -8,7 +8,7 @@
     "start": "next start",
     "lint": "eslint",
     "prisma:generate": "prisma generate",
-    "typecheck": "tsc --noEmit",
+    "typecheck": "next typegen && tsc --noEmit",
     "postinstall": "prisma generate",
     "db:generate": "prisma generate",
     "db:validate": "prisma validate",
@@ -17,7 +17,8 @@
     "db:push": "prisma db push",
     "db:seed": "prisma db seed",
     "test:return-loop": "tsx scripts/return-loop-simulation.ts",
-    "test:beta-critical": "tsx scripts/beta-critical-tests.ts"
+    "test:beta-critical": "tsx scripts/beta-critical-tests.ts",
+    "test:quality": "vitest run"
   },
   "dependencies": {
     "@clerk/nextjs": "^7.9.14",
@@ -47,11 +48,11 @@
     "framer-motion": "^12.35.2",
     "isomorphic-dompurify": "^3.7.1",
     "lucide-react": "^0.562.0",
-    "next": "16.1.2",
+    "next": "^16.4.2",
     "openai": "^6.18.0",
     "pg": "^8.17.1",
-    "react": "19.2.3",
-    "react-dom": "19.2.3",
+    "react": "~19.2.3",
+    "react-dom": "~19.2.3",
     "react-hook-form": "^7.71.1",
     "recharts": "^3.6.0",
     "resend": "^6.9.3",
@@ -59,17 +60,19 @@
     "zod": "^4.3.5"
   },
   "devDependencies": {
+    "@electric-sql/pglite": "^0.4.3",
     "@tailwindcss/postcss": "^4",
-    "@types/node": "^20",
+    "@types/node": "^24.19.2",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "dotenv": "^17.4.2",
     "eslint": "^9",
-    "eslint-config-next": "16.1.2",
+    "eslint-config-next": "^16.4.2",
     "prisma": "^7.2.0",
     "tailwindcss": "^4",
     "tsx": "^4.21.0",
-    "typescript": "^5.9.3"
+    "typescript": "^5.9.3",
+    "vitest": "^5.0.5"
   },
   "prisma": {
     "seed": "node --loader tsx prisma/seed.ts"

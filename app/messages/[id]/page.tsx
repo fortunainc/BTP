@@ -59,11 +59,11 @@ export default function ConversationPage({ params }: { params: { id: string } })
     scrollToBottom();
   }, [messages]);
 
-  const scrollToBottom = () => {
+  function scrollToBottom() {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  };
+  }
 
-  const fetchConversation = async () => {
+  async function fetchConversation() {
     try {
       const response = await fetch(`/api/conversations/${params.id}`);
       if (!response.ok) {
@@ -74,9 +74,9 @@ export default function ConversationPage({ params }: { params: { id: string } })
     } catch (error) {
       console.error('Error fetching conversation:', error);
     }
-  };
+  }
 
-  const fetchMessages = async () => {
+  async function fetchMessages() {
     try {
       const response = await fetch(`/api/conversations/${params.id}/messages`);
       if (!response.ok) {
@@ -89,7 +89,7 @@ export default function ConversationPage({ params }: { params: { id: string } })
       console.error('Error fetching messages:', error);
       setLoading(false);
     }
-  };
+  }
 
   const handleSendMessage = async (e: React.FormEvent) => {
     e.preventDefault();

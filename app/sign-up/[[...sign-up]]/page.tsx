@@ -18,7 +18,7 @@ export default function SignUpPage() {
             Join Behind the Protocol
           </h1>
           <p className="text-slate-400 text-lg mb-6">
-            Create your anonymous professional profile
+            Accept your invitation to BTP
           </p>
           <div className="bg-amber-900/30 border border-amber-700 rounded-lg p-4 mb-6">
             <p className="text-amber-300 text-sm">
@@ -46,7 +46,7 @@ export default function SignUpPage() {
             Join Behind the Protocol
           </h1>
           <p className="text-slate-400 text-lg">
-            Create your anonymous professional profile
+            Accept your invitation to BTP
           </p>
         </div>
         
@@ -87,7 +87,7 @@ export default function SignUpPage() {
           />
         </div>
         <div className="mt-6 text-center text-sm text-slate-500">
-          <p>Join thousands of clinical trial professionals sharing insights anonymously and finding opportunities</p>
+          <p>Invitation-only beta for verified clinical-trial professionals. Ask questions and share experience with identity protected in community discussions.</p>
         </div>
       </div>
     </div>

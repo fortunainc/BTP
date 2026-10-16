@@ -43,7 +43,7 @@ export default function MyPostingsPage() {
     fetchJobPostings();
   }, [isAuthenticated, user, router]);
 
-  const fetchJobPostings = async () => {
+  async function fetchJobPostings() {
     try {
       const response = await fetch('/api/job-postings/my-postings');
       if (!response.ok) {
@@ -56,7 +56,7 @@ export default function MyPostingsPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }
 
   const handleStatusUpdate = async (jobId: string, newStatus: string) => {
     try {

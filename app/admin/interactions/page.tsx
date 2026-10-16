@@ -117,7 +117,7 @@ export default function FounderInteractionControlsPage() {
     };
   }, [interactions]);
 
-  const fetchInteractions = async () => {
+  async function fetchInteractions() {
     setLoading(true);
     setError(null);
     try {
@@ -152,7 +152,7 @@ export default function FounderInteractionControlsPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }
 
   const updateDraft = (id: string, patch: Partial<DraftState>) => {
     setDrafts(prev => ({

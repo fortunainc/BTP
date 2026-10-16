@@ -1,3 +1,5 @@
+import { checkWriteRateLimit } from '@/lib/write-rate-limit';
+import { isSuspendedMember } from '@/lib/access-policy';
 import { auth } from '@clerk/nextjs/server';
 import { NextRequest, NextResponse } from 'next/server';
 import { AuditLogService, AuditEventType } from '@/lib/audit-logging';
@@ -26,6 +28,7 @@ export interface AuthResult {
  */
 export interface APIAuthConfig {
   requireAuth?: boolean; // Require authentication (default: true)
+  allowSuspended?: boolean; // Only for account privacy requests
   allowedRoles?: string[]; // Restrict to specific roles
   rateLimit?: {
     check: (ip: string) => Promise<any>;
@@ -101,6 +104,7 @@ export async function getUserDetails(clerkId: string) {
         roleCategory: true,
         companyCategory: true,
         verificationStatus: true,
+        isSuspended: true,
         trustScore: true,
       },
     });
@@ -202,6 +206,19 @@ export function withAuth(
             { error: 'User not found' },
             { status: 404 }
           );
+        }
+
+        if (isSuspendedMember(userDetails) && !config.allowSuspended) {
+          return NextResponse.json({ error: 'Account is suspended' }, { status: 403 });
+        }
+
+        if (!['GET', 'HEAD', 'OPTIONS'].includes(request.method)) {
+          try {
+            const rate = await checkWriteRateLimit(userDetails.id, request.nextUrl.pathname);
+            if (!rate.allowed) return NextResponse.json({ error: 'Too many requests. Please try again shortly.' }, { status: 429, headers: { 'Retry-After': String(rate.retryAfter) } });
+          } catch {
+            return NextResponse.json({ error: 'Writes are temporarily unavailable. Please retry shortly.' }, { status: 503 });
+          }
         }
 
         // Check role restrictions if configured

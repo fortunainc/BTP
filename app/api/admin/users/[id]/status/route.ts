@@ -1,3 +1,4 @@
+import { isAdminMember } from '@/lib/access-policy';
 import { NextRequest, NextResponse } from 'next/server';
 import { withAuth } from '@/lib/api-auth';
 import { prisma } from '@/lib/prisma';
@@ -6,7 +7,7 @@ import { logAuditEvent } from '@/lib/audit-logging';
 export const PATCH = withAuth(async (req, user) => {
     try {
       // Check if user is admin
-      if (user.userRole !== 'admin') {
+      if (!isAdminMember(user)) {
         return NextResponse.json({ error: 'Unauthorized' }, { status: 403 });
       }
 
@@ -17,8 +18,8 @@ export const PATCH = withAuth(async (req, user) => {
       const body = await req.json();
       const { isActive } = body;
 
-      if (isActive === undefined) {
-        return NextResponse.json({ error: 'isActive field is required' }, { status: 400 });
+      if (typeof isActive !== 'boolean') {
+        return NextResponse.json({ error: 'isActive must be a boolean' }, { status: 400 });
       }
 
       // Get the target user
@@ -38,7 +39,7 @@ export const PATCH = withAuth(async (req, user) => {
       // Update user status (using verificationStatus instead)
       const updatedUser = await prisma.user.update({
         where: { id: userId },
-        data: { verificationStatus: isActive ? 'Approved' : 'Suspended' },
+        data: { verificationStatus: isActive ? 'Approved' : 'Suspended', isSuspended: !isActive },
       });
 
       // Log audit event

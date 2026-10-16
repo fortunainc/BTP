@@ -68,7 +68,7 @@ export default function OperatorProfilePage() {
     fetchProfile();
   }, []);
 
-  const fetchProfile = async () => {
+  async function fetchProfile() {
     try {
       const response = await fetch('/api/operator-profiles?userId=me');
       const data = await response.json();
@@ -93,7 +93,7 @@ export default function OperatorProfilePage() {
     } finally {
       setLoading(false);
     }
-  };
+  }
 
   const toggleItem = (items: string[], item: string, setItems: (items: string[]) => void) => {
     setItems(

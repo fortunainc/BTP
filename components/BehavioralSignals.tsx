@@ -18,7 +18,7 @@ export default function BehavioralSignals() {
     fetchSignals();
   }, []);
 
-  const fetchSignals = async () => {
+  async function fetchSignals() {
     try {
       const response = await fetch('/api/operator/behavioral-signals');
       if (response.ok) {
@@ -30,7 +30,7 @@ export default function BehavioralSignals() {
     } finally {
       setLoading(false);
     }
-  };
+  }
 
   const dismissSignal = (message: string) => {
     const newDismissed = new Set(dismissed);

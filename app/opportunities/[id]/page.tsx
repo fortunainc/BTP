@@ -60,7 +60,7 @@ export default function OpportunityDetailsPage() {
     }
   }, [authLoaded, isSignedIn, opportunityId]);
 
-  const fetchOpportunity = async () => {
+  async function fetchOpportunity() {
     try {
       setLoading(true);
       const response = await fetch(`/api/opportunities/${opportunityId}`);
@@ -87,7 +87,7 @@ export default function OpportunityDetailsPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }
 
   const handleExpressInterest = async () => {
     try {

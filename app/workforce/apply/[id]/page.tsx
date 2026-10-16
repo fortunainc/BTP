@@ -48,7 +48,7 @@ export default function ApplyToJobPage({ params }: { params: { id: string } }) {
     fetchJobPosting();
   }, [isAuthenticated, user, router, params.id]);
 
-  const fetchJobPosting = async () => {
+  async function fetchJobPosting() {
     try {
       const response = await fetch(`/api/job-postings/${params.id}`);
       if (!response.ok) {
@@ -61,7 +61,7 @@ export default function ApplyToJobPage({ params }: { params: { id: string } }) {
     } finally {
       setLoading(false);
     }
-  };
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

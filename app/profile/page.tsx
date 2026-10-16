@@ -91,7 +91,7 @@ export default function OperatorProfilePage() {
     }
   }, [isLoaded, isSignedIn, userId]);
 
-  const fetchProfile = async () => {
+  async function fetchProfile() {
     try {
       setLoading(true);
       
@@ -134,7 +134,7 @@ export default function OperatorProfilePage() {
     } finally {
       setLoading(false);
     }
-  };
+  }
 
   const handleSave = async () => {
     try {

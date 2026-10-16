@@ -46,7 +46,7 @@ export default function AdminHiringFeesPage() {
     fetchHires();
   }, [isAdmin, router]);
 
-  const fetchHires = async () => {
+  async function fetchHires() {
     try {
       const response = await fetch('/api/admin/hires');
       if (!response.ok) throw new Error('Failed to fetch hires');
@@ -57,7 +57,7 @@ export default function AdminHiringFeesPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }
 
   const updateFeeStatus = async (feeRecordId: string, newStatus: string, amount?: number) => {
     try {

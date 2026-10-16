@@ -1,3 +1,4 @@
+import { isApprovedMember } from '@/lib/access-policy';
 /**
  * Safe-to-Submit Review Route
  * 
@@ -17,7 +18,7 @@ import { applyAutomaticRedaction } from '@/lib/anti-correlation';
 
 export const POST = withAuth(async (req: NextRequest, user) => {
   try {
-    if (user.verificationStatus !== 'Approved' && user.userRole !== 'admin') {
+    if (!isApprovedMember(user)) {
       return createErrorResponse('Approved BTP membership is required', 403);
     }
 
