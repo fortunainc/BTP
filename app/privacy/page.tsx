@@ -32,7 +32,7 @@ export default function PrivacyPage() {
       <div className="mx-auto max-w-3xl space-y-10 px-5 py-12">
         <section>
           <p className="mb-3 text-sm font-bold uppercase tracking-[0.18em] text-[#9C7A3C]">Trust &amp; privacy</p>
-          <h1 className="text-4xl font-bold">Anonymous to members. Verified privately by BTP.</h1>
+          <h1 className="text-4xl font-bold">Identity protected in discussions. Verified privately by BTP.</h1>
           <p className="mt-5 text-lg leading-8 text-[#715E5B]">BTP is an invite-only professional-help community. Other members see your handle and generalized professional perspective—not your account identity. BTP retains limited confidential account information for verification, safety, authentication, and support.</p>
         </section>
         <Info title="What BTP keeps privately" items={collected} />
@@ -50,7 +50,7 @@ export default function PrivacyPage() {
           <p>BTP does not promise absolute anonymity. Content details, employer monitoring, legal process, or a security incident could create re-identification risk. We minimize that risk through generalized labels, access controls, redaction, and private moderation.</p>
           <p>BTP does not sell identifiable member activity or ordinary community conversations. Paid research or sponsored participation requires separate, explicit opt-in.</p>
           <p>To request access, correction, export, or deletion of account data, email <a className="font-semibold underline" href="mailto:fortunaindustriesinc@gmail.com">fortunaindustriesinc@gmail.com</a>.</p>
-          <p>Last updated: October 12, 2026.</p>
+          <p>Last updated: October 16, 2026.</p>
         </section>
       </div>
     </main>

@@ -2,7 +2,9 @@
 
 **Status:** Living strategic registry
 **Created:** October 12, 2026 at 9:10 PM PDT
-**Last updated:** October 12, 2026 at 9:10 PM PDT
+**Last updated:** October 16, 2026
+
+**Controlling source:** [BTP Final Company Vision](docs/vision/BTP_FINAL_VISION.md). This registry preserves options, not a requirement to launch every stream.
 
 ## Purpose
 
@@ -17,7 +19,7 @@ Adding an idea here does not authorize immediate implementation. `BTP_PRODUCT_CO
 - Long-term revenue should come primarily from organizations, opportunity owners, and completed value creation rather than people experiencing layoffs or professional distress.
 - Community content, identifiable activity, employment status, and private conversations are never sold.
 - Paid research, introductions, and expert work require specific consent.
-- Test demand manually before building automation, dashboards, marketplaces, payment systems, or prediction infrastructure.
+- Test demand manually before building automation, dashboards, marketplaces, payment systems, or production prediction infrastructure. Design permissions, outcome definitions, and feasible data collection early.
 
 ## Opportunity registry
 
@@ -46,6 +48,9 @@ Adding an idea here does not authorize immediate implementation. `BTP_PRODUCT_CO
 | Carefully governed sponsorship | Relevant industry organization | Meaningful audience and strict editorial firewall | Sponsorship fee | Low-priority option; never compromise trust |
 
 ## Priority order
+
+The tiers below describe dependencies, not a rigid company sequence. Paid expertise and structured operator research/evaluations are parallel early commercial paths. Prediction is a core long-term ambition: dataset design and feasibility work begin early, while customer-facing forecasts require validation. Availability and opportunities remain meaningful expansion rather than the primary company identity.
+
 
 ### Tier 1 — Validate with the current or immediately available infrastructure
 
@@ -77,7 +82,7 @@ These use the network as a supply and trust advantage. Begin manually and measur
 
 ### Tier 4 — Long-term data and intelligence products
 
-1. Calibrated operational forecasts
+1. Calibrated operational forecasts (core strategic ambition; early data design, evidence-gated release)
 2. Monitored risk portfolios
 3. Enterprise intelligence subscriptions
 4. Aggregate licensed feeds and APIs
