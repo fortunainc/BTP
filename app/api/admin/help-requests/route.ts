@@ -20,6 +20,8 @@ export const PATCH = withAdminAuth(async (req, admin) => {
   if (!transitions[existing.status]?.includes(body.status)) return NextResponse.json({ error: 'Invalid status transition' }, { status: 409 });
   // A match is manual: do not imply expert consent or create contact from a role alone.
   if (body.status === 'MATCHED' && (body.consentConfirmed !== true || typeof body.expertId !== 'string')) return NextResponse.json({ error: 'Expert ID and confirmation of both parties’ consent are required' }, { status: 400 });
+  const consentEvidence = typeof body.consentEvidence === 'string' ? body.consentEvidence.trim() : '';
+  if (body.status === 'MATCHED' && (consentEvidence.length < 10 || consentEvidence.length > 500)) return NextResponse.json({ error: 'Record how and when each party consented (10–500 characters)' }, { status: 400 });
   if (body.status === 'MATCHED') {
     const expert = await prisma.user.findFirst({ where: { id: body.expertId, verificationStatus: 'Approved', isSuspended: false }, select: { id: true } });
     if (!expert || expert.id === existing.userId) return NextResponse.json({ error: 'An active, approved expert is required' }, { status: 400 });
@@ -28,11 +30,11 @@ export const PATCH = withAdminAuth(async (req, admin) => {
   const changed = await prisma.$transaction(async tx => {
     const result = await tx.privateHelpRequest.updateMany({ where: { id: existing.id, status: existing.status }, data: {
       status: body.status, memberUpdate,
-      ...(body.status === 'MATCHED' ? { assignedExpertId: body.expertId } : {}),
+      ...(body.status === 'MATCHED' ? { assignedExpertId: body.expertId, internalNote: [existing.internalNote, `Consent ${new Date().toISOString().slice(0, 10)}: ${applyAutomaticRedaction(consentEvidence).redactedContent}`].filter(Boolean).join('\n') } : {}),
       ...(body.status === 'COMPLETED' ? { completedAt: new Date() } : {}),
     } });
     if (result.count) {
-      const event = { aggregateType: 'HELP_REQUEST' as const, aggregateId: existing.id, eventType: 'STATUS_CHANGED', actorUserId: admin.userId!, payload: { from: existing.status, to: body.status, memberUpdate, consentConfirmed: body.consentConfirmed === true } };
+      const event = { aggregateType: 'HELP_REQUEST' as const, aggregateId: existing.id, eventType: 'STATUS_CHANGED', actorUserId: admin.userId!, payload: { from: existing.status, to: body.status, memberUpdate, consentConfirmed: body.consentConfirmed === true, ...(body.status === 'MATCHED' ? { consentEvidence: applyAutomaticRedaction(consentEvidence).redactedContent } : {}) } };
       const ref = buildLedgerEvent(event).aggregateRefHash;
       const previous = await tx.knowledgeLedgerEvent.findFirst({ where: { aggregateType: 'HELP_REQUEST', aggregateRefHash: ref }, orderBy: { sequence: 'desc' } });
       await tx.knowledgeLedgerEvent.create({ data: buildLedgerEvent({ ...event, sequence: previous ? previous.sequence + 1 : 0, previousEventHash: previous?.rowHash }) });

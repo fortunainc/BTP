@@ -18,8 +18,8 @@ Controlling vision: `docs/vision/BTP_FINAL_VISION.md`. Status labels: **Done**, 
 | # | Item | Status | Notes |
 |---|---|---|---|
 | 6 | Physical iPhone acceptance of build 7 | **Needs founder** | Sign-in, onboarding, ask, answer, follow, search, outcome, report, private help, deletion request, sign-out. Fictional content only. |
-| 7 | Private-help consent evidence and one completed-request rehearsal | Ready (after #6) | An admin checkbox is not consent collection. |
-| 8 | Durable notification batching (survives restart) | Ready | Return Engine batching is in memory today. |
+| 7 | Private-help consent evidence and one completed-request rehearsal | **In progress** | Matching now requires a written note of how and when each party consented (PR #10). Rehearsal still needs a real request. |
+| 8 | Durable notification batching (survives restart) | **Done** | Batch counts persisted in `NotificationBatch` (PR #9). Push/email delivery still not built. |
 | 9 | Mobile dependency advisories | **Done (triage)** | See `docs/MOBILE_DEPENDENCY_ADVISORIES.md`; all high findings are build/test tooling. Resolve with the next Expo SDK upgrade. |
 | 10 | Next iOS build to carry Trust Center copy fix | Ready (after #6) | Source updated in PR #6. |
 
