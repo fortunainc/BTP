@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { use, useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/components/AuthContext';
 
@@ -19,7 +19,8 @@ type JobPosting = {
   };
 };
 
-export default function ApplyToJobPage({ params }: { params: { id: string } }) {
+export default function ApplyToJobPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = use(params);
   const router = useRouter();
   const { user, isAuthenticated, loading: authLoading } = useAuth();
   const [job, setJob] = useState<JobPosting | null>(null);
@@ -46,11 +47,11 @@ export default function ApplyToJobPage({ params }: { params: { id: string } }) {
     }
 
     fetchJobPosting();
-  }, [isAuthenticated, user, router, params.id]);
+  }, [isAuthenticated, user, router, id]);
 
   async function fetchJobPosting() {
     try {
-      const response = await fetch(`/api/job-postings/${params.id}`);
+      const response = await fetch(`/api/job-postings/${id}`);
       if (!response.ok) {
         throw new Error('Job posting not found');
       }
@@ -73,7 +74,7 @@ export default function ApplyToJobPage({ params }: { params: { id: string } }) {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          jobPostingId: params.id,
+          jobPostingId: id,
           coverLetter: formData.coverLetter,
           availability: formData.availability,
           hourlyRate: parseFloat(formData.hourlyRate),
