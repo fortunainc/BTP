@@ -12,6 +12,14 @@ const inter = Inter({ subsets: ["latin"] });
 export const metadata: Metadata = {
   title: "BTP | Clinical trial experience, connected.",
   description: "Practical peer experience and private help for clinical research professionals. Ask questions, learn from peers, and follow up on what helped.",
+  metadataBase: new URL("https://btp-rho-seven.vercel.app"),
+  openGraph: {
+    title: "BTP | Clinical trial experience, connected.",
+    description: "Practical peer experience and private help for clinical research professionals. Invitation-only beta.",
+    siteName: "Behind the Protocol",
+    type: "website",
+  },
+  twitter: { card: "summary", title: "BTP | Clinical trial experience, connected." },
 };
 
 export default function RootLayout({

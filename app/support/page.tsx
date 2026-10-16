@@ -3,7 +3,7 @@ import Link from 'next/link';
 const SUPPORT_EMAIL = 'fortunaindustriesinc@gmail.com';
 
 export const metadata = {
-  title: 'BTP Support',
+  title: 'BTP | Support',
   description: 'Support for the BTP invite-only beta.',
 };
 

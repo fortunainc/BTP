@@ -11,6 +11,7 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useAuth } from '@clerk/nextjs';
 import PatternBadge from '@/components/PatternBadge';
+import { MembershipPending } from '@/components/MemberNav';
 
 interface Situation {
   id: string;
@@ -61,6 +62,7 @@ export default function SituationsPage() {
   const [situations, setSituations] = useState<Situation[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [pending, setPending] = useState(false);
   const [therapeuticArea, setTherapeuticArea] = useState('');
   const [timeBucket, setTimeBucket] = useState('');
 
@@ -77,6 +79,16 @@ export default function SituationsPage() {
 
       const response = await fetch(`/api/situations?${params.toString()}`);
       
+      if (response.status === 403) {
+        setPending(true);
+        setSituations([]);
+        setError(null);
+        return;
+      }
+      if (response.status === 401) {
+        window.location.assign('/sign-in');
+        return;
+      }
       if (!response.ok) {
         throw new Error('Failed to load situations');
       }
@@ -150,6 +162,8 @@ export default function SituationsPage() {
           <div className="flex justify-center items-center py-12">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-slate-600"></div>
           </div>
+        ) : pending ? (
+          <div className="py-12"><MembershipPending /></div>
         ) : error ? (
           <div className="text-center py-12 text-slate-500">{error}</div>
         ) : situations.length === 0 ? (
@@ -158,8 +172,8 @@ export default function SituationsPage() {
               No questions yet
             </p>
             <p className="text-slate-600">
-              {isSignedIn 
-                ? 'Ask the first question'
+              {isSignedIn
+                ? 'The beta is just opening. Ask the first question: an operational situation you are working through, without patient, site, sponsor or study identifiers.'
                 : 'Sign in to ask a question'
               }
             </p>

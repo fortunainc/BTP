@@ -21,7 +21,7 @@ const clerkHandler = clerkMiddleware(
 
   // Route redirects
   // Dormant marketplace/workforce surfaces are intentionally unreachable in beta.
-  if (["/opportunities", "/workforce", "/marketplace", "/profile"].some(path => req.nextUrl.pathname === path || req.nextUrl.pathname.startsWith(`${path}/`))) {
+  if (["/opportunities", "/workforce", "/marketplace", "/profile", "/dashboard", "/demo", "/messages"].some(path => req.nextUrl.pathname === path || req.nextUrl.pathname.startsWith(`${path}/`))) {
     return NextResponse.redirect(new URL("/situations", req.url));
   }
 

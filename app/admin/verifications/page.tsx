@@ -7,7 +7,8 @@ import { useAuth } from '@/components/AuthContext';
 type VerificationStatus = 'Pending' | 'Approved' | 'Rejected';
 type UserWithProfile = {
   id: string;
-  anonymousHandle: string;
+  anonymousHandle?: string;
+  handle?: string;
   email: string;
   userRole: string;
   verificationStatus: VerificationStatus;
@@ -99,7 +100,7 @@ export default function AdminVerificationsPage() {
 
   const filteredUsers = (activeTab === 'pending' ? pendingUsers : allUsers).filter(
     (u) =>
-      u.anonymousHandle?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (u.anonymousHandle || u.handle)?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       u.email?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
@@ -177,7 +178,7 @@ export default function AdminVerificationsPage() {
                 <div className="flex justify-between items-start">
                   <div className="flex-1">
                     <div className="flex items-center gap-3">
-                      <span className="text-lg font-semibold">{u.anonymousHandle || 'No handle'}</span>
+                      <span className="text-lg font-semibold">{(u.anonymousHandle || u.handle) || 'No handle'}</span>
                       <span className={`px-2 py-0.5 rounded text-xs ${
                         u.verificationStatus === 'Approved' ? 'bg-green-500/20 text-green-500' :
                         u.verificationStatus === 'Rejected' ? 'bg-red-500/20 text-red-500' :
@@ -190,7 +191,8 @@ export default function AdminVerificationsPage() {
                       </span>
                     </div>
                     <div className="mt-2 text-sm text-gray-400">
-                      <p>Email: {u.email}</p>
+                      <p>Email: {u.email || 'not recorded'}</p>
+                      <p>Role: {u.roleCategory === 'unspecified' ? 'profile not completed' : u.roleCategory}</p>
                       {u.verifiedEmail && <p>Verified Email: {u.verifiedEmail}</p>}
                       {u.linkedinUrl && (
                         <p>
@@ -208,7 +210,7 @@ export default function AdminVerificationsPage() {
                     {u.verificationStatus === 'Pending' && (
                       <>
                         <select
-                          aria-label={`Verification method for ${u.anonymousHandle}`}
+                          aria-label={`Verification method for ${(u.anonymousHandle || u.handle)}`}
                           value={verificationMethods[u.id] || ''}
                           onChange={(event) => setVerificationMethods((current) => ({ ...current, [u.id]: event.target.value }))}
                           className="px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg text-sm"

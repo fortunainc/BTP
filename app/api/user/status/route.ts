@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
 import { prisma } from '@/lib/prisma';
+import { onboardingComplete } from '@/lib/member-provisioning';
 
 /**
  * GET /api/user/status
@@ -25,6 +26,8 @@ export async function GET(request: NextRequest) {
         userRole: true,
         handle: true,
         linkedinUrl: true,
+        roleCategory: true,
+        verificationStatus: true,
       },
     });
 
@@ -35,19 +38,14 @@ export async function GET(request: NextRequest) {
       });
     }
 
-    // Check if onboarding is complete
-    // Onboarding requires: userRole, handle, and linkedinUrl (optional for alpha)
-    const isOnboardingComplete = Boolean(
-      user.userRole &&
-      user.handle &&
-      (user.linkedinUrl || true) // linkedinUrl optional for alpha
-    );
+    const isOnboardingComplete = onboardingComplete(user);
 
     return NextResponse.json({
       authenticated: true,
       onboardingCompleted: isOnboardingComplete,
       userRole: user.userRole,
       handle: user.handle,
+      verificationStatus: user.verificationStatus,
     });
   } catch (error) {
     console.error('Error fetching user status:', error);

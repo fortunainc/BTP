@@ -8,10 +8,10 @@ Controlling vision: `docs/vision/BTP_FINAL_VISION.md`. Status labels: **Done**, 
 | # | Item | Status | Notes |
 |---|---|---|---|
 | 1 | Credentials in a historical archive | **Done** | Archive removed from `main` (PR #7). Founder confirmed the values are not live; no rotation needed. |
-| 2 | Preview/local database isolation from production | **Needs founder** | Preview APIs already fail closed. Needs a separate database and Vercel preview env; until then treat any local write as production. |
+| 2 | Preview/local database isolation from production | **Needs founder** | Preview APIs already fail closed. Vercel Storage > btp-production > Projects > Update Project Connection: give Preview/Development their own branch (browser automation was blocked from changing this setting). |
 | 3 | Backup restoration drill and alert delivery evidence | **Needs founder** | Requires database provider and Sentry access. |
 | 4 | Deletion fulfillment rehearsal across Clerk, database and vendors | **Needs founder** | Follow `docs/DELETION_FULFILLMENT.md`; use a test account, never the founder account. |
-| 5 | Check historical rows for stored pre-redaction text (`Contribution.originalContent`) | **Needs founder** (DB access) | Current code writes `null`. Older rows should be checked and, if present, cleared after review. |
+| 5 | Check historical rows for stored pre-redaction text (`Contribution.originalContent`) | **Done** | Read-only check 2026-10-16: production has 0 contributions and 0 messages, so no stored originals. |
 
 ## P1 - Member value
 
@@ -34,6 +34,8 @@ Controlling vision: `docs/vision/BTP_FINAL_VISION.md`. Status labels: **Done**, 
 | 15 | Panel consent language reviewed by counsel | **Needs founder** | Required before recruiting paid panelists. |
 
 ## Done (recent)
+
+- PR #11: beta blockers fixed (new accounts now provisioned as pending; ask-page loop; dashboard crash; pending-review state; member navigation and sign-out; standalone private help; admin approval shows email/role); public site and investor room updated per the 16 Oct review. See `docs/BETA_TESTER_KIT.md`.
 
 - PR #6: canonical vision published; public, investor and in-app copy aligned; verified live 2026-10-16.
 - PR #7: credential-bearing archive and stray logs removed; `*.zip` and `*.log` ignored.

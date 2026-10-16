@@ -227,17 +227,8 @@ export default function NotificationsPage() {
 
   // Get link for notification
   const getNotificationLink = (notification: Notification): string => {
-    if (notification.relatedOpportunityId) {
-      return `/opportunities/${notification.relatedOpportunityId}`;
-    }
-    if (notification.relatedMatchId) {
-      return `/matches/${notification.relatedMatchId}`;
-    }
     if (notification.relatedPostId) {
-      return `/contributions/${notification.relatedPostId}`;
-    }
-    if (notification.relatedPatternId) {
-      return `/patterns/${notification.relatedPatternId}`;
+      return `/situations/${notification.relatedPostId}`;
     }
     return '#';
   };

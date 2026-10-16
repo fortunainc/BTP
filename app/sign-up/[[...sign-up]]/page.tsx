@@ -60,7 +60,7 @@ export default function SignUpPage() {
             </div>
             <div className="text-sm text-green-300">
               <p className="font-semibold mb-1">Quick Sign-up</p>
-              <p className="text-green-400">Use your work email for faster verification.</p>
+              <p className="text-green-400">Any email works. A personal email keeps BTP separate from your employer; verification is handled privately.</p>
             </div>
           </div>
         </div>
