@@ -12,6 +12,7 @@
 
 import { prisma } from '@/lib/prisma';
 import { randomUUID } from 'crypto';
+import { recordBatchedEvent } from './database';
 import {
   Notification,
   NotificationVariant,
@@ -53,7 +54,7 @@ export class ReturnEngine {
 
     // Check if this should be batched
     if (variant.requiresBatching) {
-      const batched = this.addToBatch(context, variant);
+      const batched = await this.addToBatch(context, variant);
       if (!batched) {
         return notifications; // Waiting for more events
       }
@@ -170,7 +171,21 @@ export class ReturnEngine {
   /**
    * Add event to batch and check if ready to send
    */
-  private addToBatch(context: TriggerContext, variant: NotificationVariant): boolean {
+  private async addToBatch(context: TriggerContext, variant: NotificationVariant): Promise<boolean> {
+    // Durable path: count the event in the database so batches survive restarts.
+    try {
+      const { ready } = await recordBatchedEvent({
+        userId: context.targetUserId,
+        variantId: variant.id,
+        notificationClass: variant.class,
+        relatedId: context.postId ?? context.contributionId ?? context.opportunityId ?? null,
+        minBatchSize: variant.minBatchSize,
+      });
+      return ready;
+    } catch (error) {
+      console.error('[ReturnEngine] Durable batching unavailable; using in-memory fallback', error);
+    }
+
     const batchKey = `${context.targetUserId}-${variant.class}`;
     const pending = this.pendingNotifications.get(batchKey) || [];
     
