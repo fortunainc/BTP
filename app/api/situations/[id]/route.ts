@@ -11,6 +11,8 @@ import { withAuth, createApiResponse, createErrorResponse } from '@/lib/api-auth
 import { bucketTimestamp } from '@/lib/anti-correlation';
 import { buildInteractionSummary } from '@/lib/operator-return-loop';
 import { getOrCreateUserMetrics, trackEvent, EVENT_TYPES } from '@/lib/analytics-tracker';
+import { verifiedRoleLabel } from '@/lib/role-label';
+import { reactionSummary } from '@/lib/engagement';
 
 /**
  * GET /api/situations/[id]
@@ -102,6 +104,10 @@ export const GET = withAuth(async (req, user) => {
     }
   }
 
+  const visibleAnswers = situation.interactions
+    .filter((interaction) => interaction.interactionType === 'ANSWER' && Boolean(interaction.context));
+  const reactions = await reactionSummary(visibleAnswers.map((a) => a.id), user.id);
+
   return createApiResponse({
     situation: {
       id: situation.id,
@@ -120,8 +126,7 @@ export const GET = withAuth(async (req, user) => {
       ...summary,
       userInteractions,
     },
-    answers: situation.interactions
-      .filter((interaction) => interaction.interactionType === 'ANSWER' && Boolean(interaction.context))
+    answers: visibleAnswers
       .map((interaction) => ({
         id: interaction.id,
         text: interaction.context,
@@ -130,17 +135,8 @@ export const GET = withAuth(async (req, user) => {
           : 'BTP member',
         timeLabel: bucketTimestamp(interaction.createdAt).label,
         isAuthor: interaction.userId === user.id,
+        reactions: reactions[interaction.id]?.counts,
+        myReactions: reactions[interaction.id]?.mine ?? [],
       })),
   });
 }, { requireAuth: true });
-
-function verifiedRoleLabel(role: string | null): string {
-  const normalized = (role || '').toLowerCase();
-  if (normalized.includes('crc') || normalized.includes('coordinator') || normalized.includes('site')) return 'Verified site professional';
-  if (normalized.includes('cra') || normalized.includes('monitor')) return 'Verified CRA / monitor';
-  if (normalized.includes('regulatory')) return 'Verified regulatory professional';
-  if (normalized.includes('quality')) return 'Verified quality professional';
-  if (normalized.includes('ctm') || normalized.includes('operations') || normalized.includes('project')) return 'Verified clinical operations professional';
-  if (normalized.includes('pi') || normalized.includes('investigator')) return 'Verified investigator';
-  return 'Verified clinical research professional';
-}

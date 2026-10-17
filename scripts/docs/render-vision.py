@@ -27,8 +27,8 @@ for block in source.read_text().split('\n\n'):
 def decorate(canvas,doc):
  canvas.setFillColor(HexColor('#EFE6D8'));canvas.rect(0,0,612,792,fill=1,stroke=0)
  canvas.setFillColor(HexColor('#3A1A1E'));canvas.setFont('Helvetica-Bold',9);canvas.drawString(46,762,'BTP  /  BEHIND THE PROTOCOL')
- canvas.setFont('Helvetica',8);canvas.drawRightString(566,762,'FINAL COMPANY VISION  |  16 OCT 2026')
+ canvas.setFont('Helvetica',8);canvas.drawRightString(566,762,'FINAL COMPANY VISION  |  UPDATED 17 OCT 2026')
  canvas.setStrokeColor(HexColor('#CBB9A6'));canvas.line(46,750,566,750);canvas.line(46,40,566,40)
- canvas.setFont('Helvetica',8);canvas.drawString(46,26,'Canonical source: docs/vision/BTP_FINAL_VISION.md  |  Version 1.0');canvas.drawRightString(566,26,str(doc.page))
+ canvas.setFont('Helvetica',8);canvas.drawString(46,26,'Canonical source: docs/vision/BTP_FINAL_VISION.md  |  Version 1.1');canvas.drawRightString(566,26,str(doc.page))
 SimpleDocTemplate(str(out),pagesize=(612,792),rightMargin=46,leftMargin=46,topMargin=58,bottomMargin=55,title='BTP | Final Company Vision',author='BTP / Sasha Sinclair').build(story,onFirstPage=decorate,onLaterPages=decorate)
 print(out)

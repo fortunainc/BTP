@@ -10,6 +10,7 @@
 
 'use client';
 
+import { AnswerReactions } from '@/components/AnswerReactions';
 import { useState, useEffect, use } from 'react';
 import Link from 'next/link';
 import { useAuth } from '@clerk/nextjs';
@@ -25,6 +26,7 @@ interface Situation {
   timeBucket: string;
   timeLabel: string;
   resolutionStatus?: string;
+  isAuthor?: boolean;
 }
 
 interface InteractionStatus {
@@ -41,6 +43,9 @@ interface PublicAnswer {
   text: string;
   role: string;
   timeLabel: string;
+  reactions?: Record<'HELPFUL' | 'SAME_HERE' | 'SAVED' | 'WORKED', number>;
+  myReactions?: Array<'HELPFUL' | 'SAME_HERE' | 'SAVED' | 'WORKED'>;
+  isAuthor?: boolean;
 }
 
 const INTERACTION_BUTTONS = [
@@ -317,6 +322,8 @@ export default function SituationDetailPage({ params }: { params: Promise<{ id: 
                           <span className="text-xs text-slate-600">{answer.timeLabel}</span>
                         </div>
                         <p className="text-sm text-slate-300 whitespace-pre-wrap">{answer.text}</p>
+                        <AnswerReactions answerId={answer.id} initialCounts={answer.reactions} initialMine={answer.myReactions}
+                          isOwnAnswer={Boolean(answer.isAuthor)} viewerIsAsker={Boolean(situation?.isAuthor)} />
                       </div>
                     ))}
                   </div>

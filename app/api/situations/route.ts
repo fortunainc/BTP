@@ -1,3 +1,4 @@
+import { notifyFoundingResponders } from '@/lib/engagement';
 import { isApprovedMember } from '@/lib/access-policy';
 /**
  * Situations API - Intelligence Realm
@@ -579,6 +580,13 @@ export const POST = withAuth(async (req, user) => {
         console.error('Error creating failure pathways:', err);
       });
       
+      // Ask founding operators for a fast first answer (visible questions only)
+      if (!requiresReview) {
+        notifyFoundingResponders({ contributionId: situation.id, authorId: user.id, therapeuticArea: finalTherapeuticArea }).catch(err => {
+          console.error('Error notifying founding responders:', err);
+        });
+      }
+
       // Schedule 7-day truth loop follow-up
       scheduleTruthLoopFollowUp(situation.id, user.id).catch(err => {
         console.error('Error scheduling truth loop follow-up:', err);

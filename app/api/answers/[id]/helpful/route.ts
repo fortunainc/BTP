@@ -1,6 +1,7 @@
 import { isApprovedMember } from '@/lib/access-policy';
 import { prisma } from '@/lib/prisma';
 import { withAuth, createApiResponse, createErrorResponse } from '@/lib/api-auth';
+import { addReaction, checkReaction } from '@/lib/engagement';
 
 function answerIdFrom(request: Request): string | null {
   return new URL(request.url).pathname.split('/')[3] || null;
@@ -37,34 +38,11 @@ export const POST = withAuth(async (request, user) => {
     return createErrorResponse('Approved BTP membership is required', 403);
   }
   const answerId = answerIdFrom(request);
-  const answer = answerId ? await visibleAnswer(answerId) : null;
-  if (!answerId || !answer) return createErrorResponse('Answer not found', 404);
-  if (answer.userId === user.id) return createErrorResponse('You cannot mark your own answer helpful', 400);
-
-  const existing = await prisma.auditLog.findFirst({
-    where: { userId: user.id, action: 'ANSWER_MARKED_HELPFUL', resourceType: 'Interaction', resourceId: answerId },
-    select: { id: true },
-  });
-  if (!existing) {
-    await prisma.$transaction([
-      prisma.auditLog.create({
-        data: { userId: user.id, action: 'ANSWER_MARKED_HELPFUL', resourceType: 'Interaction', resourceId: answerId },
-      }),
-      ...(answer.userId ? [prisma.notification.create({
-        data: {
-          userId: answer.userId,
-          variantId: 'IMPACT-ANSWER-HELPED',
-          notificationClass: 'VALIDATION',
-          priority: 'P2',
-          copy: 'Your answer helped another BTP member.',
-          relatedPostId: answerId,
-          surfaces: ['in_app', 'push'],
-          deliveredTo: [],
-        },
-      })] : []),
-    ]);
-  }
-  return createApiResponse({ helpful: true }, existing ? 200 : 201);
+  if (!answerId) return createErrorResponse('Answer not found', 404);
+  const check = await checkReaction(answerId, user.id, 'HELPFUL');
+  if (!check.ok) return createErrorResponse(check.error === 'You cannot react to your own answer' ? 'You cannot mark your own answer helpful' : check.error, check.status);
+  const { created } = await addReaction(user.id, 'HELPFUL', check.answer);
+  return createApiResponse({ helpful: true }, created ? 201 : 200);
 }, { requireAuth: true });
 
 export const DELETE = withAuth(async (request, user) => {

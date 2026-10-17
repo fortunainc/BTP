@@ -7,6 +7,7 @@ import { useClerk } from '@clerk/nextjs';
 const links = [
   { href: '/situations', label: 'Questions' },
   { href: '/situations/new', label: 'Ask' },
+  { href: '/polls', label: 'Polls' },
   { href: '/help', label: 'Private help' },
   { href: '/notifications', label: 'Notifications' },
   { href: '/support', label: 'Support' },

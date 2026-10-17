@@ -16,6 +16,7 @@ type UserWithProfile = {
   verifiedEmail: string | null;
   linkedinUrl: string | null;
   roleCategory: string | null;
+  isFoundingOperator?: boolean;
   companyType: string | null;
   createdAt: string;
 };
@@ -105,7 +106,16 @@ export default function AdminVerificationsPage() {
   );
 
   if (loading) {
-    return (
+    async function toggleFounding(userId: string, founding: boolean) {
+    const res = await fetch('/api/admin/founding-operators', {
+      method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ userId, founding }),
+    });
+    if (res.ok) {
+      setAllUsers((current) => current.map((x) => (x.id === userId ? { ...x, isFoundingOperator: founding } : x)));
+    }
+  }
+
+  return (
       <div className="min-h-screen bg-gray-900 flex items-center justify-center">
         <div className="text-white">Loading...</div>
       </div>
@@ -235,6 +245,15 @@ export default function AdminVerificationsPage() {
                           Reject
                         </button>
                       </>
+                    )}
+                    {u.verificationStatus === 'Approved' && (
+                      <button
+                        onClick={() => void toggleFounding(u.id, !u.isFoundingOperator)}
+                        disabled={actionLoading}
+                        className="px-4 py-2 bg-slate-700 hover:bg-slate-600 rounded-lg text-sm transition-colors"
+                      >
+                        {u.isFoundingOperator ? 'Remove founding responder' : 'Make founding responder'}
+                      </button>
                     )}
                   </div>
                 </div>

@@ -1,6 +1,6 @@
 # BTP | Final Company Vision
 
-Version 1.0 | Locked October 16, 2026 | Founder-directed source of truth
+Version 1.1 | Updated October 17, 2026 | Founder-directed source of truth
 
 ## 1. The company we are building
 
@@ -52,6 +52,16 @@ Private availability, consented introductions, contract/fractional/project oppor
 
 These are routes to validate, not claims of current sales. The revenue registry preserves the broader portfolio. BTP need not own trial execution, become a CRO, or launch every stream to succeed. Its advantage must grow through trusted participation, repeat customers, useful outcomes, and reusable evidence rather than permanent dependence on founder labor.
 
+### Approved operating model (October 17, 2026)
+
+Community first, patterns second. Operators come to BTP to ask for help and help each other without repercussions, and to learn what insiders know. The community is the product. In aggregate, the questions, answers, reactions, polls and outcomes they share show where trials actually break: why sites under-enroll, which eligibility criteria block patients, where workload and processes fail. BTP returns those patterns to operators first, then offers them, only in aggregate and never by site, study or person, to the teams that plan trials. Over time the same patterns support forecasts.
+
+Operators raise whatever they see; BTP observes, tags and tracks it to an outcome. There are no reporting tasks: no site check-ins and no site screening logs. BTP is not a site or CRO oversight layer, and it does not verify individual studies.
+
+Recurring outputs: a members-first brief (Heard Behind the Protocol), a daily question or poll, a monthly Site Operations Index built from aggregated poll votes, a quarterly Enrollment Reality Report (oncology first), and opt-in paid operator research.
+
+Engagement should feel energetic, not gimmicky: fast first answers from founding operators, "it worked" receipts to helpers, reactions (helpful, same here, saved) with visible counts, instant-reveal polls, a curated topic feed, monthly top helpers by topic and a weekly helper streak. Never: fake or empty notifications, AI-generated filler posts, public shaming, or anything that pushes members to reveal who they are.
+
 <!-- pagebreak -->
 
 ## 3. The prediction and data vision
@@ -63,6 +73,8 @@ Start with operational events that a buyer can act on: activation delays, amendm
 Predicting patient outcomes, drug efficacy, individual employability, or individual performance is outside the agreed initial scope. A future expansion into a materially different clinical use requires a separate strategy and evidence decision; another company's patient-prediction results do not validate BTP.
 
 ### How the dataset develops
+
+Aggregate release rules: a minimum group size of operators and sites before any pattern is shown or sold; coarse categories only (tumor area, site type, region band, phase band); a time lag before release; suppression of any combination a single sponsor could recognize; members see insights first. Thresholds are confirmed by a privacy reviewer before any paid release.
 
 Use a combination of sources where appropriate: separately consented longitudinal operator panels, structured paid research with explicit reuse rights, authorized partner records, and suitable licensed or public data. Community discussions reveal needs and hypotheses; membership and ordinary posting do not automatically authorize model training or commercial reuse.
 
@@ -137,6 +149,8 @@ Update this canonical source first when the founder changes the vision, record t
 ### Decision record
 
 October 16, 2026: Founder instructed Codex to lock the final BTP vision in a PDF and GitHub and proceed with aligned updates. The controlling direction is a trusted clinical-trial professional network, paid expertise and operator research, and a long-term operational intelligence and prediction business. Consented opportunities remain an expansion path. No fundraising terms, valuation, staffing plan, or prediction launch date is fixed by this decision.
+
+October 17, 2026: Founder approved the direction "community first, patterns second" after testing and rejecting sponsor-side oversight (incompatible with anonymity and duplicative of budgets already paying CROs, trial managers and QA), consent checking, site data-entry automation and biospecimen management (crowded), and monthly site check-ins or screening logs (re-identification risk and operator burden). Enrollment and execution reality, derived from normal community activity, is the first data focus; the engagement design and recurring outputs above are approved.
 
 ### The enduring test
 
