@@ -81,7 +81,7 @@ async function createCapabilityIdentity(userId: string) {
 
     // Get user's contributions to calculate capabilities
     const contributions = await prisma.contribution.findMany({
-      where: { userId },
+      where: { userId, contributionType: { not: 'poll' } },
       select: {
         therapeuticArea: true,
         trialPhase: true,
@@ -125,7 +125,7 @@ export async function updateCapabilityIdentity(userId: string): Promise<void> {
   try {
     // Get user's contributions
     const contributions = await prisma.contribution.findMany({
-      where: { userId },
+      where: { userId, contributionType: { not: 'poll' } },
       select: {
         therapeuticArea: true,
         trialPhase: true,

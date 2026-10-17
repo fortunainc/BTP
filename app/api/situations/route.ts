@@ -1,4 +1,5 @@
 import { notifyFoundingResponders } from '@/lib/engagement';
+import { after } from 'next/server';
 import { isApprovedMember } from '@/lib/access-policy';
 /**
  * Situations API - Intelligence Realm
@@ -582,9 +583,9 @@ export const POST = withAuth(async (req, user) => {
       
       // Ask founding operators for a fast first answer (visible questions only)
       if (!requiresReview) {
-        notifyFoundingResponders({ contributionId: situation.id, authorId: user.id, therapeuticArea: finalTherapeuticArea }).catch(err => {
+        after(() => notifyFoundingResponders({ contributionId: situation.id, authorId: user.id, therapeuticArea: finalTherapeuticArea }).catch(err => {
           console.error('Error notifying founding responders:', err);
-        });
+        }));
       }
 
       // Schedule 7-day truth loop follow-up

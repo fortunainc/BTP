@@ -64,6 +64,7 @@ export default function SituationsPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [pending, setPending] = useState(false);
+  const [suspended, setSuspended] = useState(false);
   const [polls, setPolls] = useState<Poll[] | null>(null);
 
   useEffect(() => {
@@ -86,6 +87,8 @@ export default function SituationsPage() {
       const response = await fetch(`/api/situations?${params.toString()}`);
       
       if (response.status === 403) {
+        const body = await response.json().catch(() => ({}));
+        setSuspended(String(body?.error || '').toLowerCase().includes('suspend'));
         setPending(true);
         setSituations([]);
         setError(null);
@@ -172,7 +175,9 @@ export default function SituationsPage() {
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-slate-600"></div>
           </div>
         ) : pending ? (
-          <div className="py-12"><MembershipPending /></div>
+          <div className="py-12">{suspended ? (
+            <div className="mx-auto max-w-xl rounded-lg border border-slate-700 bg-slate-800/50 p-6 text-slate-300"><h2 className="text-xl font-semibold text-white">Your account is suspended</h2><p className="mt-3">Contact BTP support if you believe this is a mistake: fortunaindustriesinc@gmail.com.</p></div>
+          ) : <MembershipPending />}</div>
         ) : error ? (
           <div className="text-center py-12 text-slate-500">{error}</div>
         ) : situations.length === 0 ? (

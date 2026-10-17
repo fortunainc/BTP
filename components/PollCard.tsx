@@ -26,7 +26,7 @@ export function PollCard({ poll: initial, compact = false }: { poll: Poll; compa
       });
       const data = await res.json().catch(() => null);
       const payload = data?.data ?? data;
-      if (res.ok && payload?.results) {
+      if (res.ok && payload?.voted) {
         setPoll({ ...poll, voted: true, myChoice: payload.myChoice, total: payload.total, results: payload.results });
       }
     } finally {
@@ -39,7 +39,11 @@ export function PollCard({ poll: initial, compact = false }: { poll: Poll; compa
       {poll.isDaily && <p className="mb-1 text-xs font-semibold uppercase tracking-wide text-cyan-300">Today&apos;s question</p>}
       <h3 className="font-medium text-white">{poll.question}</h3>
       <div className="mt-3 space-y-2">
-        {poll.voted && poll.results ? (
+        {poll.voted && !poll.results ? (
+          <p className="rounded-md border border-slate-700 px-3 py-2 text-sm text-slate-300">
+            Thanks. Results appear once at least 5 members have answered, so no one&apos;s choice can be identified.
+          </p>
+        ) : poll.voted && poll.results ? (
           <>
             {poll.results.map((r, i) => (
               <div key={r.label} className="relative overflow-hidden rounded-md border border-slate-700 px-3 py-2 text-sm">

@@ -35,7 +35,7 @@ export async function GET(request: NextRequest) {
     if (!capabilityIdentity) {
       // Generate CapabilityIdentity from user's contributions
       const contributions = await prisma.contribution.findMany({
-        where: { userId: user.id },
+        where: { userId: user.id, contributionType: { not: 'poll' } },
         select: {
           therapeuticArea: true,
           trialPhase: true,
@@ -102,7 +102,7 @@ export async function GET(request: NextRequest) {
     
     // Convert exact metrics to bands (never expose exact numbers)
     const bandedMetrics = convertToBands({
-      contributionCount: await prisma.contribution.count({ where: { userId: user.id } }),
+      contributionCount: await prisma.contribution.count({ where: { userId: user.id, contributionType: { not: 'poll' } } }),
     });
 
     return NextResponse.json({

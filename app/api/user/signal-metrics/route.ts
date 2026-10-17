@@ -40,13 +40,13 @@ export const GET = withAuth(async (req, user) => {
     try {
       // Get contribution counts
       const contributionCount = await prisma.contribution.count({
-        where: { userId: user.id }
+        where: { userId: user.id, contributionType: { not: 'poll' } }
       });
 
       // Get interaction counts (signals that received engagement)
       const interactionCount = await prisma.interaction.count({
         where: { 
-          contribution: { userId: user.id }
+          contribution: { userId: user.id, contributionType: { not: 'poll' } }
         }
       });
 

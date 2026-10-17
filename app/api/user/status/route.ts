@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
 import { prisma } from '@/lib/prisma';
 import { onboardingComplete } from '@/lib/member-provisioning';
+import { isApprovedMember } from '@/lib/access-policy';
 
 /**
  * GET /api/user/status
@@ -28,6 +29,7 @@ export async function GET(request: NextRequest) {
         linkedinUrl: true,
         roleCategory: true,
         verificationStatus: true,
+        isSuspended: true,
       },
     });
 
@@ -46,6 +48,8 @@ export async function GET(request: NextRequest) {
       userRole: user.userRole,
       handle: user.handle,
       verificationStatus: user.verificationStatus,
+      approved: isApprovedMember(user),
+      suspended: user.isSuspended,
     });
   } catch (error) {
     console.error('Error fetching user status:', error);

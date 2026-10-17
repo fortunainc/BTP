@@ -50,7 +50,8 @@ export const POST = withAuth(async (req, user) => {
       const updatedUser = await prisma.user.update({
         where: { id: user.id },
         data: {
-          userRole,
+          // Never downgrade staff roles through self-service onboarding.
+          userRole: ['admin', 'founder'].includes(user.userRole) ? user.userRole : userRole,
           linkedinUrl: sanitizedLinkedinUrl,
           handle: sanitizedHandle,
           roleCategory: sanitizedRoleCategory,

@@ -172,7 +172,7 @@ export default function FounderAnalyticsDashboard() {
           <div className="text-red-500 text-6xl mb-4">🚫</div>
           <h1 className="text-2xl font-bold text-gray-900 mb-2">Access Denied</h1>
           <p className="text-gray-600">You need admin privileges to access this dashboard.</p>
-          <Link href="/dashboard" className="mt-4 inline-block text-indigo-600 hover:underline">
+          <Link href="/situations" className="mt-4 inline-block text-indigo-600 hover:underline">
             Return to Dashboard
           </Link>
         </div>

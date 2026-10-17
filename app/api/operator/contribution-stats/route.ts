@@ -26,7 +26,7 @@ export async function GET(request: NextRequest) {
 
     // Get all contributions
     const contributions = await prisma.contribution.findMany({
-      where: { userId: user.id },
+      where: { userId: user.id, contributionType: { not: 'poll' } },
       select: {
         contributionType: true,
         therapeuticArea: true,

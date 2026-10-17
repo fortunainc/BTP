@@ -99,7 +99,7 @@ export async function computeContributorHealth(userId: string): Promise<Contribu
   try {
     // Get contribution stats
     const contributions = await prisma.contribution.findMany({
-      where: { userId, isHidden: false, isFlagged: false },
+      where: { userId, isHidden: false, isFlagged: false, contributionType: { not: 'poll' } },
       select: {
         id: true,
         signalQualityScore: true,

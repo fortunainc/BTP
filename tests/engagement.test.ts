@@ -86,3 +86,20 @@ describe('engagement metrics', () => {
     expect(m).toMatchObject({ questions: 3, answeredPct: 67, answeredWithin2hPct: 33, medianMinutesToFirstAnswer: 105, outcomeReportedPct: 33, membersWhoAskAndAnswer: 2 });
   });
 });
+
+describe('reaction toggles and poll privacy', () => {
+  it('does not re-notify when a reaction is removed and added again', async () => {
+    const check = await checkReaction('a1', 'asker', 'WORKED');
+    if (!check.ok) throw new Error('expected ok');
+    await addReaction('asker', 'WORKED', check.answer);
+    db.audit = db.audit.filter((a) => a.action !== 'ANSWER_MARKED_WORKED'); // simulate un-react
+    await addReaction('asker', 'WORKED', check.answer);
+    expect(db.notifications).toHaveLength(1);
+  });
+
+  it('hides poll breakdowns until at least 5 members have voted', async () => {
+    const { visibleResults } = await import('@/lib/engagement');
+    expect(visibleResults(tallyPoll(['A', 'B'], [{ context: '0' }, { context: '1' }]))).toBeNull();
+    expect(visibleResults(tallyPoll(['A', 'B'], ['0', '0', '1', '1', '0'].map((c) => ({ context: c })))) ).not.toBeNull();
+  });
+});
