@@ -1,13 +1,12 @@
+import { answeredByCopy } from '@/lib/engagement';
 /**
  * Structured Operator Return Loop
  *
- * This module is intentionally anti-forum:
- * - no usernames
- * - no public profiles
- * - no reply chains
- * - no exact small counts in user-facing summaries
- * - no exact timestamps in user-facing summaries
- * - no likes, votes, karma, popularity sorting, or follower mechanics
+ * Identity-protected by design:
+ * - no real names, employers or public profiles; handles and broad verified roles only
+ * - bucketed, non-exact timestamps in user-facing summaries
+ * - reaction counts (helpful, same here, saved, it worked) are shown on answers
+ *   per the approved 17 Oct 2026 engagement direction; they never reveal who reacted
  */
 
 import { prisma } from '@/lib/prisma';
@@ -284,6 +283,7 @@ export async function createReturnLoopNotification(params: {
     | 'PATTERN_MATURITY'
     | 'REFLECTION_UPDATED'
     | 'MICRO_OPPORTUNITY';
+  copy?: string;
 }): Promise<void> {
   const copyByTrigger: Record<typeof params.trigger, string> = {
     FIRST_VALIDATION: 'Similar anonymous context has appeared.',
@@ -345,6 +345,11 @@ export async function createReturnLoopNotification(params: {
     minMinutes = 15;
     maxMinutes = 60;
     priority = 'P1';
+  } else if (params.trigger === 'WHAT_WORKED' && params.interactionType === 'ANSWER') {
+    // A peer answer is already visible on the page; tell the asker quickly.
+    minMinutes = 5;
+    maxMinutes = 20;
+    priority = 'P1';
   } else if (params.trigger === 'REFLECTION_UPDATED') {
     minMinutes = 120;
     maxMinutes = 360;
@@ -362,7 +367,7 @@ export async function createReturnLoopNotification(params: {
       variantId: variantByTrigger[params.trigger],
       notificationClass: classByTrigger[params.trigger],
       priority,
-      copy: copyByTrigger[params.trigger],
+      copy: params.copy ?? copyByTrigger[params.trigger],
       relatedPostId: params.contributionId,
       relatedThreadId: null,
       relatedOpportunityId: null,
@@ -418,6 +423,7 @@ export async function triggerReturnLoopForInteraction(params: {
       contributionId: params.contributionId,
       interactionType: params.interactionType,
       trigger: 'WHAT_WORKED',
+      copy: await answeredByCopy(params.actorId),
     });
     return;
   }

@@ -12,6 +12,7 @@ import Link from 'next/link';
 import { useAuth } from '@clerk/nextjs';
 import PatternBadge from '@/components/PatternBadge';
 import { MembershipPending } from '@/components/MemberNav';
+import { DailyQuestion, type Poll } from '@/components/PollCard';
 
 interface Situation {
   id: string;
@@ -63,6 +64,11 @@ export default function SituationsPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [pending, setPending] = useState(false);
+  const [polls, setPolls] = useState<Poll[] | null>(null);
+
+  useEffect(() => {
+    fetch('/api/polls').then(r => r.ok ? r.json() : null).then(d => setPolls((d?.data ?? d)?.polls ?? null)).catch(() => setPolls(null));
+  }, []);
   const [therapeuticArea, setTherapeuticArea] = useState('');
   const [timeBucket, setTimeBucket] = useState('');
 
@@ -158,6 +164,9 @@ export default function SituationsPage() {
 
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-8 py-8">
+        {!pending && polls && polls.length > 0 && (
+          <div className="mb-6 max-w-2xl"><DailyQuestion polls={polls} /></div>
+        )}
         {loading ? (
           <div className="flex justify-center items-center py-12">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-slate-600"></div>

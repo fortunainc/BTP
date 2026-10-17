@@ -33,7 +33,20 @@ Controlling vision: `docs/vision/BTP_FINAL_VISION.md`. Status labels: **Done**, 
 | 14 | Implement prediction-ready event fields (timestamps + permission tags) | Ready after #13 | Additive migration; no change to member experience. |
 | 15 | Panel consent language reviewed by counsel | **Needs founder** | Required before recruiting paid panelists. |
 
+## P1 - Approved direction (17 Oct 2026): community first, patterns second
+
+| # | Item | Status | Notes |
+|---|---|---|---|
+| 16 | Engagement items 1-4: founding responders, "it worked" receipts and visible counts, reactions, instant-reveal polls and daily question | **Done (web)** | PR #14. iOS app gets reactions and polls in the next build. Founding responders are set in Admin > Verifications. |
+| 17 | Engagement items 5-10: curated topic feed, monthly top helpers, weekly helper streak, directed asks, impact receipts, expertise labels | Ready | After beta activity confirms items 1-4. |
+| 18 | Members brief (Heard Behind the Protocol) | Ready | First issue after 6-8 weeks of activity. |
+| 19 | Site Operations Index from aggregated poll votes | Ready | Monthly; members first. |
+| 20 | Enrollment Reality Report (oncology first) | Ready | Quarterly; aggregate release rules apply. |
+| 21 | Privacy review of aggregate thresholds | **Needs founder** | Choose reviewer before the first paid release. |
+| 22 | Decide private help free or paid during beta | **Needs founder** | |
+
 ## Done (recent)
+
 
 - PR #11: beta blockers fixed (new accounts now provisioned as pending; ask-page loop; dashboard crash; pending-review state; member navigation and sign-out; standalone private help; admin approval shows email/role); public site and investor room updated per the 16 Oct review. See `docs/BETA_TESTER_KIT.md`.
 
