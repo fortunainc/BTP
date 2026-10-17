@@ -105,8 +105,7 @@ export default function AdminVerificationsPage() {
       u.email?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  if (loading) {
-    async function toggleFounding(userId: string, founding: boolean) {
+  async function toggleFounding(userId: string, founding: boolean) {
     const res = await fetch('/api/admin/founding-operators', {
       method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ userId, founding }),
     });
@@ -115,7 +114,8 @@ export default function AdminVerificationsPage() {
     }
   }
 
-  return (
+  if (loading) {
+    return (
       <div className="min-h-screen bg-gray-900 flex items-center justify-center">
         <div className="text-white">Loading...</div>
       </div>
