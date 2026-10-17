@@ -36,7 +36,7 @@ export default function AdminVerificationsPage() {
 
   useEffect(() => {
     if (!isAdmin) {
-      router.push('/dashboard');
+      router.push('/situations');
       return;
     }
     fetchUsers();

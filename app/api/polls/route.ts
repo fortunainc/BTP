@@ -1,7 +1,7 @@
 import { isApprovedMember } from '@/lib/access-policy';
 import { prisma } from '@/lib/prisma';
 import { withAuth, createApiResponse, createErrorResponse } from '@/lib/api-auth';
-import { POLL_TYPE, POLL_VOTE, parsePollOptions, tallyPoll } from '@/lib/engagement';
+import { POLL_TYPE, POLL_VOTE, parsePollOptions, tallyPoll, visibleResults } from '@/lib/engagement';
 
 /** GET /api/polls — recent polls; results only for polls the member has voted on. */
 export const GET = withAuth(async (_request, user) => {
@@ -28,7 +28,7 @@ export const GET = withAuth(async (_request, user) => {
         voted: Boolean(mine),
         myChoice: mine ? Number(mine.context) : null,
         total: mine ? tally.total : null,
-        results: mine ? tally.results : null,
+        results: mine ? visibleResults(tally) : null,
       };
     }),
   });

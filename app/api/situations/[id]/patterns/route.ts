@@ -10,16 +10,31 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
 import { prisma } from '@/lib/prisma';
+import { getUserDetails } from '@/lib/api-auth';
+import { isApprovedMember } from '@/lib/access-policy';
 
 export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { userId } = await auth();
+    if (!userId) return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
+    const member = await getUserDetails(userId);
+    if (!member || !isApprovedMember(member)) {
+      return NextResponse.json({ error: 'Approved BTP membership is required' }, { status: 403 });
+    }
+
     const { id } = await params;
     
-    const contribution = await prisma.contribution.findUnique({
-      where: { id },
+    const contribution = await prisma.contribution.findFirst({
+      where: {
+        id,
+        contributionType: { in: ['question', 'situation'] },
+        isHidden: false,
+        isFlagged: false,
+        forceExcludeFromPatterns: false,
+      },
       select: {
         id: true,
         contributionType: true,

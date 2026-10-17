@@ -369,6 +369,7 @@ async function getReturnLoopData(startDate: string, endDate: string, dataSources
 
   const interactionWhere = {
     ...interactionSourceFilter,
+    interactionType: { not: 'POLL_VOTE' },
     createdAt: {
       gte: new Date(`${startDate}T00:00:00.000Z`),
       lte: new Date(`${endDate}T23:59:59.999Z`),

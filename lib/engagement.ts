@@ -33,10 +33,15 @@ export async function reactionSummary(answerIds: string[], viewerId: string) {
     where: { resourceType: 'Interaction', resourceId: { in: answerIds }, action: { in: Object.values(REACTIONS) } },
     select: { resourceId: true, action: true, userId: true },
   });
+  const seen = new Set<string>();
   for (const row of rows) {
     const type = ACTION_TO_TYPE[row.action];
     const entry = row.resourceId ? result[row.resourceId] : undefined;
     if (!type || !entry) continue;
+    // Count each member once per reaction even if a concurrent request wrote twice.
+    const key = `${row.resourceId}|${row.action}|${row.userId}`;
+    if (seen.has(key)) continue;
+    seen.add(key);
     entry.counts[type] += 1;
     if (row.userId === viewerId) entry.mine.push(type);
   }
@@ -77,9 +82,17 @@ export async function addReaction(userId: string, type: ReactionType, answer: { 
   });
   if (existing) return { created: false };
   const receipt = RECEIPT_COPY[type];
+  // Toggling a reaction off and on again must not re-notify the helper.
+  const alreadyNotified = receipt && answer.userId
+    ? await prisma.auditLog.findFirst({
+        where: { userId, action: `${action}_NOTIFIED`, resourceType: 'Interaction', resourceId: answer.id },
+        select: { id: true },
+      })
+    : null;
+  const notify = Boolean(receipt && answer.userId && !alreadyNotified);
   await prisma.$transaction([
     prisma.auditLog.create({ data: { userId, action, resourceType: 'Interaction', resourceId: answer.id, details: { contributionId: answer.contributionId } } }),
-    ...(receipt && answer.userId ? [prisma.notification.create({
+    ...(notify && receipt && answer.userId ? [prisma.auditLog.create({ data: { userId, action: `${action}_NOTIFIED`, resourceType: 'Interaction', resourceId: answer.id } }), prisma.notification.create({
       data: {
         userId: answer.userId, variantId: receipt.variant, notificationClass: 'VALIDATION', priority: type === 'WORKED' ? 'P1' : 'P2',
         copy: receipt.copy, relatedPostId: answer.contributionId, surfaces: ['in_app', 'push'], deliveredTo: [],
@@ -141,6 +154,14 @@ export function validatePollInput(question: unknown, options: unknown): { ok: tr
   if (opts.some((o) => o.length > 80)) return { ok: false, error: 'Each option must be 80 characters or fewer' };
   if (new Set(opts.map((o) => o.toLowerCase())).size !== opts.length) return { ok: false, error: 'Options must be different' };
   return { ok: true, question: q, options: opts };
+}
+
+/** Minimum votes before any breakdown is shown, so small polls can't reveal individual choices. */
+export const POLL_MIN_RESULTS = 5;
+
+/** Results are revealed only to members who have voted, and only once enough members have answered. */
+export function visibleResults(tally: ReturnType<typeof tallyPoll>) {
+  return tally.total >= POLL_MIN_RESULTS ? tally.results : null;
 }
 
 /** Results are revealed only to members who have voted. */

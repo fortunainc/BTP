@@ -302,7 +302,7 @@ async function updateContributorHealth(userId: string): Promise<void> {
 
     // Count contributions and follow-ups
     const contributionCount = await prisma.contribution.count({
-      where: { userId, isHidden: false, isFlagged: false }
+      where: { userId, isHidden: false, isFlagged: false, contributionType: { not: 'poll' } }
     });
 
     const followUpCount = await prisma.contributionFollowUp.count({

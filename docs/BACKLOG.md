@@ -47,6 +47,8 @@ Controlling vision: `docs/vision/BTP_FINAL_VISION.md`. Status labels: **Done**, 
 
 ## Done (recent)
 
+- PR #15: CTO readiness (architecture, codebase status, demo script, README, proprietary LICENSE, .env.example, ~60 legacy files archived) and quality sweep fixes: patterns endpoint now requires approved membership; poll votes excluded from analytics and member stats; poll breakdowns hidden until 5 votes; reaction toggles no longer re-notify; pending/suspended states on Ask; staff roles protected in onboarding.
+
 
 - PR #11: beta blockers fixed (new accounts now provisioned as pending; ask-page loop; dashboard crash; pending-review state; member navigation and sign-out; standalone private help; admin approval shows email/role); public site and investor room updated per the 16 Oct review. See `docs/BETA_TESTER_KIT.md`.
 

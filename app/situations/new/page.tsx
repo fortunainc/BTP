@@ -21,6 +21,7 @@
 
 'use client';
 
+import { MembershipPending } from '@/components/MemberNav';
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@clerk/nextjs';
@@ -83,6 +84,8 @@ export default function NewSituationPage() {
   const [result, setResult] = useState<SubmissionResult | null>(null);
   const [onboardingComplete, setOnboardingComplete] = useState<boolean | null>(null);
   const [checkingOnboarding, setCheckingOnboarding] = useState(true);
+  const [approved, setApproved] = useState(false);
+  const [suspended, setSuspended] = useState(false);
 
   // Check onboarding status when user is authenticated
   useEffect(() => {
@@ -97,6 +100,8 @@ export default function NewSituationPage() {
         if (response.ok) {
           const data = await response.json();
           setOnboardingComplete(data.onboardingCompleted === true);
+          setApproved(data.approved === true);
+          setSuspended(data.suspended === true);
         } else {
           setOnboardingComplete(false);
         }
@@ -117,6 +122,20 @@ export default function NewSituationPage() {
       <div className="min-h-screen bg-slate-950 flex flex-col justify-center items-center px-4">
         <Loader2 className="w-8 h-8 text-cyan-500 animate-spin mb-4" />
         <p className="text-slate-400">Checking your account...</p>
+      </div>
+    );
+  }
+
+  // Membership gate - signed in and onboarded, but not yet approved (or suspended)
+  if (isSignedIn && onboardingComplete && (!approved || suspended)) {
+    return (
+      <div className="min-h-screen bg-slate-950 px-4 py-16">
+        {suspended ? (
+          <div className="mx-auto max-w-xl rounded-lg border border-slate-700 bg-slate-800/50 p-6 text-slate-300">
+            <h2 className="text-xl font-semibold text-white">Your account is suspended</h2>
+            <p className="mt-3">Contact BTP support if you believe this is a mistake: fortunaindustriesinc@gmail.com.</p>
+          </div>
+        ) : <MembershipPending />}
       </div>
     );
   }

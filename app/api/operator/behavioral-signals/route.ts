@@ -39,6 +39,7 @@ export async function GET(request: NextRequest) {
     const recentContributions = await prisma.contribution.findMany({
       where: {
         userId: user.id,
+        contributionType: { not: 'poll' },
         createdAt: {
           gte: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000), // Last 7 days
         },
@@ -82,6 +83,7 @@ export async function GET(request: NextRequest) {
     const contributionsWithInteractions = await prisma.contribution.findMany({
       where: {
         userId: user.id,
+        contributionType: { not: 'poll' },
         createdAt: {
           gte: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000),
         },

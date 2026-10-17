@@ -1,7 +1,7 @@
 import { isApprovedMember } from '@/lib/access-policy';
 import { prisma } from '@/lib/prisma';
 import { withAuth, createApiResponse, createErrorResponse } from '@/lib/api-auth';
-import { POLL_TYPE, POLL_VOTE, parsePollOptions, tallyPoll } from '@/lib/engagement';
+import { POLL_TYPE, POLL_VOTE, parsePollOptions, tallyPoll, visibleResults } from '@/lib/engagement';
 
 /** POST /api/polls/[id]/vote { option } — one vote per member; returns results immediately. */
 export const POST = withAuth(async (request, user) => {
@@ -22,14 +22,20 @@ export const POST = withAuth(async (request, user) => {
     select: { id: true },
   });
   if (!existing) {
-    await prisma.interaction.create({
-      data: { contributionId: poll.id, userId: user.id, interactionType: POLL_VOTE, context: String(option), displayStatus: 'VISIBLE' },
-    });
+    try {
+      await prisma.interaction.create({
+        data: { contributionId: poll.id, userId: user.id, interactionType: POLL_VOTE, context: String(option), displayStatus: 'VISIBLE' },
+      });
+    } catch (error) {
+      // A concurrent request already recorded this member's vote.
+      if ((error as { code?: string }).code !== 'P2002') throw error;
+    }
   }
   const votes = await prisma.interaction.findMany({
     where: { contributionId: poll.id, interactionType: POLL_VOTE },
     select: { userId: true, context: true },
   });
   const mine = votes.find((v) => v.userId === user.id);
-  return createApiResponse({ voted: true, myChoice: mine ? Number(mine.context) : option, ...tallyPoll(options, votes) }, existing ? 200 : 201);
+  const tally = tallyPoll(options, votes);
+  return createApiResponse({ voted: true, myChoice: mine ? Number(mine.context) : option, total: tally.total, results: visibleResults(tally) }, existing ? 200 : 201);
 }, { requireAuth: true });

@@ -40,7 +40,7 @@ export default function AdminHiringFeesPage() {
 
   useEffect(() => {
     if (!isAdmin) {
-      router.push('/dashboard');
+      router.push('/situations');
       return;
     }
     fetchHires();

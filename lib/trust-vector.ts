@@ -134,7 +134,7 @@ export async function updateTrustVector(userId: string): Promise<TrustVectorResu
     // Get user's contributions, interactions, AND outcomes
     const [contributions, interactions, contributionOutcomes, hireOutcomes, user] = await Promise.all([
       prisma.contribution.findMany({
-        where: { userId },
+        where: { userId, contributionType: { not: 'poll' } },
         select: {
           id: true,
           createdAt: true,
@@ -146,7 +146,7 @@ export async function updateTrustVector(userId: string): Promise<TrustVectorResu
         }
       }),
       prisma.interaction.findMany({
-        where: { userId },
+        where: { userId, interactionType: { not: 'POLL_VOTE' } },
         select: {
           interactionType: true,
           createdAt: true

@@ -35,7 +35,7 @@ export default function AdminModerationPage() {
 
   useEffect(() => {
     if (!isAdmin) {
-      router.push('/dashboard');
+      router.push('/situations');
       return;
     }
     fetchData();

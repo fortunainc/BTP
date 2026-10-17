@@ -31,7 +31,7 @@ export default function AdminUsersPage() {
 
   useEffect(() => {
     if (!isAdmin) {
-      router.push('/dashboard');
+      router.push('/situations');
       return;
     }
     fetchUsers();
