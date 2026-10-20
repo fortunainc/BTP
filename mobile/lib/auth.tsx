@@ -4,7 +4,7 @@ import { createContext, type PropsWithChildren, useCallback, useContext, useEffe
 import { ActivityIndicator, Alert, Pressable, StyleSheet, Text, TextInput, View } from "react-native";
 import { colors, spacing } from "@/constants/theme";
 import { api, ApiError, liveApiConfigured } from "@/lib/api";
-import { CLERK_PUBLISHABLE_KEY, configurationIssues, devAuthToken, localPreviewEnabled } from "@/lib/config";
+import { CLERK_PROXY_URL, CLERK_PUBLISHABLE_KEY, configurationIssues, devAuthToken, localPreviewEnabled } from "@/lib/config";
 
 export type BtpMember = { id: string; handle: string; roleCategory?: string | null; companyCategory?: string | null; verificationStatus?: string | null; approved: boolean };
 type AuthState = { configured: boolean; ready: boolean; signedIn: boolean; member: BtpMember | null; getToken: () => Promise<string | null>; signOut: () => Promise<void> };
@@ -29,8 +29,10 @@ function ClerkBridge({ children }: PropsWithChildren) {
       else setError(e instanceof Error ? e.message : "Could not verify your BTP membership.");
     } finally { setChecking(false); }
   }, [getToken, isSignedIn]);
+  const [slow, setSlow] = useState(false);
+  useEffect(() => { if (isLoaded) return; const t = setTimeout(() => setSlow(true), 15000); return () => clearTimeout(t); }, [isLoaded]);
   useEffect(() => { if (isLoaded && isSignedIn) void checkMembership(); }, [checkMembership, isLoaded, isSignedIn]);
-  if (!isLoaded) return <View style={styles.center}><ActivityIndicator color={colors.accent}/></View>;
+  if (!isLoaded) return <View style={styles.center}><ActivityIndicator color={colors.accent}/>{slow ? <Text style={styles.checking}>Can’t reach BTP. Check your connection, then close and reopen the app.</Text> : null}</View>;
   if (!isSignedIn) return <SignInScreen/>;
   if (!liveApiConfigured) return <AccessScreen title="App setup needed" copy="This build is not connected to the BTP service." onRetry={checkMembership} onSignOut={signOut} retryLabel="Try again" />;
   if (checking) return <View style={styles.center}><ActivityIndicator color={colors.accent}/><Text style={styles.checking}>Checking your BTP membership…</Text></View>;
@@ -91,7 +93,7 @@ export function BtpAuthProvider({ children }: PropsWithChildren) {
   if (!CLERK_PUBLISHABLE_KEY || !liveApiConfigured) {
     return <View style={styles.access}><Text style={styles.brand}>BTP</Text><Text style={styles.title}>App setup required</Text><Text style={styles.copy}>This build cannot connect securely because {configurationIssues.join(" and ")} {configurationIssues.length === 1 ? "is" : "are"} not configured. Install a correctly configured build or contact BTP.</Text></View>;
   }
-  return <ClerkProvider publishableKey={CLERK_PUBLISHABLE_KEY} tokenCache={tokenCache}><ClerkBridge>{children}</ClerkBridge></ClerkProvider>;
+  return <ClerkProvider publishableKey={CLERK_PUBLISHABLE_KEY} proxyUrl={CLERK_PROXY_URL} tokenCache={tokenCache}><ClerkBridge>{children}</ClerkBridge></ClerkProvider>;
 }
 export function useBtpAuth() { return useContext(AuthContext); }
 
