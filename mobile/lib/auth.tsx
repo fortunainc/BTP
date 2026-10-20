@@ -1,4 +1,4 @@
-import { ClerkProvider, useAuth, useSignIn } from "@clerk/clerk-expo";
+import { ClerkProvider, getClerkInstance, useAuth, useSignIn } from "@clerk/clerk-expo";
 import * as SecureStore from "expo-secure-store";
 import { createContext, type PropsWithChildren, useCallback, useContext, useEffect, useState } from "react";
 import { ActivityIndicator, Alert, Pressable, StyleSheet, Text, TextInput, View } from "react-native";
@@ -10,6 +10,20 @@ export type BtpMember = { id: string; handle: string; roleCategory?: string | nu
 type AuthState = { configured: boolean; ready: boolean; signedIn: boolean; member: BtpMember | null; getToken: () => Promise<string | null>; signOut: () => Promise<void> };
 const AuthContext = createContext<AuthState>({ configured: Boolean(devAuthToken), ready: true, signedIn: Boolean(devAuthToken), member: null, getToken: async () => devAuthToken ?? null, signOut: async () => undefined });
 const tokenCache = { getToken: (key: string) => SecureStore.getItemAsync(key), saveToken: (key: string, value: string) => SecureStore.setItemAsync(key, value) };
+
+/**
+ * Native Clerk ignores `proxyUrl`, and the production Clerk subdomain has no DNS,
+ * so rewrite every Clerk API request to the web app's /__clerk proxy. The instance
+ * is a singleton, so ClerkProvider reuses this one.
+ */
+type ClerkRequest = { url?: URL };
+if (!localPreviewEnabled && CLERK_PUBLISHABLE_KEY && CLERK_PROXY_URL) {
+  const proxy = CLERK_PROXY_URL;
+  const clerk = getClerkInstance({ publishableKey: CLERK_PUBLISHABLE_KEY, tokenCache }) as unknown as { __unstable__onBeforeRequest: (cb: (req: ClerkRequest) => void | Promise<void>) => void };
+  clerk.__unstable__onBeforeRequest((req) => {
+    if (req.url && !req.url.href.startsWith(proxy)) req.url = new URL(`${proxy}${req.url.pathname}${req.url.search}`);
+  });
+}
 
 function ClerkBridge({ children }: PropsWithChildren) {
   const { getToken, isLoaded, isSignedIn, signOut } = useAuth();
@@ -93,7 +107,7 @@ export function BtpAuthProvider({ children }: PropsWithChildren) {
   if (!CLERK_PUBLISHABLE_KEY || !liveApiConfigured) {
     return <View style={styles.access}><Text style={styles.brand}>BTP</Text><Text style={styles.title}>App setup required</Text><Text style={styles.copy}>This build cannot connect securely because {configurationIssues.join(" and ")} {configurationIssues.length === 1 ? "is" : "are"} not configured. Install a correctly configured build or contact BTP.</Text></View>;
   }
-  return <ClerkProvider publishableKey={CLERK_PUBLISHABLE_KEY} proxyUrl={CLERK_PROXY_URL} tokenCache={tokenCache}><ClerkBridge>{children}</ClerkBridge></ClerkProvider>;
+  return <ClerkProvider publishableKey={CLERK_PUBLISHABLE_KEY} tokenCache={tokenCache}><ClerkBridge>{children}</ClerkBridge></ClerkProvider>;
 }
 export function useBtpAuth() { return useContext(AuthContext); }
 

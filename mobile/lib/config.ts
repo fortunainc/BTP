@@ -12,8 +12,8 @@ export const devAuthToken = localPreviewEnabled ? requestedDevAuthToken : undefi
 export const API_URL = apiUrl;
 /**
  * The production Clerk instance is served through the web app's /__clerk proxy
- * (its own Clerk subdomain has no DNS on vercel.app). Native must use it too,
- * otherwise Clerk never loads and the app spins forever.
+ * (its own Clerk subdomain has no DNS on vercel.app). lib/auth.tsx rewrites
+ * native Clerk requests to it; otherwise Clerk never loads.
  */
 export const CLERK_PROXY_URL = apiUrl ? `${apiUrl.replace(/\/+$/, "")}/__clerk` : undefined;
 export const CLERK_PUBLISHABLE_KEY = clerkPublishableKey;
