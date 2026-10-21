@@ -12,10 +12,15 @@ function clerkMessage(error: unknown): string {
   return candidate.errors?.[0]?.longMessage || candidate.errors?.[0]?.message || 'Check your email and password and try again.';
 }
 
-/** Only same-site paths; `//host` and `/\host` would leave the site. */
+/** Only same-site destinations; anything resolving to another origin falls back to the member home. */
 function safeRedirect(destination: string | null): string {
-  if (!destination || !destination.startsWith('/') || destination.startsWith('//') || destination.startsWith('/\\')) return '/situations';
-  return destination;
+  if (!destination) return '/situations';
+  try {
+    const url = new URL(destination, window.location.origin);
+    return url.origin === window.location.origin ? `${url.pathname}${url.search}${url.hash}` : '/situations';
+  } catch {
+    return '/situations';
+  }
 }
 
 export default function SignInPage() {
