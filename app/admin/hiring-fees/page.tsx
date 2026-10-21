@@ -33,18 +33,19 @@ type HireRecord = {
 
 export default function AdminHiringFeesPage() {
   const router = useRouter();
-  const { user, isAdmin } = useAuth();
+  const { user, isAdmin, loading: authLoading } = useAuth();
   const [hires, setHires] = useState<HireRecord[]>([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState<'all' | 'Fee Pending' | 'Invoiced' | 'Collected' | 'Waived'>('all');
 
   useEffect(() => {
+    if (authLoading) return;
     if (!isAdmin) {
       router.push('/situations');
       return;
     }
     fetchHires();
-  }, [isAdmin, router]);
+  }, [isAdmin, authLoading, router]);
 
   async function fetchHires() {
     try {
@@ -104,7 +105,7 @@ export default function AdminHiringFeesPage() {
     );
   }
 
-  if (!isAdmin) {
+  if (authLoading || !isAdmin) {
     return null;
   }
 

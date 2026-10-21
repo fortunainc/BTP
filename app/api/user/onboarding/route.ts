@@ -7,7 +7,7 @@ import { logAuditEvent, AuditEventType } from '@/lib/audit-logging';
 
 export const POST = withAuth(async (req, user) => {
     try {
-      const body = await req.json();
+      const body = await req.json().catch(() => ({}));
       const { userRole, linkedinUrl, anonymousHandle, roleCategory, companyType } = body;
 
       // Validation
@@ -20,8 +20,8 @@ export const POST = withAuth(async (req, user) => {
         return NextResponse.json({ error: 'Invalid LinkedIn URL format' }, { status: 400 });
       }
 
-      if (!anonymousHandle || anonymousHandle.length < 3) {
-        return NextResponse.json({ error: 'Display handle must be at least 3 characters' }, { status: 400 });
+      if (typeof anonymousHandle !== 'string' || !/^[a-zA-Z0-9_-]{3,30}$/.test(anonymousHandle.trim())) {
+        return NextResponse.json({ error: 'Display handle must be 3-30 letters, numbers, dashes or underscores' }, { status: 400 });
       }
 
       if (userRole === 'operator' && !roleCategory) {
@@ -34,7 +34,7 @@ export const POST = withAuth(async (req, user) => {
 
       // Check if anonymous handle is already taken
       const existingUser = await prisma.user.findUnique({
-        where: { handle: anonymousHandle.toLowerCase() },
+        where: { handle: anonymousHandle.trim().toLowerCase() },
       });
 
       if (existingUser && existingUser.id !== user.id) {
@@ -43,7 +43,7 @@ export const POST = withAuth(async (req, user) => {
 
       // Update user profile
       const sanitizedLinkedinUrl = linkedinUrl ? DOMPurify.sanitize(linkedinUrl) : null;
-      const sanitizedHandle = DOMPurify.sanitize(anonymousHandle).toLowerCase();
+      const sanitizedHandle = DOMPurify.sanitize(anonymousHandle.trim()).toLowerCase();
       const sanitizedRoleCategory = roleCategory ? DOMPurify.sanitize(roleCategory) : undefined;
       const sanitizedCompanyType = companyType ? DOMPurify.sanitize(companyType) : undefined;
 
@@ -54,7 +54,8 @@ export const POST = withAuth(async (req, user) => {
           userRole: ['admin', 'founder'].includes(user.userRole) ? user.userRole : userRole,
           linkedinUrl: sanitizedLinkedinUrl,
           handle: sanitizedHandle,
-          roleCategory: sanitizedRoleCategory,
+          // The verified role label is set at review; approved members cannot self-change it.
+          roleCategory: user.verificationStatus === 'Approved' && user.roleCategory && user.roleCategory !== 'unspecified' ? user.roleCategory : sanitizedRoleCategory,
           companyCategory: sanitizedCompanyType,
           ...(user.verificationStatus === 'Approved' ? {} : { verificationStatus: 'Pending' }),
         },
@@ -84,6 +85,9 @@ export const POST = withAuth(async (req, user) => {
         },
       });
     } catch (error) {
+      if ((error as { code?: string }).code === 'P2002') {
+        return NextResponse.json({ error: 'That display handle is already taken' }, { status: 409 });
+      }
       console.error('Onboarding error:', error);
       return NextResponse.json({ error: 'Failed to complete onboarding' }, { status: 500 });
     }

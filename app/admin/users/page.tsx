@@ -23,19 +23,20 @@ type User = {
 
 export default function AdminUsersPage() {
   const router = useRouter();
-  const { user, isAdmin } = useAuth();
+  const { user, isAdmin, loading: authLoading } = useAuth();
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState<'all' | 'active' | 'suspended'>('all');
   const [searchTerm, setSearchTerm] = useState('');
 
   useEffect(() => {
+    if (authLoading) return;
     if (!isAdmin) {
       router.push('/situations');
       return;
     }
     fetchUsers();
-  }, [isAdmin, router]);
+  }, [isAdmin, authLoading, router]);
 
   async function fetchUsers() {
     try {
@@ -111,7 +112,7 @@ export default function AdminUsersPage() {
     );
   }
 
-  if (!isAdmin) {
+  if (authLoading || !isAdmin) {
     return null;
   }
 

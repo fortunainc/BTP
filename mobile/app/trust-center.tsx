@@ -26,7 +26,7 @@ export default function TrustCenterScreen() {
 }
 
 const styles = StyleSheet.create({
-  safe: { backgroundColor: colors.background, flex: 1, paddingTop: 48 },
+  safe: { backgroundColor: colors.background, flex: 1, paddingTop: 24 },
   header: { alignItems: "center", borderBottomColor: colors.border, borderBottomWidth: 1, flexDirection: "row", justifyContent: "space-between", paddingBottom: 12, paddingHorizontal: spacing.md },
   back: { alignItems: "center", height: 40, justifyContent: "center", width: 40 },
   headerTitle: { color: colors.ink, fontFamily: "Geist", fontSize: 17, fontWeight: "700" },

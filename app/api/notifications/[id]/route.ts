@@ -14,7 +14,7 @@ export const PATCH = withAuth(async (request: NextRequest, user: any) => {
   try {
     const url = new URL(request.url);
     const id = url.pathname.split('/').pop() || '';
-    const body = await request.json();
+    const body = await request.json().catch(() => ({}));
     const { read, dismissed, opened, clicked } = body;
 
     const notification = await prisma.notification.findUnique({ where: { id } });

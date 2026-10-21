@@ -15,7 +15,8 @@ export async function GET(req: NextRequest) {
   try {
     const [pendingUsers, allUsers] = await Promise.all([
       prisma.user.findMany({
-        where: { verificationStatus: 'Pending' },
+        // Accounts that signed in but never finished their profile are not ready to review.
+        where: { verificationStatus: 'Pending', roleCategory: { not: 'unspecified' } },
         select: {
           id: true,
           handle: true,

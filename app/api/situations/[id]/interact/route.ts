@@ -51,7 +51,7 @@ export const POST = withAuth(async (req, user) => {
   const pathSegments = url.pathname.split('/');
   const contributionId = pathSegments[3];
 
-  const body = await req.json();
+  const body = await req.json().catch(() => ({}));
   const normalizedType = normalizeInteractionType(String(body.interactionType || ''));
   const rawContext = typeof body.context === 'string' ? body.context : undefined;
 

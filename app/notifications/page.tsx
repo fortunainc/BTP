@@ -249,7 +249,7 @@ export default function NotificationsPage() {
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
               <Link
-                href="/"
+                href="/situations"
                 className="text-slate-400 hover:text-slate-300 flex items-center gap-1"
               >
                 <ChevronLeft className="w-4 h-4" />

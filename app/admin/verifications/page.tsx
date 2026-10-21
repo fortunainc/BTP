@@ -23,7 +23,7 @@ type UserWithProfile = {
 
 export default function AdminVerificationsPage() {
   const router = useRouter();
-  const { user, isAdmin } = useAuth();
+  const { user, isAdmin, loading: authLoading } = useAuth();
   const [pendingUsers, setPendingUsers] = useState<UserWithProfile[]>([]);
   const [allUsers, setAllUsers] = useState<UserWithProfile[]>([]);
   const [loading, setLoading] = useState(true);
@@ -35,12 +35,13 @@ export default function AdminVerificationsPage() {
   const [verificationMethods, setVerificationMethods] = useState<Record<string, string>>({});
 
   useEffect(() => {
+    if (authLoading) return;
     if (!isAdmin) {
       router.push('/situations');
       return;
     }
     fetchUsers();
-  }, [isAdmin, router]);
+  }, [isAdmin, authLoading, router]);
 
   async function fetchUsers() {
     try {
@@ -122,7 +123,7 @@ export default function AdminVerificationsPage() {
     );
   }
 
-  if (!isAdmin) {
+  if (authLoading || !isAdmin) {
     return null;
   }
 

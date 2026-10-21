@@ -39,8 +39,8 @@ export const GET = withAuth(async (request, user) => {
 
       const { searchParams } = new URL(request.url);
       const unreadOnly = searchParams.get('unreadOnly') === 'true';
-      const limit = parseInt(searchParams.get('limit') || '50');
-      const offset = parseInt(searchParams.get('offset') || '0');
+      const limit = Math.min(Math.max(parseInt(searchParams.get('limit') || '50', 10) || 50, 1), 100);
+      const offset = Math.max(parseInt(searchParams.get('offset') || '0', 10) || 0, 0);
       const classFilter = searchParams.get('class');
 
       // Build where clause.

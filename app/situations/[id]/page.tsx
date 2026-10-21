@@ -11,6 +11,7 @@
 'use client';
 
 import { AnswerReactions } from '@/components/AnswerReactions';
+import { MembershipPending } from '@/components/MemberNav';
 import { useState, useEffect, use } from 'react';
 import Link from 'next/link';
 import { useAuth } from '@clerk/nextjs';
@@ -79,6 +80,7 @@ export default function SituationDetailPage({ params }: { params: Promise<{ id: 
   const [helpTiming, setHelpTiming] = useState('');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [pendingAccess, setPendingAccess] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [selectedContextType, setSelectedContextType] = useState<string | null>(null);
   const [contextText, setContextText] = useState('');
@@ -99,6 +101,10 @@ export default function SituationDetailPage({ params }: { params: Promise<{ id: 
       setLoading(true);
       const response = await fetch(`/api/situations/${id}`);
 
+      if (response.status === 403) {
+        setPendingAccess(true);
+        return;
+      }
       if (!response.ok) {
         throw new Error('Situation not found');
       }
@@ -115,10 +121,10 @@ export default function SituationDetailPage({ params }: { params: Promise<{ id: 
     }
   }
 
-  const submitInteraction = async (interactionType: string, context?: string) => {
+  const submitInteraction = async (interactionType: string, context?: string): Promise<boolean> => {
     if (!isSignedIn) {
       window.location.assign('/sign-in');
-      return;
+      return false;
     }
 
     try {
@@ -138,12 +144,14 @@ export default function SituationDetailPage({ params }: { params: Promise<{ id: 
         setSelectedContextType(null);
         fetchSituation();
         setTimeout(() => setSuccessMessage(null), 4500);
-      } else {
-        setError(data.error || 'Failed to record your response');
+        return true;
       }
+      setError(data.error || 'Failed to record your response');
+      return false;
     } catch (err) {
       console.error('Error recording interaction:', err);
       setError('Failed to record your response');
+      return false;
     } finally {
       setSubmitting(false);
     }
@@ -166,8 +174,7 @@ export default function SituationDetailPage({ params }: { params: Promise<{ id: 
 
   const handleSubmitAnswer = async () => {
     if (!answerText.trim()) return;
-    await submitInteraction('ANSWER', answerText.trim());
-    setAnswerText('');
+    if (await submitInteraction('ANSWER', answerText.trim())) setAnswerText('');
   };
 
   const handleSubmitHelpRequest = async () => {
@@ -241,12 +248,20 @@ export default function SituationDetailPage({ params }: { params: Promise<{ id: 
     );
   }
 
+  if (pendingAccess) {
+    return (
+      <div className="min-h-screen bg-slate-950 flex flex-col justify-center items-center px-4">
+        <MembershipPending />
+      </div>
+    );
+  }
+
   if (error || !situation) {
     return (
       <div className="min-h-screen bg-slate-950 flex flex-col justify-center items-center px-4">
         <p className="text-red-400 text-lg text-center">{error || 'Situation not found'}</p>
         <Link href="/situations" className="mt-4 text-cyan-400 hover:text-cyan-300">
-          ← Back to Situations
+          ← Back to Community Questions
         </Link>
       </div>
     );

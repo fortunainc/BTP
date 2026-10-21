@@ -12,6 +12,12 @@ function clerkMessage(error: unknown): string {
   return candidate.errors?.[0]?.longMessage || candidate.errors?.[0]?.message || 'Check your email and password and try again.';
 }
 
+/** Only same-site paths; `//host` and `/\host` would leave the site. */
+function safeRedirect(destination: string | null): string {
+  if (!destination || !destination.startsWith('/') || destination.startsWith('//') || destination.startsWith('/\\')) return '/situations';
+  return destination;
+}
+
 export default function SignInPage() {
   const { signIn, fetchStatus } = useSignIn();
   const [email, setEmail] = useState('');
@@ -44,7 +50,7 @@ export default function SignInPage() {
 
       const params = new URLSearchParams(window.location.search);
       const destination = params.get('redirect_url');
-      const redirectTo = destination?.startsWith('/') ? destination : '/admin/analytics';
+      const redirectTo = safeRedirect(destination);
       await signIn.finalize({
         navigate: ({ session, decorateUrl }) => {
           if (session?.currentTask) {
@@ -101,7 +107,7 @@ export default function SignInPage() {
       }
       const params = new URLSearchParams(window.location.search);
       const destination = params.get('redirect_url');
-      const redirectTo = destination?.startsWith('/') ? destination : '/admin/analytics';
+      const redirectTo = safeRedirect(destination);
       await signIn.finalize({ navigate: ({ decorateUrl }) => window.location.replace(decorateUrl(redirectTo)) });
     } catch (cause) {
       setError(clerkMessage(cause));
