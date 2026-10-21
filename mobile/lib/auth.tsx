@@ -27,37 +27,44 @@ if (!localPreviewEnabled && CLERK_PUBLISHABLE_KEY && CLERK_PROXY_URL) {
 }
 
 function ClerkBridge({ children }: PropsWithChildren) {
-  const { getToken, isLoaded, isSignedIn, signOut } = useAuth();
+  const { getToken, isLoaded, isSignedIn, signOut, userId } = useAuth();
+  // Clerk hands back new getToken/signOut functions on every render. Keep the latest in
+  // refs so the membership check runs once per signed-in user instead of on every render
+  // (which looped: check -> re-render -> check, and the app never left "Checking").
+  const getTokenRef = useRef(getToken);
+  const signOutRef = useRef(signOut);
+  useEffect(() => { getTokenRef.current = getToken; signOutRef.current = signOut; }, [getToken, signOut]);
   const [member, setMember] = useState<BtpMember | null>(null);
   const [checking, setChecking] = useState(true);
   const [error, setError] = useState("");
   const [notFound, setNotFound] = useState(false);
   const checkMembership = useCallback(async () => {
-    if (!isSignedIn || !liveApiConfigured) return;
+    if (!liveApiConfigured) return;
     setChecking(true); setError(""); setNotFound(false);
     try {
-      const result = await api.session(await getToken());
+      const result = await api.session(await getTokenRef.current());
       setMember(result.member);
     } catch (e) {
       setMember(null);
       if (e instanceof ApiError && e.status === 404) setNotFound(true);
       else setError(e instanceof Error ? e.message : "Could not verify your BTP membership.");
     } finally { setChecking(false); }
-  }, [getToken, isSignedIn]);
+  }, []);
+  const stableSignOut = useCallback(() => signOutRef.current(), []);
   const [slow, setSlow] = useState(false);
   useEffect(() => { if (isLoaded) return; const t = setTimeout(() => setSlow(true), 15000); return () => clearTimeout(t); }, [isLoaded]);
-  useEffect(() => { if (isLoaded && isSignedIn) void checkMembership(); }, [checkMembership, isLoaded, isSignedIn]);
+  useEffect(() => { if (isLoaded && isSignedIn && userId) void checkMembership(); }, [checkMembership, isLoaded, isSignedIn, userId]);
   useEffect(() => { if (isLoaded && !isSignedIn) { setMember(null); setError(""); setNotFound(false); setChecking(true); } }, [isLoaded, isSignedIn]);
-  const value = useMemo<AuthState>(() => ({ configured: true, ready: true, signedIn: true, member, getToken: () => getToken(), signOut }), [member, getToken, signOut]);
+  const value = useMemo<AuthState>(() => ({ configured: true, ready: true, signedIn: true, member, getToken: () => getTokenRef.current(), signOut: stableSignOut }), [member, stableSignOut]);
   if (!isLoaded) return <View style={styles.center}><ActivityIndicator color={colors.accent}/>{slow ? <Text style={styles.checking}>Can’t reach BTP. Check your connection, then close and reopen the app.</Text> : null}</View>;
   if (!isSignedIn) return <SignInScreen/>;
-  if (!liveApiConfigured) return <AccessScreen title="App setup needed" copy="This build is not connected to the BTP service." onRetry={checkMembership} onSignOut={signOut} retryLabel="Try again" />;
+  if (!liveApiConfigured) return <AccessScreen title="App setup needed" copy="This build is not connected to the BTP service." onRetry={checkMembership} onSignOut={stableSignOut} retryLabel="Try again" />;
   if (checking) return <View style={styles.center}><ActivityIndicator color={colors.accent}/><Text style={styles.checking}>Checking your BTP membership…</Text></View>;
-  if (error) return <AccessScreen title="Could not verify access" copy={error} onRetry={checkMembership} onSignOut={signOut} retryLabel="Retry" />;
-  if (notFound) return <AccessScreen title="Account not ready" copy="BTP could not set up your member account. Try again, or contact BTP support." onRetry={checkMembership} onSignOut={signOut} retryLabel="Check again" />;
+  if (error) return <AccessScreen title="Could not verify access" copy={error} onRetry={checkMembership} onSignOut={stableSignOut} retryLabel="Retry" />;
+  if (notFound) return <AccessScreen title="Account not ready" copy="BTP could not set up your member account. Try again, or contact BTP support." onRetry={checkMembership} onSignOut={stableSignOut} retryLabel="Check again" />;
   if (!member?.approved) {
     const rejected = member?.verificationStatus?.toLowerCase() === "rejected";
-    return <AccessScreen title={rejected ? "Access not approved" : "Verification pending"} copy={rejected ? "This account is not approved for the BTP beta. Contact BTP if you think this is an error." : "BTP is reviewing your invitation and professional verification. You’ll be able to enter once it is approved."} onRetry={checkMembership} onSignOut={signOut} retryLabel="Check status" />;
+    return <AccessScreen title={rejected ? "Access not approved" : "Verification pending"} copy={rejected ? "This account is not approved for the BTP beta. Contact BTP if you think this is an error." : "BTP is reviewing your invitation and professional verification. You’ll be able to enter once it is approved."} onRetry={checkMembership} onSignOut={stableSignOut} retryLabel="Check status" />;
   }
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
