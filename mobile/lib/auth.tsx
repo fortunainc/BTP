@@ -2,6 +2,7 @@ import { ClerkProvider, getClerkInstance, useAuth, useSignIn } from "@clerk/cler
 import * as SecureStore from "expo-secure-store";
 import { createContext, type PropsWithChildren, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
 import { ActivityIndicator, Alert, Keyboard, KeyboardAvoidingView, Platform, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
+import { BookQuote } from "@/components/BookQuote";
 import { colors, spacing } from "@/constants/theme";
 import { api, ApiError, liveApiConfigured } from "@/lib/api";
 import { CLERK_PROXY_URL, CLERK_PUBLISHABLE_KEY, configurationIssues, devAuthToken, localPreviewEnabled } from "@/lib/config";
@@ -120,6 +121,7 @@ function SignInScreen() {
   const canEmail = !busy && Boolean(email.trim());
   const codeHint = step === "totp" ? "Enter the code from your authenticator." : step === "backup" ? "Enter a backup code." : step === "phone" ? "Enter the code sent to your phone." : `Enter the code sent to ${email.trim() || "your email"}.`;
   return <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : undefined} style={styles.flex}><ScrollView contentContainerStyle={styles.signIn} keyboardShouldPersistTaps="handled" keyboardDismissMode="on-drag"><Text style={styles.brand}>BTP</Text><Text style={styles.title}>{step === "password" ? "Welcome back" : "Verify your sign-in"}</Text><Text style={styles.copy}>Invite-only access for verified clinical-trial professionals.</Text>
+    {step === "password" && <BookQuote compact />}
     {step === "password"
       ? <><TextInput accessibilityLabel="Email" autoCapitalize="none" autoComplete="email" autoCorrect={false} keyboardType="email-address" onChangeText={setEmail} onSubmitEditing={() => passwordRef.current?.focus()} placeholder="Email address" placeholderTextColor={colors.muted} returnKeyType="next" submitBehavior="submit" style={styles.input} textContentType="emailAddress" value={email}/>
          <TextInput ref={passwordRef} accessibilityLabel="Password" autoCapitalize="none" autoComplete="password" onChangeText={setPassword} onSubmitEditing={() => { if (canSubmit) void submit(); else Keyboard.dismiss(); }} placeholder="Password (or use an email code below)" placeholderTextColor={colors.muted} returnKeyType="go" secureTextEntry style={styles.input} textContentType="password" value={password}/></>
