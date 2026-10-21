@@ -12,6 +12,17 @@ function clerkMessage(error: unknown): string {
   return candidate.errors?.[0]?.longMessage || candidate.errors?.[0]?.message || 'Check your email and password and try again.';
 }
 
+/** Only same-site destinations; anything resolving to another origin falls back to the member home. */
+function safeRedirect(destination: string | null): string {
+  if (!destination) return '/situations';
+  try {
+    const url = new URL(destination, window.location.origin);
+    return url.origin === window.location.origin ? `${url.pathname}${url.search}${url.hash}` : '/situations';
+  } catch {
+    return '/situations';
+  }
+}
+
 export default function SignInPage() {
   const { signIn, fetchStatus } = useSignIn();
   const [email, setEmail] = useState('');
@@ -44,7 +55,7 @@ export default function SignInPage() {
 
       const params = new URLSearchParams(window.location.search);
       const destination = params.get('redirect_url');
-      const redirectTo = destination?.startsWith('/') ? destination : '/admin/analytics';
+      const redirectTo = safeRedirect(destination);
       await signIn.finalize({
         navigate: ({ session, decorateUrl }) => {
           if (session?.currentTask) {
@@ -101,7 +112,7 @@ export default function SignInPage() {
       }
       const params = new URLSearchParams(window.location.search);
       const destination = params.get('redirect_url');
-      const redirectTo = destination?.startsWith('/') ? destination : '/admin/analytics';
+      const redirectTo = safeRedirect(destination);
       await signIn.finalize({ navigate: ({ decorateUrl }) => window.location.replace(decorateUrl(redirectTo)) });
     } catch (cause) {
       setError(clerkMessage(cause));

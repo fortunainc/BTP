@@ -9,7 +9,8 @@
  */
 
 import { useEffect, useMemo, useState } from 'react';
-import { useAuth, useUser } from '@clerk/nextjs';
+import { useAuth } from '@clerk/nextjs';
+import { useAuth as useMemberAuth } from '@/components/AuthContext';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 
@@ -66,10 +67,9 @@ type DraftState = {
 
 export default function FounderInteractionControlsPage() {
   const { isLoaded, isSignedIn } = useAuth();
-  const { user } = useUser();
+  const { isAdmin, loading: memberLoading } = useMemberAuth();
   const router = useRouter();
 
-  const [isAdmin, setIsAdmin] = useState(false);
   const [statusFilter, setStatusFilter] = useState('PENDING_REVIEW');
   const [interactions, setInteractions] = useState<InteractionItem[]>([]);
   const [drafts, setDrafts] = useState<Record<string, DraftState>>({});
@@ -94,12 +94,6 @@ export default function FounderInteractionControlsPage() {
     }
   }, [isLoaded, isSignedIn, router]);
 
-  useEffect(() => {
-    if (isLoaded && isSignedIn && user) {
-      const role = user.publicMetadata?.role as string;
-      setIsAdmin(role === 'admin' || role === 'founder');
-    }
-  }, [isLoaded, isSignedIn, user]);
 
   useEffect(() => {
     if (isSignedIn && isAdmin) {
@@ -124,7 +118,6 @@ export default function FounderInteractionControlsPage() {
       const response = await fetch(`/api/admin/interactions?status=${statusFilter}&limit=100`);
       if (response.status === 403) {
         setError('Access denied. Founder/admin privileges required.');
-        setIsAdmin(false);
         return;
       }
       if (!response.ok) {
@@ -243,7 +236,7 @@ export default function FounderInteractionControlsPage() {
     }
   };
 
-  if (!isLoaded || !isSignedIn) {
+  if (!isLoaded || !isSignedIn || memberLoading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">

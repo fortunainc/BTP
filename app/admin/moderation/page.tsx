@@ -27,19 +27,20 @@ type AuditLog = {
 
 export default function AdminModerationPage() {
   const router = useRouter();
-  const { isAdmin } = useAuth();
+  const { isAdmin, loading: authLoading } = useAuth();
   const [flaggedContent, setFlaggedContent] = useState<FlaggedContent[]>([]);
   const [auditLogs, setAuditLogs] = useState<AuditLog[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<'flagged' | 'audit'>('flagged');
 
   useEffect(() => {
+    if (authLoading) return;
     if (!isAdmin) {
       router.push('/situations');
       return;
     }
     fetchData();
-  }, [isAdmin, router]);
+  }, [isAdmin, authLoading, router]);
 
   async function fetchData() {
     try {
@@ -120,7 +121,7 @@ export default function AdminModerationPage() {
     );
   }
 
-  if (!isAdmin) {
+  if (authLoading || !isAdmin) {
     return null;
   }
 

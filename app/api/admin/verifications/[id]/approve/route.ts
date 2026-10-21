@@ -46,6 +46,20 @@ export const POST = withAuth(async (req, user) => {
         },
       });
 
+      if (targetUser.verificationStatus !== 'Approved') {
+        await prisma.notification.create({
+          data: {
+            userId,
+            variantId: 'MEMBERSHIP-APPROVED',
+            notificationClass: 'VALIDATION',
+            priority: 'P1',
+            copy: 'Your BTP membership is approved. Welcome in.',
+            surfaces: ['in_app', 'push'],
+            deliveredTo: [],
+          },
+        }).catch((error) => console.error('Approval notification failed', error));
+      }
+
       // Log audit event
       await logAuditEvent({
         userId: user.id,

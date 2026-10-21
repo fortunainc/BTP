@@ -60,8 +60,8 @@ export default function OnboardingPage() {
       return false;
     }
     
-    if (formData.anonymousHandle.length < 3) {
-      setError('Display handle must be at least 3 characters');
+    if (!/^[a-zA-Z0-9_-]{3,30}$/.test(formData.anonymousHandle.trim())) {
+      setError('Display handle must be 3-30 letters, numbers, dashes or underscores');
       return false;
     }
     

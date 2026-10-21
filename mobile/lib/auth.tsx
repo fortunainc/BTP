@@ -1,7 +1,7 @@
 import { ClerkProvider, getClerkInstance, useAuth, useSignIn } from "@clerk/clerk-expo";
 import * as SecureStore from "expo-secure-store";
-import { createContext, type PropsWithChildren, useCallback, useContext, useEffect, useState } from "react";
-import { ActivityIndicator, Alert, KeyboardAvoidingView, Platform, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
+import { createContext, type PropsWithChildren, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
+import { ActivityIndicator, Alert, Keyboard, KeyboardAvoidingView, Platform, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
 import { colors, spacing } from "@/constants/theme";
 import { api, ApiError, liveApiConfigured } from "@/lib/api";
 import { CLERK_PROXY_URL, CLERK_PUBLISHABLE_KEY, configurationIssues, devAuthToken, localPreviewEnabled } from "@/lib/config";
@@ -46,58 +46,91 @@ function ClerkBridge({ children }: PropsWithChildren) {
   const [slow, setSlow] = useState(false);
   useEffect(() => { if (isLoaded) return; const t = setTimeout(() => setSlow(true), 15000); return () => clearTimeout(t); }, [isLoaded]);
   useEffect(() => { if (isLoaded && isSignedIn) void checkMembership(); }, [checkMembership, isLoaded, isSignedIn]);
+  useEffect(() => { if (isLoaded && !isSignedIn) { setMember(null); setError(""); setNotFound(false); setChecking(true); } }, [isLoaded, isSignedIn]);
+  const value = useMemo<AuthState>(() => ({ configured: true, ready: true, signedIn: true, member, getToken: () => getToken(), signOut }), [member, getToken, signOut]);
   if (!isLoaded) return <View style={styles.center}><ActivityIndicator color={colors.accent}/>{slow ? <Text style={styles.checking}>Can’t reach BTP. Check your connection, then close and reopen the app.</Text> : null}</View>;
   if (!isSignedIn) return <SignInScreen/>;
   if (!liveApiConfigured) return <AccessScreen title="App setup needed" copy="This build is not connected to the BTP service." onRetry={checkMembership} onSignOut={signOut} retryLabel="Try again" />;
   if (checking) return <View style={styles.center}><ActivityIndicator color={colors.accent}/><Text style={styles.checking}>Checking your BTP membership…</Text></View>;
   if (error) return <AccessScreen title="Could not verify access" copy={error} onRetry={checkMembership} onSignOut={signOut} retryLabel="Retry" />;
-  if (notFound) return <AccessScreen title="Invitation setup incomplete" copy="This sign-in is not connected to a BTP member account yet. Contact BTP to finish your invitation." onRetry={checkMembership} onSignOut={signOut} retryLabel="Check again" />;
+  if (notFound) return <AccessScreen title="Account not ready" copy="BTP could not set up your member account. Try again, or contact BTP support." onRetry={checkMembership} onSignOut={signOut} retryLabel="Check again" />;
   if (!member?.approved) {
     const rejected = member?.verificationStatus?.toLowerCase() === "rejected";
     return <AccessScreen title={rejected ? "Access not approved" : "Verification pending"} copy={rejected ? "This account is not approved for the BTP beta. Contact BTP if you think this is an error." : "BTP is reviewing your invitation and professional verification. You’ll be able to enter once it is approved."} onRetry={checkMembership} onSignOut={signOut} retryLabel="Check status" />;
   }
-  return <AuthContext.Provider value={{ configured: true, ready: true, signedIn: true, member, getToken: async () => getToken(), signOut }}>{children}</AuthContext.Provider>;
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
 
 function AccessScreen({ title, copy, onRetry, onSignOut, retryLabel }: { title: string; copy: string; onRetry: () => Promise<void>; onSignOut: () => Promise<void>; retryLabel: string }) {
   return <View style={styles.access}><Text style={styles.brand}>BTP</Text><Text style={styles.title}>{title}</Text><Text style={styles.copy}>{copy}</Text><Pressable onPress={() => void onRetry()} style={styles.button}><Text style={styles.buttonText}>{retryLabel}</Text></Pressable><Pressable onPress={() => void onSignOut()} style={styles.secondary}><Text style={styles.secondaryText}>Sign out</Text></Pressable></View>;
 }
 
+type Step = "password" | "email" | "email2" | "totp" | "phone" | "backup";
+
 function SignInScreen() {
   const { signIn, setActive, isLoaded } = useSignIn();
   const [email, setEmail] = useState(""); const [password, setPassword] = useState("");
   const [code, setCode] = useState(""); const [busy, setBusy] = useState(false);
-  const [step, setStep] = useState<"password" | "email" | "totp" | "phone" | "backup">("password");
-  const showError = (e: unknown) => Alert.alert("Could not sign in", (e as { errors?: Array<{ longMessage?: string }> }).errors?.[0]?.longMessage || (e instanceof Error ? e.message : "Please retry."));
+  const [step, setStep] = useState<Step>("password");
+  const [emailAddressId, setEmailAddressId] = useState("");
+  const passwordRef = useRef<TextInput>(null);
+  const showError = (e: unknown) => Alert.alert("Could not sign in", (e as { errors?: Array<{ longMessage?: string; message?: string }> }).errors?.[0]?.longMessage || (e as { errors?: Array<{ message?: string }> }).errors?.[0]?.message || (e instanceof Error ? e.message : "Please retry."));
+  const goTo = (next: Step) => { setStep(next); setCode(""); };
   async function advance(result: NonNullable<typeof signIn>) {
     if (result.status === "complete") { await setActive!({ session: result.createdSessionId }); return; }
     if (result.status === "needs_second_factor") {
       const factors = result.supportedSecondFactors || [];
-      if (factors.some(f => f.strategy === "totp")) { setStep("totp"); setCode(""); return; }
+      if (factors.some(f => f.strategy === "totp")) { goTo("totp"); return; }
       const phone = factors.find(f => f.strategy === "phone_code");
-      if (phone?.strategy === "phone_code") { await result.prepareSecondFactor({ strategy: "phone_code", phoneNumberId: phone.phoneNumberId }); setStep("phone"); setCode(""); return; }
-      if (factors.some(f => f.strategy === "backup_code")) { setStep("backup"); setCode(""); return; }
+      if (phone?.strategy === "phone_code") { await result.prepareSecondFactor({ strategy: "phone_code", phoneNumberId: phone.phoneNumberId }); goTo("phone"); return; }
+      // New-device check (Client Trust) asks for a code sent to the account email.
+      const emailFactor = factors.find(f => f.strategy === "email_code");
+      if (emailFactor?.strategy === "email_code") { await result.prepareSecondFactor({ strategy: "email_code", emailAddressId: emailFactor.emailAddressId }); setEmailAddressId(emailFactor.emailAddressId); goTo("email2"); return; }
+      if (factors.some(f => f.strategy === "backup_code")) { goTo("backup"); return; }
     }
     throw new Error("This account requires another sign-in method. Contact BTP support for help.");
   }
-  async function submit(emailOnly = false) {
-    if (!isLoaded || !signIn || busy) return; setBusy(true);
-    try {
-      if (emailOnly) {
-        const result = await signIn.create({ identifier: email.trim() });
-        const factor = result.supportedFirstFactors?.find(f => f.strategy === "email_code");
-        if (factor?.strategy !== "email_code") throw new Error("Email-code sign-in is unavailable for this account. Contact BTP support to recover access.");
-        await signIn.prepareFirstFactor({ strategy: "email_code", emailAddressId: factor.emailAddressId }); setCode(""); setStep("email");
-      } else if (step === "password") await advance(await signIn.create({ identifier: email.trim(), password }));
-      else if (step === "email") await advance(await signIn.attemptFirstFactor({ strategy: "email_code", code }));
-      else await advance(await signIn.attemptSecondFactor({ strategy: step === "phone" ? "phone_code" : step === "backup" ? "backup_code" : "totp", code }));
-    } catch (e) { showError(e); } finally { setBusy(false); }
+  async function sendEmailCode() {
+    if (!signIn) return;
+    const result = await signIn.create({ identifier: email.trim() });
+    const factor = result.supportedFirstFactors?.find(f => f.strategy === "email_code");
+    if (factor?.strategy !== "email_code") throw new Error("Email-code sign-in is unavailable for this account. Contact BTP support to recover access.");
+    await signIn.prepareFirstFactor({ strategy: "email_code", emailAddressId: factor.emailAddressId });
+    setEmailAddressId(factor.emailAddressId); goTo("email");
   }
+  async function run(action: () => Promise<void>) {
+    if (!isLoaded || !signIn || busy) return;
+    Keyboard.dismiss(); setBusy(true);
+    try { await action(); } catch (e) { showError(e); } finally { setBusy(false); }
+  }
+  const submit = () => run(async () => {
+    if (!signIn) return;
+    if (step === "password") await advance(await signIn.create({ identifier: email.trim(), password }));
+    else if (step === "email") await advance(await signIn.attemptFirstFactor({ strategy: "email_code", code: code.trim() }));
+    else if (step === "email2") await advance(await signIn.attemptSecondFactor({ strategy: "email_code", code: code.trim() }));
+    else await advance(await signIn.attemptSecondFactor({ strategy: step === "phone" ? "phone_code" : step === "backup" ? "backup_code" : "totp", code: code.trim() }));
+  });
+  const resend = () => run(async () => {
+    if (!signIn) return;
+    if (step === "email") await signIn.prepareFirstFactor({ strategy: "email_code", emailAddressId });
+    else if (step === "email2") await signIn.prepareSecondFactor({ strategy: "email_code", emailAddressId });
+    Alert.alert("Code sent", "Check your email for a new code.");
+  });
+  const canSubmit = !busy && (step === "password" ? Boolean(email.trim() && password) : Boolean(code.trim()));
+  const canEmail = !busy && Boolean(email.trim());
+  const codeHint = step === "totp" ? "Enter the code from your authenticator." : step === "backup" ? "Enter a backup code." : step === "phone" ? "Enter the code sent to your phone." : `Enter the code sent to ${email.trim() || "your email"}.`;
   return <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : undefined} style={styles.flex}><ScrollView contentContainerStyle={styles.signIn} keyboardShouldPersistTaps="handled" keyboardDismissMode="on-drag"><Text style={styles.brand}>BTP</Text><Text style={styles.title}>{step === "password" ? "Welcome back" : "Verify your sign-in"}</Text><Text style={styles.copy}>Invite-only access for verified clinical-trial professionals.</Text>
-    {step === "password" ? <><TextInput accessibilityLabel="Email" autoCapitalize="none" autoComplete="email" keyboardType="email-address" onChangeText={setEmail} placeholder="Work or verified email" placeholderTextColor={colors.muted} returnKeyType="next" style={styles.input} value={email}/><TextInput accessibilityLabel="Password" autoCapitalize="none" autoComplete="password" onChangeText={setPassword} placeholder="Password" placeholderTextColor={colors.muted} secureTextEntry style={styles.input} value={password}/></> : <><Text style={styles.copy}>{step === "totp" ? "Enter the code from your authenticator." : step === "backup" ? "Enter a backup code." : "Enter the code sent to your verified contact."}</Text><TextInput accessibilityLabel="Verification code" autoCapitalize="none" autoComplete="one-time-code" onChangeText={setCode} placeholder="Verification code" style={styles.input} value={code}/></>}
-    <Pressable disabled={busy || (step === "password" ? !email || !password : !code)} onPress={() => void submit()} style={styles.button}><Text style={styles.buttonText}>{busy ? "Please wait…" : "Continue"}</Text></Pressable>
-    {step === "password" ? <Pressable disabled={busy || !email} onPress={() => void submit(true)} style={styles.secondary}><Text style={styles.secondaryText}>Use an email code / recover access</Text></Pressable> : <><Pressable disabled={busy} onPress={() => { setStep("password"); setCode(""); }} style={styles.secondary}><Text style={styles.secondaryText}>Start again</Text></Pressable>{(step === "totp" || step === "phone") && <Pressable onPress={() => { setStep("backup"); setCode(""); }}><Text style={styles.secondaryText}>Use a backup code</Text></Pressable>}</>}
-    <Text style={styles.note}>Need access? BTP beta accounts are created by invitation.</Text></ScrollView></KeyboardAvoidingView>;
+    {step === "password"
+      ? <><TextInput accessibilityLabel="Email" autoCapitalize="none" autoComplete="email" autoCorrect={false} keyboardType="email-address" onChangeText={setEmail} onSubmitEditing={() => passwordRef.current?.focus()} placeholder="Email address" placeholderTextColor={colors.muted} returnKeyType="next" submitBehavior="submit" style={styles.input} textContentType="emailAddress" value={email}/>
+         <TextInput ref={passwordRef} accessibilityLabel="Password" autoCapitalize="none" autoComplete="password" onChangeText={setPassword} onSubmitEditing={() => { if (canSubmit) void submit(); else Keyboard.dismiss(); }} placeholder="Password (or use an email code below)" placeholderTextColor={colors.muted} returnKeyType="go" secureTextEntry style={styles.input} textContentType="password" value={password}/></>
+      : <><Text style={styles.copy}>{codeHint}</Text><TextInput accessibilityLabel="Verification code" autoCapitalize="none" autoComplete="one-time-code" autoFocus keyboardType={step === "backup" ? "default" : "number-pad"} onChangeText={setCode} placeholder="Verification code" placeholderTextColor={colors.muted} style={styles.input} textContentType="oneTimeCode" value={code}/></>}
+    <Pressable disabled={!canSubmit} onPress={() => void submit()} style={[styles.button, !canSubmit && styles.disabled]}><Text style={styles.buttonText}>{busy ? "Please wait…" : "Continue"}</Text></Pressable>
+    {step === "password"
+      ? <Pressable disabled={!canEmail} onPress={() => void run(sendEmailCode)} style={[styles.secondary, !canEmail && styles.disabled]}><Text style={styles.secondaryText}>Email me a sign-in code</Text></Pressable>
+      : <>{(step === "email" || step === "email2") && <Pressable disabled={busy} onPress={() => void resend()} style={styles.secondary}><Text style={styles.secondaryText}>Resend code</Text></Pressable>}
+          <Pressable disabled={busy} onPress={() => goTo("password")} style={styles.secondary}><Text style={styles.secondaryText}>Start again</Text></Pressable>
+          {(step === "totp" || step === "phone") && <Pressable onPress={() => goTo("backup")}><Text style={styles.secondaryText}>Use a backup code</Text></Pressable>}</>}
+    <Text style={styles.note}>No password? Enter your email and tap “Email me a sign-in code”. New here? Request access at the BTP website.</Text></ScrollView></KeyboardAvoidingView>;
 }
 
 export function BtpAuthProvider({ children }: PropsWithChildren) {

@@ -52,9 +52,7 @@ export const api = {
     async list(token: string | null): Promise<ActivityItem[]> {
       const result = await apiRequest<{ notifications: Array<Record<string, unknown>> }>("/api/notifications?limit=50", { token });
       return result.notifications.map((n) => {
-        const variantId = String(n.variantId || "");
-        const relatedIdIsAnswer = variantId === "IMPACT-ANSWER-HELPED";
-        return { id: String(n.id), title: String(n.title || n.subject || "BTP update"), detail: String(n.body || n.message || n.copy || "A case you care about has an update."), displayTime: String(n.displayTime || "recently").replaceAll("_", " "), read: Boolean(n.read), questionId: !relatedIdIsAnswer && n.relatedPostId ? String(n.relatedPostId) : null };
+        return { id: String(n.id), title: String(n.title || n.subject || "BTP update"), detail: String(n.body || n.message || n.copy || "A case you care about has an update."), displayTime: String(n.displayTime || "recently").replaceAll("_", " "), read: Boolean(n.read), questionId: n.relatedPostId ? String(n.relatedPostId) : null };
       });
     },
     markRead: (token: string | null, id: string) => apiRequest(`/api/notifications/${id}`, { token, method: "PATCH", body: JSON.stringify({ opened: true }) }),

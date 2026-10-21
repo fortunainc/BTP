@@ -17,7 +17,8 @@
  */
 
 import { useState, useEffect } from 'react';
-import { useAuth, useUser } from '@clerk/nextjs';
+import { useAuth } from '@clerk/nextjs';
+import { useAuth as useMemberAuth } from '@/components/AuthContext';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 
@@ -60,7 +61,7 @@ type TabType = 'overview' | 'kpis' | 'funnels' | 'readiness' | 'return-loop' | '
 
 export default function FounderAnalyticsDashboard() {
   const { isLoaded, isSignedIn } = useAuth();
-  const { user } = useUser();
+  const { isAdmin, loading: memberLoading } = useMemberAuth();
   const router = useRouter();
   
   const [activeTab, setActiveTab] = useState<TabType>('overview');
@@ -68,17 +69,7 @@ export default function FounderAnalyticsDashboard() {
   const [data, setData] = useState<DashboardData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [isAdmin, setIsAdmin] = useState(false);
 
-  // Check admin role
-  useEffect(() => {
-    if (isLoaded && isSignedIn && user) {
-      // In production, this would check the user's role from the database
-      // For now, we'll check if the user has admin metadata
-      const role = user.publicMetadata?.role as string;
-      setIsAdmin(role === 'admin' || role === 'founder');
-    }
-  }, [isLoaded, isSignedIn, user]);
 
   // Redirect if not signed in
   useEffect(() => {
@@ -103,7 +94,6 @@ export default function FounderAnalyticsDashboard() {
       
       if (response.status === 403) {
         setError('Access denied. Admin privileges required.');
-        setIsAdmin(false);
         return;
       }
       
@@ -153,7 +143,7 @@ export default function FounderAnalyticsDashboard() {
   };
 
   // Loading state
-  if (!isLoaded || !isSignedIn) {
+  if (!isLoaded || !isSignedIn || memberLoading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
@@ -193,6 +183,8 @@ export default function FounderAnalyticsDashboard() {
               </p>
             </div>
             <div className="flex items-center gap-4">
+              <Link href="/admin/verifications" className="underline">Member approvals</Link>
+              <Link href="/admin/polls" className="underline">Polls</Link>
               <Link href="/admin/help-requests" className="underline">Private help and deletion queue</Link>
               <Link
                 href="/admin/trust-safety"

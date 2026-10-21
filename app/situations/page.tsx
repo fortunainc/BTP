@@ -38,17 +38,17 @@ interface SituationsResponse {
 
 const THERAPEUTIC_AREAS = [
   { value: '', label: 'All Areas' },
-  { value: 'oncology', label: 'Oncology' },
-  { value: 'cardiology', label: 'Cardiology' },
-  { value: 'neurology', label: 'Neurology' },
-  { value: 'immunology', label: 'Immunology' },
-  { value: 'rare_disease', label: 'Rare Disease' },
-  { value: 'pediatrics', label: 'Pediatrics' },
-  { value: 'infectious_disease', label: 'Infectious Disease' },
-  { value: 'metabolism', label: 'Metabolism' },
-  { value: 'respiratory', label: 'Respiratory' },
-  { value: 'dermatology', label: 'Dermatology' },
-  { value: 'other', label: 'Other' }
+  { value: 'Oncology', label: 'Oncology' },
+  { value: 'Cardiology', label: 'Cardiology' },
+  { value: 'Neurology', label: 'Neurology' },
+  { value: 'Immunology', label: 'Immunology' },
+  { value: 'Rare Disease', label: 'Rare Disease' },
+  { value: 'Pediatrics', label: 'Pediatrics' },
+  { value: 'Infectious Disease', label: 'Infectious Disease' },
+  { value: 'Metabolism', label: 'Metabolism' },
+  { value: 'Respiratory', label: 'Respiratory' },
+  { value: 'Dermatology', label: 'Dermatology' },
+  { value: 'Other', label: 'Other' }
 ];
 
 const TIME_BUCKETS = [

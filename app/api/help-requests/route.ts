@@ -37,7 +37,7 @@ export const POST = withAuth(async (req, user) => {
     return createErrorResponse('Approved BTP membership is required', 403);
   }
 
-  const body = await req.json();
+  const body = await req.json().catch(() => ({}));
   const contributionId = body.contributionId ? String(body.contributionId) : null;
   const helpType = String(body.helpType || 'CONSULTATION');
   const rawDetails = String(body.details || '').trim();
@@ -94,7 +94,7 @@ export const POST = withAuth(async (req, user) => {
 
 export const PATCH = withAuth(async (req, user) => {
   if (!isApprovedMember(user)) return createErrorResponse('Approved BTP membership is required', 403);
-  const body = await req.json();
+  const body = await req.json().catch(() => ({}));
   if (typeof body.id !== 'string' || typeof body.feedback !== 'string' || !body.feedback.trim() || body.feedback.length > 2000) return createErrorResponse('Request ID and feedback (1–2,000 characters) are required', 400);
   const feedback = applyAutomaticRedaction(body.feedback.trim()).redactedContent;
   const saved = await prisma.$transaction(async tx => {
