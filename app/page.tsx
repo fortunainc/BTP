@@ -16,6 +16,7 @@ const gets = [
   ['💬', 'Answers from people who’ve been there', 'Practical experience from verified coordinators, CRAs and trial teams, not generic advice.'],
   ['✓', 'Proof of what worked', 'Members come back to report what helped, so the best answers rise to the top.'],
   ['🔒', 'A safe place to ask', 'Ask the questions you can’t ask your manager or your pharma/biotech contact.'],
+  ['💰', 'Get paid for what you know', 'Opt in to paid research and private expert sessions. You choose what to join, and your identity stays protected.'],
 ];
 const roles = [
   ['Doing the work', ['Study coordinators', 'Research nurses', 'Site teams']],
@@ -25,7 +26,7 @@ const roles = [
 const protects = ['Your name and employer never appear next to your posts', 'Every member is verified privately before joining', 'Identifying details are automatically removed', 'Content is moderated, and anyone can report a post'];
 const never = ['Patient information', 'Site, study, protocol or company names', 'Confidential documents or screenshots', 'Urgent safety reports (use your official channels)'];
 const faqs = [
-  ['Is it free?', 'Yes. Asking, answering and sharing what worked is free. Private one-on-one help may have a fee, always agreed before you start.'],
+  ['Is it free?', 'Yes. Asking, answering and sharing what worked is free. Private one-on-one help may have a fee, always agreed before you start. Paid research and expert sessions are coming soon, always opt-in.'],
   ['How does verification work?', 'BTP confirms your experience privately, for example through LinkedIn or a reference from a member. You don’t need a work email, and other members never see your details.'],
   ['Can I ask without naming my site or study?', 'Yes, and you should. Describe the workflow and the challenge, not the people or places.'],
   ['Will my employer know?', 'No. BTP never contacts your employer, and your name and employer are never shown with your posts.'],
@@ -37,29 +38,23 @@ export default function HomePage() {
   <main id="main" className="home">
     <section className="hero"><div className="wrap">
       <p className="label">For clinical research professionals · Invitation-only beta</p>
-      <h1>Real answers from the people who <em>actually run clinical trials.</em></h1>
-      <p className="sub">A private, verified community where coordinators, CRAs and trial teams ask what they can’t ask at work, and learn what actually worked.</p>
+      <h1 className="bookline">The people running clinical trials see the failures first, and the system was never built to hear them. <em>BTP is the system built to hear them.</em></h1>
+      <p className="bookcite">From <span className="citeTitle">Behind the Protocol</span></p>
+      <p className="sub"><b>Real answers from the people who actually run clinical trials.</b> A private, verified community where coordinators, CRAs and trial teams ask what they can’t ask at work, and learn what actually worked.</p>
       <div className="ctas"><a className="btn" href={contact}>Request beta access <span aria-hidden>↗</span></a><Link className="btn ghost" href="#how">See how it works <span aria-hidden>↓</span></Link></div>
-      <div className="chips"><span className="chip"><b>✓</b> Free to join</span><span className="chip"><b>✓</b> Your name and employer stay hidden</span><span className="chip"><b>✓</b> Every member verified</span><span className="chip"><b>✓</b> Web and iPhone</span></div>
-    </div></section>
-
-    <section className="band" aria-labelledby="why-btp"><div className="wrap">
-      <p className="label" id="why-btp">Why BTP</p>
-      <q>“The people running clinical trials see the failures first, and the system was never built to hear them.”</q>
-      <div className="cite">From <span className="citeTitle">Behind the Protocol</span></div>
-      <div className="ans">BTP is the system built to hear them.</div>
+      <div className="chips"><span className="chip"><b>✓</b> Free to join</span><span className="chip"><b>✓</b> Your name and employer stay hidden</span><span className="chip"><b>✓</b> Every member verified</span><span className="chip"><b>✓</b> Web, plus iPhone by beta invite</span></div>
     </div></section>
 
     <section><div className="wrap">
       <p className="label">The reality at sites</p>
       <h2>You’re carrying more than the protocol shows.</h2>
       <div className="grid3">
-        <div className="stat"><div className="n">~90%</div><div className="t">of trials miss their enrollment deadlines</div></div>
+        <div className="stat"><div className="n">11%</div><div className="t">of trial sites never enroll a single patient, and 37% under-enroll</div></div>
         <div className="stat"><div className="n">35 to 61%</div><div className="t">yearly turnover of patient-facing site staff</div></div>
         <div className="stat"><div className="n">6 to 12 mo</div><div className="t">for a study to recover after a coordinator leaves</div></div>
       </div>
       <div className="callout">When the person who knew how to fix it leaves, the answer leaves too. <b>BTP keeps that know-how where the next coordinator can find it.</b></div>
-      <p className="fine">Sources: SCRS 2023 site workforce report; industry enrollment data.</p>
+      <p className="fine">Sources: SCRS 2023 site workforce report; Tufts CSDD, 2013.</p>
     </div></section>
 
     <section id="how"><div className="wrap">
@@ -71,7 +66,7 @@ export default function HomePage() {
     <section><div className="wrap">
       <p className="label">What you get</p>
       <h2>Help that actually fits the work.</h2>
-      <div className="grid3">{gets.map(([ic, h, p]) => <div className="card" key={h}><div className="ic" aria-hidden>{ic}</div><h3>{h}</h3><p>{p}</p></div>)}</div>
+      <div className="grid2">{gets.map(([ic, h, p]) => <div className="card" key={h}><div className="ic" aria-hidden>{ic}</div><h3>{h}{h === 'Get paid for what you know' && <span className="soon">Coming soon</span>}</h3><p>{p}</p></div>)}</div>
     </div></section>
 
     <section id="who"><div className="wrap roles">
