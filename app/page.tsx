@@ -2,28 +2,105 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { SiteHeader, SiteFooter } from '@/components/marketing/SiteChrome';
 import s from '@/components/marketing/site.module.css';
+import './home.css';
 export const metadata: Metadata = { title: 'BTP | Clinical trial experience, connected.', description: 'Behind the Protocol connects clinical-trial professionals to practical peer experience, operational discussions, and private help.' };
 const contact = 'mailto:fortunaindustriesinc@gmail.com?subject=BTP%20beta%20access&body=Role%3A%0AYears%20in%20clinical%20research%3A%0AWhat%20you%20hope%20to%20use%20BTP%20for%3A%0A';
-export default function HomePage() { return <div className={s.site}><a className={s.skip} href="#main">Skip to content</a><SiteHeader/><main id="main">
-<section className={s.hero}><div><p className={s.eyebrow}>Clinical research professionals · Invitation-only beta</p><h1>There’s the protocol.<br/>Then there’s <em>the reality.</em></h1><p className={s.lead}>Behind the Protocol connects the people who make clinical trials work—with practical peer experience, a place to ask difficult questions, and a way to learn what actually helped.</p><div className={s.actions}><a className={s.button} href={contact}>Request beta access <span aria-hidden>↗</span></a><Link className={s.secondary} href="#how">Explore BTP <span aria-hidden>↓</span></Link></div><p className={s.note}>Membership is free. Request access from a personal email address; BTP never contacts your employer. We reply personally with next steps.</p></div>
-<div className={s.visual} aria-label="Illustrative example of BTP’s question-to-outcome loop"><div className={s.visualLabel}><span>Inside the operational layer</span><span>01 / BTP</span></div><div className={s.case}><small>ILLUSTRATIVE QUESTION · NOT MEMBER DATA</small><h2>“The amendment is approved. Why is site implementation still stuck?”</h2><p>Protocol burden / Site operations / Implementation</p></div><div className={s.signalRow}><span>01 &nbsp; Ask in context</span><span>Operational experience</span></div><div className={s.signalRow}><span>02 &nbsp; Compare approaches</span><span>Peer perspectives</span></div><div className={s.signalRow}><span>03 &nbsp; Follow up</span><span>What changed?</span></div><p className={s.visualFoot}>A better question. A useful response. An outcome worth learning from.</p></div></section><section className={s.why} aria-labelledby="why-btp"><p className={s.eyebrow} id="why-btp">Why BTP</p><blockquote className={s.quote}><p>“The people running clinical trials see the failures first, and the system was never built to hear them.”</p><cite>From <em>Behind the Protocol</em></cite></blockquote><p className={s.answer}>BTP is the system built to hear them.</p></section>
-<div className={s.strip}><span>Site & research teams</span><span>Clinical operations</span><span>CRO professionals</span><span>Sponsor & biotech teams</span></div>
-<section className={s.section} id="what"><p className={s.eyebrow}>What you get</p><div className={s.audiences}>{[['01','Answers from people who have been there','Ask an operational question and hear from verified peers who have handled similar situations.'],['02','Follow-up on what actually worked','Members return to report what helped and what did not, so answers improve over time.'],['03','Private help when it needs more depth','Request a focused conversation, including interview preparation. Scope and any fee are agreed first.']].map(([n,t,b])=><article className={s.audience} key={n}><span className={s.number}>{n} /</span><h3>{t}</h3><p>{b}</p></article>)}</div></section>
-<section className={s.section} id="who"><p className={s.eyebrow}>Who it serves</p><div className={s.sectionIntro}><h2>Different roles.<br/>Shared operational friction.</h2><p>Trials are collaborative. The lessons learned inside them are often fragmented. BTP gives professionals a place to exchange useful experience without putting their name or employer alongside every community question.</p></div><div className={s.audiences}>{[['01','The people doing the work','Coordinators, CRAs, research nurses, and site teams navigating visit burden, handoffs, staffing, and everyday execution.','Ask peers how they approached a similar situation.'],['02','The people connecting the work','Clinical operations, study managers, and CRO professionals working across sites, systems, and competing expectations.','Understand the practical context behind recurring problems.'],['03','The people supporting their teams','Site managers, research leads, and sponsor-side clinical professionals supporting the people responsible for day-to-day delivery.','Explore practical ways to support your team and navigate difficult situations.']].map(([n,t,b,f])=><article className={s.audience} key={n}><span className={s.number}>{n} /</span><h3>{t}</h3><p>{b}</p><p><strong>{f}</strong></p></article>)}</div></section>
-<div className={s.dark}><section className={s.section} id="how"><p className={s.eyebrow}>The experience</p><div className={s.sectionIntro}><h2>From “has anyone seen this?”<br/>to “here’s what helped.”</h2><p>Useful support begins with people who understand the work. BTP’s beta brings questions, peer responses, follow-up, and private help into one loop.</p></div><div className={s.steps}>{[['01','Bring the situation','Describe an operational question with enough context to be useful. Leave out patient information and confidential or identifying details.'],['02','Learn from peers','Read and respond to practical experience, and mark the answers that helped.'],['03','Close the loop','Report what helped, what changed, or what remains unresolved. Corrections matter as much as success stories.'],['04','Go deeper, privately','Request dedicated help, including interview preparation. BTP reviews and coordinates requests during beta; introductions require consent.']].map(([n,t,b])=><article className={s.step} key={n}><strong>{n}</strong><h3>{t}</h3><p>{b}</p></article>)}</div></section></div>
-<section className={`${s.section} ${s.split}`} id="trust"><div><p className={s.eyebrow}>Trust is part of the product</p><h2>Room for candid questions.<br/>Responsibility for what’s shared.</h2><p>BTP separates the identity used for account verification from the identity shown in community discussions. That supports more candid participation—it is not a promise of absolute anonymity.</p><Link className={s.secondary} href="/privacy">Read the privacy policy <span aria-hidden>↗</span></Link></div><ul className={s.list}><li><strong>Professional membership, reviewed</strong>Account sign-in and approval to participate are separate steps.</li><li><strong>Identity protected in discussions</strong>Your name and employer are not displayed with questions and answers. Authorized staff can access account information for verification and safety.</li><li><strong>Context without confidential details</strong>Do not post patient data, confidential documents, or details that identify a person, site, sponsor, or trial. Redaction and moderation cannot guarantee removal of every identifying detail.</li><li><strong>Experience, not clinical guidance</strong>Peer responses do not replace medical advice, trial procedures, professional obligations, or validated evidence.</li></ul></section>
-<section className={s.section} id="site-support" style={{borderTop:'1px solid #cbb9a6'}}><p className={s.eyebrow}>For the work at your site</p><div className={s.sectionIntro}><h2>Some questions need<br/>someone who’s been there.</h2><p>When you’re balancing visits, amendments, staffing, and competing priorities, it helps to hear how another research professional approached a similar challenge.</p></div><div className={s.roadmap}><article><span className={s.tag}>Study start-up & changes</span><h3>Make the next step clearer</h3><p>Ask peers about coordinating activation tasks, organizing amendment training, or preparing your team for a process change—without sharing confidential study details.</p></article><article><span className={s.tag}>Everyday site operations</span><h3>Work through the friction</h3><p>Discuss visit scheduling, handoffs, competing demands, and workload. Compare approaches you can assess against your own site’s procedures and responsibilities.</p></article><article><span className={s.tag}>Professional support</span><h3>Don’t navigate it alone</h3><p>Learn from peers as you take on a new role, prepare for an interview, or work through a difficult professional situation. Request private help when you need a more focused conversation.</p></article></div></section>
-<section className={`${s.section} ${s.faq}`}><p className={s.eyebrow}>For research professionals</p><h2>Know what you’re joining.</h2>{[
-['Who is BTP for?','BTP’s invitation-only beta is for clinical research professionals, including coordinators, research nurses, CRAs, site managers, study managers, and clinical operations teams. Request access to discuss fit; signing up does not automatically approve membership.'],
-['How does verification work?','BTP confirms your clinical research experience privately, for example through LinkedIn history, a reference from a verified member, or other evidence you choose. You do not need to use your work email, and verification details are never shown to other members.'],
-['Is membership free?','Yes. Ordinary community participation—asking, answering, following discussions, and sharing outcomes—is free. If dedicated private help involves a fee, the scope and price will be agreed before you proceed.'],
-['Why is BTP helpful for my site?','Not every operational question has an obvious answer in a manual. BTP gives you a place to ask how peers have handled similar challenges, compare practical approaches, and revisit discussions when you need them. It can help you prepare better questions and consider your next steps; your site’s procedures and professional judgment still guide what you do.'],
-['How is BTP different from a general community forum?','BTP is built around clinical research work and reviewed professional membership. Discussions start with operational situations, can be followed over time, and let participants return with what helped or what remains unresolved. You can also request private help. The emphasis is on useful context and follow-through, not simply collecting replies.'],
-['What safeguards support candid participation?','Your name and employer are not displayed alongside community questions and answers. Membership review, access controls, content reporting, redaction, and moderation support safer participation. Authorized staff can access account information for verification and safety. No platform can guarantee absolute anonymity, so leave out identifying and confidential details even when asking a difficult question.'],
-['Can I ask a question without naming my site or study?','Yes—and you should. Focus on the general workflow, challenge, and kind of help you need. Avoid names, protocol identifiers, exact dates, unusual combinations of details, or other clues that could identify a person, site, sponsor, or trial.'],
-['What should I never share?','Do not post patient information, confidential documents, screenshots of study systems, or information restricted by your employer or study agreements. BTP does not replace required safety reporting, escalation channels, or approved study communications.'],
-['Can I get help beyond a public discussion?','You can submit a private help request, including interview preparation or a focused professional question. BTP reviews and coordinates requests during beta. Introductions require consent; submitting a request does not guarantee an available match or a particular response time.'],
-['Does BTP replace our trial systems or study procedures?','No. BTP supports peer learning alongside your existing work. It is not an EDC, CTMS, patient record, medical advice service, or substitute for your organization’s required procedures.']
-].map(([q,a])=><details key={q}><summary>{q}</summary><p>{a}</p></details>)}</section>
-<div className={s.dark}><section className={s.cta}><div><h2>Bring the experience<br/>that doesn’t fit in a dashboard.</h2><p>Join research professionals who understand the work behind every visit and milestone.</p></div><div className={s.actions}><a className={s.button} href={contact}>Talk to BTP <span aria-hidden>↗</span></a></div></section></div>
-</main><SiteFooter/></div>; }
+
+const steps = [
+  ['1 · ASK', 'Bring the situation', 'Describe the problem. No patient data, no site or study names.'],
+  ['2 · LEARN', 'Hear from peers', 'Verified professionals share what they did and what to watch for.'],
+  ['3 · CLOSE THE LOOP', 'Share what worked', 'Mark the answer that helped, so the next person finds it fast.'],
+  ['4 · GO DEEPER', 'Get private help', 'One-on-one help, including interview prep. Scope agreed first.'],
+];
+const gets = [
+  ['💬', 'Answers from people who’ve been there', 'Practical experience from verified coordinators, CRAs and trial teams, not generic advice.'],
+  ['✓', 'Proof of what worked', 'Members come back to report what helped, so the best answers rise to the top.'],
+  ['🔒', 'A safe place to ask', 'Ask the questions you can’t ask your manager or your pharma/biotech contact.'],
+];
+const roles = [
+  ['Doing the work', ['Study coordinators', 'Research nurses', 'Site teams']],
+  ['Connecting the work', ['CRAs', 'Study and clinical operations managers', 'CRO professionals']],
+  ['Supporting the work', ['Site and research managers', 'Pharma/biotech clinical teams', 'Research leads']],
+] as const;
+const protects = ['Your name and employer never appear next to your posts', 'Every member is verified privately before joining', 'Identifying details are automatically removed', 'Content is moderated, and anyone can report a post'];
+const never = ['Patient information', 'Site, study, protocol or company names', 'Confidential documents or screenshots', 'Urgent safety reports (use your official channels)'];
+const faqs = [
+  ['Is it free?', 'Yes. Asking, answering and sharing what worked is free. Private one-on-one help may have a fee, always agreed before you start.'],
+  ['How does verification work?', 'BTP confirms your experience privately, for example through LinkedIn or a reference from a member. You don’t need a work email, and other members never see your details.'],
+  ['Can I ask without naming my site or study?', 'Yes, and you should. Describe the workflow and the challenge, not the people or places.'],
+  ['Will my employer know?', 'No. BTP never contacts your employer, and your name and employer are never shown with your posts.'],
+  ['How is this different from LinkedIn groups?', 'Every member is verified, posts are identity-protected, and members report back on what actually worked.'],
+];
+
+export default function HomePage() {
+  return <div className={s.site}><a className={s.skip} href="#main">Skip to content</a><SiteHeader/>
+  <main id="main" className="home">
+    <section className="hero"><div className="wrap">
+      <p className="label">For clinical research professionals · Invitation-only beta</p>
+      <h1>Real answers from the people who <em>actually run clinical trials.</em></h1>
+      <p className="sub">A private, verified community where coordinators, CRAs and trial teams ask what they can’t ask at work, and learn what actually worked.</p>
+      <div className="ctas"><a className="btn" href={contact}>Request beta access <span aria-hidden>↗</span></a><Link className="btn ghost" href="#how">See how it works <span aria-hidden>↓</span></Link></div>
+      <div className="chips"><span className="chip"><b>✓</b> Free to join</span><span className="chip"><b>✓</b> Your name and employer stay hidden</span><span className="chip"><b>✓</b> Every member verified</span><span className="chip"><b>✓</b> Web and iPhone</span></div>
+    </div></section>
+
+    <section className="band" aria-labelledby="why-btp"><div className="wrap">
+      <p className="label" id="why-btp">Why BTP</p>
+      <q>“The people running clinical trials see the failures first, and the system was never built to hear them.”</q>
+      <div className="cite">From <span className="citeTitle">Behind the Protocol</span></div>
+      <div className="ans">BTP is the system built to hear them.</div>
+    </div></section>
+
+    <section><div className="wrap">
+      <p className="label">The reality at sites</p>
+      <h2>You’re carrying more than the protocol shows.</h2>
+      <div className="grid3">
+        <div className="stat"><div className="n">~90%</div><div className="t">of trials miss their enrollment deadlines</div></div>
+        <div className="stat"><div className="n">35 to 61%</div><div className="t">yearly turnover of patient-facing site staff</div></div>
+        <div className="stat"><div className="n">6 to 12 mo</div><div className="t">for a study to recover after a coordinator leaves</div></div>
+      </div>
+      <div className="callout">When the person who knew how to fix it leaves, the answer leaves too. <b>BTP keeps that know-how where the next coordinator can find it.</b></div>
+      <p className="fine">Sources: SCRS 2023 site workforce report; industry enrollment data.</p>
+    </div></section>
+
+    <section id="how"><div className="wrap">
+      <p className="label">How it works</p>
+      <h2>From “has anyone seen this?” to “here’s what helped.”</h2>
+      <div className="grid4">{steps.map(([k, h, p]) => <div className="step" key={k}><div className="k">{k}</div><h4>{h}</h4><p>{p}</p></div>)}</div>
+    </div></section>
+
+    <section><div className="wrap">
+      <p className="label">What you get</p>
+      <h2>Help that actually fits the work.</h2>
+      <div className="grid3">{gets.map(([ic, h, p]) => <div className="card" key={h}><div className="ic" aria-hidden>{ic}</div><h3>{h}</h3><p>{p}</p></div>)}</div>
+    </div></section>
+
+    <section id="who"><div className="wrap roles">
+      <p className="label">Who it’s for</p>
+      <h2>Different roles. The same friction.</h2>
+      <div className="grid3">{roles.map(([h, items]) => <div className="card" key={h}><h3>{h}</h3><ul>{items.map(i => <li key={i}>{i}</li>)}</ul></div>)}</div>
+    </div></section>
+
+    <section id="trust"><div className="wrap">
+      <p className="label">Privacy and trust</p>
+      <h2>Candid questions. Real protection.</h2>
+      <div className="trust">
+        <div className="card"><h3 className="h3tight">How BTP protects you</h3><ul className="list">{protects.map(t => <li key={t}><span className="yes" aria-hidden>✓</span>{t}</li>)}</ul></div>
+        <div className="card"><h3 className="h3tight">Never post</h3><ul className="list">{never.map(t => <li key={t}><span className="no" aria-hidden>✕</span>{t}</li>)}</ul></div>
+      </div>
+      <p className="fine">BTP separates the identity used for verification from the identity shown in discussions. That supports candid participation; it is not a promise of absolute anonymity. Peer experience does not replace medical advice or your site’s procedures. <Link href="/privacy">Read the privacy policy</Link>.</p>
+    </div></section>
+
+    <section><div className="wrap faq">
+      <p className="label">Questions</p>
+      <h2>Know what you’re joining.</h2>
+      {faqs.map(([q, a]) => <details key={q}><summary>{q}</summary><p>{a}</p></details>)}
+    </div></section>
+
+    <section className="cta"><div className="wrap">
+      <h2>Bring the experience that doesn’t fit in a dashboard.</h2>
+      <p>Join clinical research professionals who understand the work behind every visit and milestone. Membership is free.</p>
+      <div className="ctas"><a className="btn gold" href={contact}>Request beta access <span aria-hidden>↗</span></a><Link className="btn ghost ghostLight" href="/sign-in">Member sign in</Link></div>
+    </div></section>
+  </main>
+  <SiteFooter/></div>;
+}
