@@ -6,7 +6,8 @@ const nextConfig: NextConfig = {
     return [{ source: '/investors/:path*', headers: [
       { key: 'Cache-Control', value: 'private, no-store, max-age=0' },
       { key: 'X-Robots-Tag', value: 'noindex, nofollow, noarchive' },
-      { key: 'Referrer-Policy', value: 'no-referrer' },
+      // same-origin: no referrer leaves the site, but browsers still send Origin on the login form POST.
+      { key: 'Referrer-Policy', value: 'same-origin' },
       { key: 'X-Frame-Options', value: 'DENY' },
       { key: 'Content-Security-Policy', value: "frame-ancestors 'none'; form-action 'self'" },
     ] }];

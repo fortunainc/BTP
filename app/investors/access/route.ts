@@ -5,8 +5,11 @@ export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 const headers = { 'Cache-Control': 'private, no-store, max-age=0', 'X-Robots-Tag': 'noindex, nofollow, noarchive', 'Referrer-Policy': 'no-referrer' };
 export async function POST(request: NextRequest) {
+  // Same-site check. Browsers send `Origin: null` when the page's referrer policy hides it,
+  // so also accept the browser-set Sec-Fetch-Site header, which cannot be forged by a page.
   const origin = request.headers.get('origin');
-  if (!origin || origin !== request.nextUrl.origin) return new NextResponse('Invalid request origin.', { status: 403, headers });
+  const sameOrigin = origin === request.nextUrl.origin || request.headers.get('sec-fetch-site') === 'same-origin';
+  if (!sameOrigin) return new NextResponse('Invalid request origin.', { status: 403, headers });
   if (process.env.VERCEL_ENV === 'preview' || !investorConfig()) return new NextResponse('Investor access is not available on this deployment.', { status: 503, headers });
   if (!request.headers.get('content-type')?.startsWith('application/x-www-form-urlencoded')) return new NextResponse('Unsupported form.', { status: 415, headers });
   // Read a bounded body even when the client omits or forges Content-Length.
