@@ -37,7 +37,7 @@ export function validInvestorSession(token?: string, now = Date.now()) {
   const received = Buffer.from(parts[2]);
   return expected.length === received.length && timingSafeEqual(expected, received);
 }
-export type InvestorBrief = { title: string; intro: string; updated: string; sections: Array<{id: string; title: string; paragraphs?: string[]; bullets?: string[]; table?: { headings: string[]; rows: string[][] }; subsections?: Array<{ title: string; body: string }> }> };
+export type InvestorBrief = { title: string; intro: string; updated: string; html?: string; sections: Array<{id: string; title: string; paragraphs?: string[]; bullets?: string[]; table?: { headings: string[]; rows: string[][] }; subsections?: Array<{ title: string; body: string }> }> };
 export function decryptInvestorBrief(envelope: { iv: string; tag: string; ciphertext: string }): InvestorBrief {
   const config = investorConfig();
   if (!config) throw new Error('Investor access is not configured');
