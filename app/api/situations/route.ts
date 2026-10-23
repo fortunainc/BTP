@@ -1,6 +1,7 @@
 import { notifyFoundingResponders } from '@/lib/engagement';
 import { after } from 'next/server';
-import { isApprovedMember } from '@/lib/access-policy';
+import { isAdminMember, isApprovedMember } from '@/lib/access-policy';
+import { getOrCreateTeamUser } from '@/lib/team-account';
 /**
  * Situations API - Intelligence Realm
  * 
@@ -236,6 +237,12 @@ export const POST = withAuth(async (req, user) => {
       }
 
       const body = await req.json();
+      // Admins may publish under the BTP team profile (starter questions).
+      const postedByAdminId: string | null = body?.postAsTeam === true && isAdminMember(user) ? user.id : null;
+      if (body?.postAsTeam === true && !postedByAdminId) {
+        return createErrorResponse('Only admins can post as the BTP team', 403);
+      }
+      if (postedByAdminId) user = await getOrCreateTeamUser();
       const { 
         description, 
         confirmedRedaction,
@@ -478,6 +485,7 @@ export const POST = withAuth(async (req, user) => {
           resourceId: situation.id,
           details: {
             contributionType: 'question',
+            postedByAdminId,
             therapeuticArea: finalTherapeuticArea,
             issueCategory: finalIssueCategory,
             correlationRisk: riskResult.riskScore,
