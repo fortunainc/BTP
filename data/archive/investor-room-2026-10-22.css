@@ -1,0 +1,50 @@
+/* Investor room layout (content itself is encrypted). */
+.vcroom{--ox:#3a1a1e;--gold:#a8823f;--goldl:#c9a66b;--ink:#231114;--muted:#5f4f4c;--line:#e2d4c3;--card:#fffaf3;--blue:#2f5470;background:#f7f1e8;color:var(--ink);font:16px/1.6 -apple-system,"Segoe UI",Helvetica,Arial,sans-serif;padding:8px 0 40px}
+.vcroom *{box-sizing:border-box}
+.vcroom .wrap{max-width:1040px;margin:0 auto;padding:0 20px}
+.vcroom p{margin:0 0 12px}
+.vcroom .k{font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--gold);font-weight:700;margin:0 0 8px}
+.vcroom h1{font:400 clamp(30px,4.6vw,50px)/1.12 Georgia,serif;color:#fff;margin:0 0 18px;letter-spacing:-.02em}
+.vcroom h2{font:400 clamp(24px,3vw,32px)/1.2 Georgia,serif;color:var(--ox);margin:0 0 16px;letter-spacing:-.01em}
+.vcroom h3{color:var(--ox)}
+.vcroom .hero{background:var(--ox);color:#eadfcd;border-radius:18px;padding:clamp(28px,5vw,56px)}
+.vcroom .hero .k{color:var(--goldl)}
+.vcroom .hero .lead{font-size:18px;line-height:1.6;color:#f3e9da;max-width:780px}
+.vcroom .tags span{display:inline-block;border:1px solid rgba(201,166,107,.6);color:#f0e4cf;border-radius:20px;padding:5px 13px;font-size:13px;margin:0 8px 8px 0}
+.vcroom .sec{margin:56px 0 0}
+.vcroom .stats{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin:14px 0}
+.vcroom .stat{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:20px}
+.vcroom .stat b{display:block;font:400 38px/1.05 Georgia,serif;color:var(--ox);margin-bottom:8px}
+.vcroom .stat span{font-size:14px;color:var(--muted)}
+.vcroom .callout{background:var(--card);border-left:4px solid var(--gold);border-radius:0 14px 14px 0;padding:16px 20px;margin:14px 0}
+.vcroom .flow{display:grid;grid-template-columns:1fr 28px 1fr 28px 1fr;align-items:stretch;margin:14px 0}
+.vcroom .flow .arrow{display:flex;align-items:center;justify-content:center;color:var(--gold);font-size:22px}
+.vcroom .step{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px}
+.vcroom .step .t{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--gold);font-weight:700;margin:0}
+.vcroom .step h3{font:400 20px/1.25 Georgia,serif;margin:6px 0 8px}
+.vcroom .step p,.vcroom .step li{font-size:14px;color:var(--muted);margin:0}
+.vcroom table{width:100%;border-collapse:collapse;font-size:14px;margin:12px 0;background:var(--card);border:1px solid var(--line);border-radius:14px;overflow:hidden}
+.vcroom th{background:var(--ox);color:#fff;text-align:left;padding:12px 14px;font-weight:600}
+.vcroom td{padding:12px 14px;border-top:1px solid var(--line);vertical-align:top}
+.vcroom ul{padding-left:20px;margin:6px 0 12px}.vcroom li{margin:5px 0}
+.vcroom .two{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:12px 0}
+.vcroom .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px 20px}
+.vcroom .card h3{font:400 20px Georgia,serif;margin:0 0 8px}
+.vcroom .chain{display:flex;gap:8px;align-items:center;justify-content:center;flex-wrap:wrap;margin:16px 0}
+.vcroom .chain span{background:var(--ox);color:#fff;border-radius:10px;padding:9px 14px;font-size:14px;font-weight:600}
+.vcroom .chain i{color:var(--gold);font-style:normal;font-size:18px}
+.vcroom .src{font-size:12px;color:var(--muted);margin-top:6px}
+.vcroom .founder{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin:14px 0}
+.vcroom .founder div{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px;font-size:14px;color:var(--muted)}
+.vcroom .founder b{display:block;font:400 28px Georgia,serif;color:var(--ox);margin-bottom:6px}
+.vcroom .north{background:var(--ox);color:#f3e9da;border-radius:14px;padding:16px 20px;margin-top:14px}
+.vcroom .north b{color:var(--goldl)}
+.vcroom svg{display:block;max-width:100%;height:auto;background:#fff;border:1px solid var(--line);border-radius:14px;padding:10px}
+.vcroom .foot{margin-top:28px;font-size:12px;color:var(--muted);border-top:1px solid var(--line);padding-top:12px}
+@media(max-width:760px){
+.vcroom .stats,.vcroom .two,.vcroom .founder{grid-template-columns:1fr!important}
+.vcroom .flow{grid-template-columns:1fr!important}
+.vcroom .flow .arrow{transform:rotate(90deg);padding:4px 0}
+.vcroom .sec{margin-top:40px}
+.vcroom table{font-size:13px}.vcroom th,.vcroom td{padding:9px}
+}
