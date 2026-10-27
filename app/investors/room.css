@@ -359,3 +359,4 @@
 .ir .rule p{margin:0;color:var(--soft);font-size:14.5px;line-height:1.55}
 @media(max-width:960px){.ir .rules{grid-template-columns:1fr 1fr}.ir .rule:nth-child(3n){border-right:1px solid rgba(232,204,148,.12)}.ir .rule:nth-child(2n){border-right:0}.ir .rule:nth-child(n+4){border-bottom:1px solid rgba(232,204,148,.12)}.ir .rule:nth-child(n+5){border-bottom:0}}
 @media(max-width:600px){.ir .rules{grid-template-columns:1fr}.ir .rule{border-right:0!important;border-bottom:1px solid rgba(232,204,148,.12)!important}.ir .rule:last-child{border-bottom:0!important}}
+.ir section.trustS{padding-bottom:48px}.ir section.trustS+section{padding-top:72px}.ir section.cta{padding:72px 0 96px}
