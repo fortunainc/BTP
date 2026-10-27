@@ -1,22 +1,68 @@
 import type { Metadata } from 'next';
 import { cookies } from 'next/headers';
-import { SiteHeader, SiteFooter } from '@/components/marketing/SiteChrome';
-import s from '@/components/marketing/site.module.css';
+import Link from 'next/link';
+import { Newsreader, Inter, Cormorant_Garamond } from 'next/font/google';
+import HomeReveal from '@/components/marketing/HomeReveal';
 import { decryptInvestorBrief, INVESTOR_COOKIE, investorConfig, validInvestorSession } from '@/lib/investor-auth';
 import envelope from '@/data/investor-brief.encrypted.json';
 import './room.css';
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
-export const metadata: Metadata = { title:'BTP | Private investor room', description:'Private technical and investor briefing. Access by invitation.', robots:{index:false,follow:false,nocache:true} };
+export const metadata: Metadata = { title:'BTP | Private investor room', description:'Private investor briefing. Access by invitation.', robots:{index:false,follow:false,nocache:true} };
+
+const serif = Newsreader({ subsets: ['latin'], axes: ['opsz'], variable: '--font-newsreader', display: 'swap' });
+const sans = Inter({ subsets: ['latin'], variable: '--font-inter', display: 'swap' });
+const signet = Cormorant_Garamond({ subsets: ['latin'], weight: '500', style: 'italic', variable: '--font-cormorant', display: 'swap' });
+const shell = `ir ${serif.variable} ${sans.variable} ${signet.variable}`;
+const CONTACT = 'mailto:fortunaindustriesinc@gmail.com?subject=BTP%20investor%20room%20access';
+
+// Fixed (not random) drifting particles so server output is stable.
+const BOKEH = Array.from({ length: 34 }, (_, i) => {
+  const r = (n: number) => ((Math.sin(i * 12.9898 + n * 78.233) * 43758.5453) % 1 + 1) % 1;
+  const s = 2 + r(1) * 7;
+  return { width: s, height: s, left: `${50 + r(2) * 50}%`, top: `${r(3) * 100}%`, animationDuration: `${6 + r(4) * 10}s`, animationDelay: `${-r(5) * 12}s` };
+});
+
+function Gate({ children }: { children: React.ReactNode }) {
+  return <div className={shell} data-sentry-block data-sentry-mask>
+    <header className="hero gate">
+      <div className="bokeh" aria-hidden="true">{BOKEH.map((st, i) => <i key={i} style={st} />)}</div>
+      <div className="grain" aria-hidden="true" /><div className="vignette" aria-hidden="true" />
+      <div className="wrap">
+        <nav><Link className="logo" href="/"><span className="mono">BTP</span><span>BEHIND<br />THE PROTOCOL</span></Link>
+          <div className="navlinks"><Link href="/">Home</Link><Link className="pill" href="/sign-in">Member sign in ↗</Link></div></nav>
+        <div className="heroBody">{children}</div>
+      </div>
+    </header>
+    <footer><div className="wrap">Behind the Protocol · Fortuna Industries Inc. · <Link href="/privacy" style={{color:'inherit'}}>Privacy</Link> · <Link href="/support" style={{color:'inherit'}}>Support</Link></div></footer>
+  </div>;
+}
+
 export default async function Investors({searchParams}: {searchParams:Promise<{error?:string}>}) {
   const token = (await cookies()).get(INVESTOR_COOKIE)?.value;
   const configured = !!investorConfig() && process.env.VERCEL_ENV !== 'preview';
-  if (!configured || !validInvestorSession(token)) { const params = await searchParams; return <div className={s.site} data-sentry-block data-sentry-mask><SiteHeader/><main className={s.login}><p className={s.eyebrow}>By invitation</p><h1>The investor room.</h1><p>A closer look at BTP’s architecture, product logic, development priorities, and commercial direction—for prospective investors and technical collaborators.</p>{params.error && <p role="alert" className={s.alert}>Access could not be verified. Check your password and try again.</p>}{configured ? <form method="post" action="/investors/access"><label htmlFor="password">Investor access password</label><input id="password" name="password" type="password" autoComplete="current-password" required maxLength={256}/><button className={s.button} type="submit">Enter the room <span aria-hidden>↗</span></button></form> : <p role="status">Private access is being prepared. Please contact BTP for an invitation.</p>}<p>Need access? <a href="mailto:fortunaindustriesinc@gmail.com?subject=BTP%20investor%20room%20access">Contact BTP</a>.</p><p className={s.note}>Access expires after eight hours. Please do not forward your password or confidential briefing material.</p></main><SiteFooter/></div>; }
-  let brief;
-  try { brief = decryptInvestorBrief(envelope); } catch { return <div className={s.site} data-sentry-block data-sentry-mask><SiteHeader/><main className={s.login}><h1>Briefing temporarily unavailable.</h1><p>Please contact BTP. Your password has not been displayed or logged.</p></main><SiteFooter/></div>; }
-  if (brief.html) {
-    // Authored, encrypted briefing layout; only decrypted after a valid investor session.
-    return <div className={s.site} data-sentry-block data-sentry-mask><SiteHeader/><div className={s.room} style={{paddingBottom:0,paddingTop:20}}><div className={s.topbar}><p className={s.eyebrow}>Private briefing · {brief.updated}</p><form method="post" action="/investors/logout"><button type="submit">Sign out</button></form></div></div><div className="vcroom" dangerouslySetInnerHTML={{ __html: brief.html }} /><main className={s.room}><section className={s.roomSection} style={{borderBottom:0}}><h2>Discuss BTP’s next stage.</h2><p>We welcome conversations with investors and technical founders who understand trusted professional networks and clinical operations.</p><a className={s.button} href="mailto:fortunaindustriesinc@gmail.com?subject=BTP%20investor%20conversation">Start a conversation <span aria-hidden>↗</span></a></section></main><SiteFooter/></div>;
+  if (!configured || !validInvestorSession(token)) {
+    const params = await searchParams;
+    return <Gate>
+      <div className="eyebrow">By invitation</div>
+      <h1><span className="ln l1">The investor</span><span className="ln l2"><span className="g">room.</span></span></h1>
+      <p className="sub">The business behind BTP: the problem, the model, the first product and where the company stands today. For prospective investors.</p>
+      <div className="gcard reveal in">
+        {params.error && <p role="alert" className="gerr">Access could not be verified. Check your password and try again.</p>}
+        {configured
+          ? <form method="post" action="/investors/access"><label htmlFor="password">Investor access password</label><input id="password" name="password" type="password" autoComplete="current-password" required maxLength={256} /><button className="btn gold" type="submit">Enter the room <span aria-hidden>→</span></button></form>
+          : <p role="status">Private access is being prepared. Please contact BTP for an invitation.</p>}
+        <p>Need access? <a href={CONTACT}>Contact BTP</a>. Access expires after eight hours. Please do not forward your password or briefing material.</p>
+      </div>
+    </Gate>;
   }
-  return <div className={s.site} data-sentry-block data-sentry-mask><SiteHeader/><main className={s.room}><div className={s.topbar}><p className={s.eyebrow}>Private briefing · {brief.updated}</p><form method="post" action="/investors/logout"><button type="submit">Sign out</button></form></div><h1>{brief.title}</h1><p className={s.roomIntro}>{brief.intro}</p><nav className={s.roomNav} aria-label="Investor briefing sections">{brief.sections.map(section=><a key={section.id} href={`#${section.id}`}>{section.title}</a>)}</nav>{brief.sections.map(section=><section className={s.roomSection} id={section.id} key={section.id}><h2>{section.title}</h2>{section.paragraphs?.map(p=><p key={p}>{p}</p>)}{section.bullets && <ul>{section.bullets.map(p=><li key={p}>{p}</li>)}</ul>}{section.table && <div className={s.tableWrap}><table className={s.table}><thead><tr>{section.table.headings.map(h=><th scope="col" key={h}>{h}</th>)}</tr></thead><tbody>{section.table.rows.map((row,i)=><tr key={i}>{row.map((cell,j)=><td key={j}>{cell}</td>)}</tr>)}</tbody></table></div>}{section.subsections?.map(sub=><div key={sub.title}><h3>{sub.title}</h3><p>{sub.body}</p></div>)}</section>)}<section className={s.roomSection}><h2>Discuss BTP’s next stage.</h2><p>We are interested in investors and technical founders who understand trusted professional networks, clinical operations, and disciplined paths from services to scalable products.</p><a className={s.button} href="mailto:fortunaindustriesinc@gmail.com?subject=BTP%20investor%20conversation">Start a conversation <span aria-hidden>↗</span></a></section></main><SiteFooter/></div>;
+  let brief;
+  try { brief = decryptInvestorBrief(envelope); } catch {
+    return <Gate><div className="eyebrow">Investor room</div><h1><span className="ln l1">Briefing temporarily unavailable.</span></h1><p className="sub">Please <a href={CONTACT} style={{color:'#e8cc94'}}>contact BTP</a>. Your password has not been displayed or logged.</p></Gate>;
+  }
+  // Authored, encrypted briefing layout; only decrypted after a valid investor session.
+  return <div className={shell} data-sentry-block data-sentry-mask>
+    <div dangerouslySetInnerHTML={{ __html: brief.html ?? '' }} />
+    <HomeReveal scope=".ir" />
+  </div>;
 }
