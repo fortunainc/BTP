@@ -152,4 +152,4 @@
 @media(max-width:560px){.bh .grid4{grid-template-columns:1fr}
 .bh section{padding:80px 0}}
 @media(prefers-reduced-motion:reduce){.bh *,.bh *::before,.bh *::after{animation:none!important;transition:none!important}
-.bh .eyebrow,.bh h1 span.ln,.bh .sub,.bh .ctas,.bh .reveal{opacity:1!important;transform:none!important}}
+.bh .eyebrow,.bh h1 span.ln,.bh .sub,.bh .ctas,.bh .reveal{opacity:1!important;transform:none!important}}@media(max-width:560px){.bh .hero .eco{width:min(300px,70vw)}.bh .eco .pill{padding:8px 11px}.bh .eco .pill b{font-size:18px}.bh .eco .pill small{font-size:8.5px;letter-spacing:.1em}}
