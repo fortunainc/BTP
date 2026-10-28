@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useClerk } from '@clerk/nextjs';
+import { useAuth } from '@/components/AuthContext';
 
 const links = [
   { href: '/situations', label: 'Questions' },
@@ -17,11 +18,13 @@ const links = [
 export function MemberNav() {
   const pathname = usePathname();
   const { signOut } = useClerk();
+  const { isAdmin } = useAuth();
+  const items = isAdmin ? [...links, { href: '/admin/founder', label: 'Founder' }, { href: '/admin/investors', label: 'Investors' }] : links;
   return (
     <nav aria-label="Member navigation" className="sticky top-0 z-40 border-b border-[rgba(232,204,148,0.16)] bg-[rgba(7,4,5,0.72)] backdrop-blur-md">
       <div className="mx-auto flex max-w-7xl flex-wrap items-center gap-x-6 gap-y-2 px-4 py-3 text-sm sm:px-8">
         <Link href="/situations" aria-label="BTP home" className="mr-2 rounded-[9px] border border-[rgba(240,214,165,0.35)] bg-gradient-to-br from-white/10 to-white/[0.02] px-2.5 font-signet text-2xl leading-8 text-[#e8cc94]">BTP</Link>
-        {links.map(l => {
+        {items.map(l => {
           const active = pathname === l.href;
           return (
             <Link key={l.href} href={l.href} aria-current={active ? 'page' : undefined}

@@ -1309,3 +1309,42 @@ model AccessRequest {
 
   @@index([referrerId])
 }
+
+// Investors approved by the founder for the private investor room and data room.
+model Investor {
+  id           String    @id @default(cuid())
+  email        String    @unique
+  name         String?
+  company      String?
+  status       String    @default("pending") // pending, approved, revoked
+  tokenHash    String?   @unique // Hash of the current sign-in link token
+  tokenExpires DateTime?
+  createdAt    DateTime  @default(now())
+  approvedAt   DateTime?
+  lastSeenAt   DateTime?
+  visits       Int       @default(0)
+}
+
+// Files in the investor data room. Stored in the database so access is checked on every download.
+model DiligenceDoc {
+  id        String   @id @default(cuid())
+  title     String
+  category  String
+  fileName  String
+  mimeType  String
+  size      Int
+  data      Bytes
+  createdAt DateTime @default(now())
+}
+
+// What each investor opened, for the founder's view.
+model InvestorActivity {
+  id         String   @id @default(cuid())
+  investorId String
+  action     String // room, data_room, download
+  docId      String?
+  createdAt  DateTime @default(now())
+
+  @@index([investorId])
+  @@index([createdAt])
+}
