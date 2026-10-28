@@ -17,17 +17,21 @@ export function MemberNav() {
   const pathname = usePathname();
   const { signOut } = useClerk();
   return (
-    <nav aria-label="Member navigation" className="border-b border-slate-800 bg-slate-950">
-      <div className="mx-auto flex max-w-7xl flex-wrap items-center gap-x-5 gap-y-2 px-4 py-3 text-sm sm:px-8">
-        <Link href="/situations" className="mr-2 font-bold tracking-wide text-white">BTP</Link>
-        {links.map(l => (
-          <Link key={l.href} href={l.href}
-            className={pathname === l.href ? 'font-semibold text-white' : 'text-slate-400 hover:text-white'}>
-            {l.label}
-          </Link>
-        ))}
+    <nav aria-label="Member navigation" className="sticky top-0 z-40 border-b border-[rgba(232,204,148,0.16)] bg-[rgba(7,4,5,0.72)] backdrop-blur-md">
+      <div className="mx-auto flex max-w-7xl flex-wrap items-center gap-x-6 gap-y-2 px-4 py-3 text-sm sm:px-8">
+        <Link href="/situations" aria-label="BTP home" className="mr-2 rounded-[9px] border border-[rgba(240,214,165,0.35)] bg-gradient-to-br from-white/10 to-white/[0.02] px-2.5 font-signet text-2xl leading-8 text-[#e8cc94]">BTP</Link>
+        {links.map(l => {
+          const active = pathname === l.href;
+          return (
+            <Link key={l.href} href={l.href} aria-current={active ? 'page' : undefined}
+              className={`relative py-2 ${active ? 'text-[#fff6ea]' : 'text-[#d9ccbd] hover:text-[#fff6ea]'}`}>
+              {l.label}
+              {active && <span aria-hidden className="absolute inset-x-0 -bottom-3 h-0.5 bg-gradient-to-r from-transparent via-[#e8cc94] to-transparent" />}
+            </Link>
+          );
+        })}
         <button type="button" onClick={() => void signOut({ redirectUrl: '/' })}
-          className="ml-auto text-slate-400 hover:text-white">Sign out</button>
+          className="ml-auto rounded-full border border-[rgba(232,204,148,0.38)] px-4 py-2 text-[#e8cc94] hover:bg-[rgba(201,166,107,0.08)]">Sign out</button>
       </div>
     </nav>
   );

@@ -36,26 +36,11 @@ interface SituationsResponse {
   };
 }
 
-const THERAPEUTIC_AREAS = [
-  { value: '', label: 'All Areas' },
-  { value: 'Oncology', label: 'Oncology' },
-  { value: 'Cardiology', label: 'Cardiology' },
-  { value: 'Neurology', label: 'Neurology' },
-  { value: 'Immunology', label: 'Immunology' },
-  { value: 'Rare Disease', label: 'Rare Disease' },
-  { value: 'Pediatrics', label: 'Pediatrics' },
-  { value: 'Infectious Disease', label: 'Infectious Disease' },
-  { value: 'Metabolism', label: 'Metabolism' },
-  { value: 'Respiratory', label: 'Respiratory' },
-  { value: 'Dermatology', label: 'Dermatology' },
-  { value: 'Other', label: 'Other' }
-];
-
 const TIME_BUCKETS = [
-  { value: '', label: 'All Time' },
+  { value: '', label: 'All time' },
   { value: 'today', label: 'Today' },
-  { value: 'week', label: 'This Week' },
-  { value: 'month', label: 'This Month' }
+  { value: 'week', label: 'This week' },
+  { value: 'month', label: 'This month' }
 ];
 
 export default function SituationsPage() {
@@ -70,18 +55,25 @@ export default function SituationsPage() {
   useEffect(() => {
     fetch('/api/polls').then(r => r.ok ? r.json() : null).then(d => setPolls((d?.data ?? d)?.polls ?? null)).catch(() => setPolls(null));
   }, []);
-  const [therapeuticArea, setTherapeuticArea] = useState('');
   const [timeBucket, setTimeBucket] = useState('');
+  const [showWelcome, setShowWelcome] = useState(false);
+
+  useEffect(() => {
+    try { setShowWelcome(localStorage.getItem('btp-welcome-dismissed') !== '1'); } catch { setShowWelcome(true); }
+  }, []);
+  function dismissWelcome() {
+    setShowWelcome(false);
+    try { localStorage.setItem('btp-welcome-dismissed', '1'); } catch { /* storage unavailable */ }
+  }
 
   useEffect(() => {
     fetchSituations();
-  }, [therapeuticArea, timeBucket]);
+  }, [timeBucket]);
 
   async function fetchSituations() {
     try {
       setLoading(true);
       const params = new URLSearchParams();
-      if (therapeuticArea) params.append('therapeuticArea', therapeuticArea);
       if (timeBucket) params.append('timeBucket', timeBucket);
 
       const response = await fetch(`/api/situations?${params.toString()}`);
@@ -114,14 +106,14 @@ export default function SituationsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-900">
+    <div className="min-h-screen">
       {/* Header - Clear, observational */}
       <header className="border-b border-slate-800">
         <div className="max-w-7xl mx-auto px-8 py-8">
           <div className="flex justify-between items-start">
             <div>
-              <h1 className="text-3xl font-bold text-white mb-2">
-                Questions from the BTP community
+              <h1 className="text-4xl text-[#fff6ea] mb-2">
+                Questions from <span className="text-[#e8cc94]">the BTP community.</span>
               </h1>
               <p className="text-slate-400">
                 Ask openly. Answer from experience. Keep identities and employers protected.
@@ -130,38 +122,37 @@ export default function SituationsPage() {
             {isSignedIn && (
               <Link
                 href="/situations/new"
-                className="inline-flex items-center px-6 py-3 bg-slate-700 hover:bg-slate-600 text-white rounded-lg font-medium transition-colors border border-slate-600"
+                className="btn-primary inline-flex items-center gap-2 whitespace-nowrap rounded px-6 py-3 text-xs uppercase tracking-[0.16em]"
               >
-                Ask a question
+                Ask a question <span aria-hidden>→</span>
               </Link>
             )}
           </div>
         </div>
       </header>
 
-      {/* Filters - Subtle, not prominent */}
-      <div className="bg-slate-800/30 border-b border-slate-800">
-        <div className="max-w-7xl mx-auto px-8 py-4">
-          <div className="flex gap-4">
-            <select
-              value={therapeuticArea}
-              onChange={(e) => setTherapeuticArea(e.target.value)}
-              className="bg-slate-800 border border-slate-700 text-white px-4 py-2 rounded-lg focus:outline-none focus:border-slate-600"
-            >
-              {THERAPEUTIC_AREAS.map(area => (
-                <option key={area.value} value={area.value}>{area.label}</option>
-              ))}
-            </select>
-            <select
-              value={timeBucket}
-              onChange={(e) => setTimeBucket(e.target.value)}
-              className="bg-slate-800 border border-slate-700 text-white px-4 py-2 rounded-lg focus:outline-none focus:border-slate-600"
-            >
-              {TIME_BUCKETS.map(bucket => (
-                <option key={bucket.value} value={bucket.value}>{bucket.label}</option>
-              ))}
-            </select>
+      {/* Orientation for new members, then time filter */}
+      <div className="max-w-7xl mx-auto px-8 pt-6">
+        {showWelcome && !pending && (
+          <div className="mb-5 flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-[rgba(232,204,148,0.3)] bg-gradient-to-br from-[rgba(201,166,107,0.12)] to-white/[0.02] px-5 py-4">
+            <div>
+              <p className="mb-2 text-[11px] font-semibold uppercase tracking-[0.24em] text-[#dcbc82]">New here? How BTP works</p>
+              <ol className="flex flex-wrap gap-x-6 gap-y-2 text-sm text-[#f1e7da]">
+                {['Ask a work question under your handle', 'Verified peers answer from experience', 'Mark the answer that worked'].map((s, i) => (
+                  <li key={s} className="flex items-center gap-2"><span className="grid h-6 w-6 place-items-center rounded-full bg-gradient-to-br from-[#ead0a0] to-[#c9a66b] text-xs font-medium text-[#1c0e0b]">{i + 1}</span>{s}</li>
+                ))}
+              </ol>
+            </div>
+            <button type="button" onClick={dismissWelcome} className="text-sm text-[#e8cc94] hover:underline">Got it</button>
           </div>
+        )}
+        <div className="flex flex-wrap gap-2" role="group" aria-label="Filter by time">
+          {TIME_BUCKETS.map(bucket => (
+            <button key={bucket.value} type="button" onClick={() => setTimeBucket(bucket.value)} aria-pressed={timeBucket === bucket.value}
+              className={`rounded-full border px-4 py-1.5 text-sm transition-colors ${timeBucket === bucket.value ? 'border-transparent bg-gradient-to-br from-[#ead0a0] to-[#c9a66b] text-[#1c0e0b]' : 'border-white/10 bg-white/[0.02] text-[#e6dacb] hover:border-[rgba(232,204,148,0.4)]'}`}>
+              {bucket.label}
+            </button>
+          ))}
         </div>
       </div>
 
@@ -197,13 +188,13 @@ export default function SituationsPage() {
             {situations.map((situation) => (
               <article
                 key={situation.id}
-                className="bg-slate-800/50 backdrop-blur-sm rounded-lg border border-slate-700 hover:border-slate-600 transition-colors"
+                className="rounded-2xl border border-white/[0.08] bg-gradient-to-br from-white/[0.055] to-white/[0.012] shadow-[inset_0_1px_0_rgba(255,255,255,0.06)] transition-colors hover:border-[rgba(232,204,148,0.35)]"
               >
                 <Link href={`/situations/${situation.id}`}>
                   <div className="p-6">
                     {/* Title and Time */}
                     <div className="flex items-start justify-between gap-4 mb-3">
-                      <h2 className="text-lg font-semibold text-white">
+                      <h2 className="text-xl text-[#fff6ea]">
                         {situation.title}
                       </h2>
                       <span className="text-sm text-slate-500 flex-shrink-0">
@@ -213,16 +204,6 @@ export default function SituationsPage() {
 
                     {/* Tags */}
                     <div className="flex flex-wrap items-center gap-2 mb-3">
-                      {situation.therapeuticArea && (
-                        <span className="px-2 py-0.5 rounded text-xs bg-slate-700 text-slate-300">
-                          {situation.therapeuticArea.replace('_', ' ')}
-                        </span>
-                      )}
-                      {situation.trialPhase && (
-                        <span className="px-2 py-0.5 rounded text-xs bg-slate-700 text-slate-300">
-                          Phase {situation.trialPhase}
-                        </span>
-                      )}
                       <PatternBadge contributionId={situation.id} />
                     </div>
 

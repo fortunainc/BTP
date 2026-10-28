@@ -235,14 +235,14 @@ export default function NotificationsPage() {
 
   if (loading || !user) {
     return (
-      <div className="min-h-screen bg-slate-950 flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center">
         <Loader2 className="w-8 h-8 text-cyan-500 animate-spin" />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-slate-950">
+    <div className="min-h-screen">
       {/* Header */}
       <div className="border-b border-slate-800 bg-slate-900/50">
         <div className="max-w-4xl mx-auto px-4 py-4">
