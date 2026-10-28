@@ -23,7 +23,7 @@ describe('member provisioning', () => {
   it('creates a pending, unapproved record with the Clerk email on first contact', async () => {
     const u = await ensureMemberRecord('clerk_1');
     expect(u).toMatchObject({ clerkId: 'clerk_1', verificationStatus: 'Pending', roleCategory: 'unspecified', email: 'tester@example.com' });
-    expect(String(u.handle)).toMatch(/^member-[0-9a-f]{6}$/);
+    expect(String(u.handle)).toMatch(/^[a-z]+-[a-z]+(-\d{2})?$/);
   });
 
   it('returns the existing record instead of creating a duplicate', async () => {
