@@ -1,283 +1,246 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/components/AuthContext';
 
-type UserRole = 'operator' | 'organization';
-type Step = 1 | 2 | 3;
+type Step = 'profile' | 'verify' | 'done';
+type Method = 'linkedin' | 'work_email' | 'vouch';
+
+const ROLES: Array<[string, string]> = [
+  ['CRA', 'Clinical Research Associate'], ['CRC', 'Clinical Research Coordinator'], ['PI', 'Principal Investigator'],
+  ['PM', 'Project Manager'], ['DM', 'Data Manager'], ['RM', 'Regulatory Manager'], ['QA', 'Quality Assurance'], ['Other', 'Other'],
+];
+const ORG_TYPES: Array<[string, string]> = [['CRO', 'CRO'], ['Site', 'Clinical site'], ['Sponsor', 'Pharma/biotech'], ['Vendor', 'Service vendor'], ['Independent', 'Independent or between roles'], ['Other', 'Other']];
+
+const label = 'mb-2 block text-[11px] font-semibold uppercase tracking-[0.18em] text-[#e6c98f]';
+const field = 'w-full rounded-lg border border-[rgba(232,204,148,0.25)] bg-black/40 p-3 text-white placeholder:text-[#9c8a78] focus:border-[#c9a66b] focus:outline-none';
+const hint = 'mt-1.5 text-xs leading-5 text-slate-400';
 
 export default function OnboardingPage() {
   const router = useRouter();
   const { user, loading: authLoading } = useAuth();
-  // Beta onboarding is for individual professionals; the organization path is dormant.
-  const [step, setStep] = useState<Step>(2);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string>('');
-  
-  // Step 1: Role selection
-  const [selectedRole, setSelectedRole] = useState<UserRole | null>('operator');
-  
-  // Step 2: Professional information
-  const [formData, setFormData] = useState({
-    linkedinUrl: '',
-    anonymousHandle: '',
-    roleCategory: '',
-    companyType: '',
-  });
-  
-  // Step 3: Email verification
+  const [step, setStep] = useState<Step>('profile');
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState('');
+  const [form, setForm] = useState({ roleCategory: '', companyType: '', yearsExperience: '', handle: '', linkedinUrl: '' });
+  const [method, setMethod] = useState<Method>('linkedin');
+  const [vouchNote, setVouchNote] = useState('');
+  const [vouchLink, setVouchLink] = useState('');
+  const [vouchState, setVouchState] = useState<'none' | 'waiting' | 'vouched'>('none');
+  const [copied, setCopied] = useState(false);
+  const [proofCode, setProofCode] = useState<string | null>(null);
+  const [workEmail, setWorkEmail] = useState('');
+  const [codeSent, setCodeSent] = useState(false);
+  const [emailVerified, setEmailVerified] = useState(false);
 
   useEffect(() => {
     if (authLoading) return;
-    // Redirect if user is already verified (onboarding is complete)
-    if (user?.verificationStatus === 'Approved' && user.roleCategory && user.roleCategory !== 'unspecified') {
-      router.push('/situations');
-    }
+    if (user?.verificationStatus === 'Approved' && user.roleCategory && user.roleCategory !== 'unspecified') router.push('/situations');
   }, [user, authLoading, router]);
 
-  const handleRoleSelect = (role: UserRole) => {
-    setSelectedRole(role);
-    setError('');
-    setStep(2);
-  };
+  useEffect(() => { void suggestHandle(false); }, []);
 
-  const validateStep2 = () => {
-    // LinkedIn URL is optional during alpha - no validation required
-    // if (!formData.linkedinUrl) {
-    //   setError('LinkedIn URL is required for verification');
-    //   return false;
-    // }
-    
-    // const linkedinRegex = /^https?://(www.)?linkedin.com\/in\/[\w-]+\/?$/;
-    // if (!linkedinRegex.test(formData.linkedinUrl)) {
-    //   setError('Please enter a valid LinkedIn URL (e.g., https://www.linkedin.com/in/username)');
-    //   return false;
-    // }
-    
-    if (!formData.anonymousHandle) {
-      setError('Display handle is required');
-      return false;
-    }
-    
-    if (!/^[a-zA-Z0-9_-]{3,30}$/.test(formData.anonymousHandle.trim())) {
-      setError('Display handle must be 3-30 letters, numbers, dashes or underscores');
-      return false;
-    }
-    
-    if (selectedRole === 'operator' && !formData.roleCategory) {
-      setError('Please select your role category');
-      return false;
-    }
-    
-    if (selectedRole === 'organization' && !formData.companyType) {
-      setError('Please select your company type');
-      return false;
-    }
-    
-    setError('');
-    return true;
-  };
+  // Returning from the one-click link in the work email.
+  useEffect(() => {
+    const status = new URLSearchParams(window.location.search).get('email');
+    if (!status) return;
+    setStep('verify');
+    setMethod('work_email');
+    if (status === 'confirmed') setEmailVerified(true);
+    else setError(status === 'in-use' ? 'That work email is already linked to another BTP account.' : 'That link has expired or was already used. Send a new one.');
+  }, []);
 
-  const handleStep2Next = async () => {
-    if (!validateStep2()) return;
-    
-    setLoading(true);
-    try {
-      const response = await fetch('/api/user/onboarding', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          userRole: selectedRole,
-          linkedinUrl: formData.linkedinUrl,
-          anonymousHandle: formData.anonymousHandle,
-          roleCategory: selectedRole === 'operator' ? formData.roleCategory : null,
-          companyType: selectedRole === 'organization' ? formData.companyType : null,
-        }),
-      });
+  async function suggestHandle(fresh: boolean) {
+    const res = await fetch(`/api/user/handle-suggestion${fresh ? '?fresh=1' : ''}`).catch(() => null);
+    const data = res?.ok ? await res.json() : null;
+    if (data?.handle) setForm(f => ({ ...f, handle: data.handle }));
+  }
 
-      if (!response.ok) {
-        const data = await response.json();
-        throw new Error(data.error || 'Failed to save profile');
-      }
+  async function post(url: string, body: unknown) {
+    const res = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) throw new Error(data.error || 'Something went wrong. Please try again.');
+    return data;
+  }
 
-      setStep(3);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'An error occurred');
-    } finally {
-      setLoading(false);
-    }
-  };
+  function profileError(): string {
+    if (!form.roleCategory) return 'Choose your role.';
+    if (!form.companyType) return 'Choose where you work.';
+    const years = Number(form.yearsExperience);
+    if (form.yearsExperience === '' || !Number.isInteger(years) || years < 0 || years > 50) return 'Enter your years of experience (0 to 50).';
+    if (!/^[a-zA-Z0-9_-]{3,30}$/.test(form.handle.trim())) return 'Your handle needs 3 to 30 letters, numbers or dashes.';
+    return '';
+  }
+
+  async function saveProfile(linkedinUrl = '') {
+    const data = await post('/api/user/onboarding', {
+      userRole: 'operator', anonymousHandle: form.handle.trim(), roleCategory: form.roleCategory,
+      companyType: form.companyType, yearsExperience: Number(form.yearsExperience), linkedinUrl,
+    });
+    return data as { linkedinProofCode?: string | null };
+  }
+
+  async function next() {
+    const problem = profileError();
+    if (problem) { setError(problem); return; }
+    setBusy(true); setError('');
+    try { await saveProfile(); setStep('verify'); } catch (e) { setError((e as Error).message); } finally { setBusy(false); }
+  }
+
+  async function submitLinkedIn() {
+    if (!/^https?:\/\/(www\.)?linkedin\.com\/in\/[\w-]+\/?$/.test(form.linkedinUrl.trim())) { setError('Enter your LinkedIn profile link, like https://www.linkedin.com/in/your-name'); return; }
+    setBusy(true); setError('');
+    try { const data = await saveProfile(form.linkedinUrl.trim()); setProofCode(data.linkedinProofCode ?? null); } catch (e) { setError((e as Error).message); } finally { setBusy(false); }
+  }
+
+  async function createVouchLink() {
+    setBusy(true); setError('');
+    try { const data = await post('/api/user/vouch-request', { note: vouchNote }); setVouchLink(data.link); setVouchState('waiting'); } catch (e) { setError((e as Error).message); } finally { setBusy(false); }
+  }
+
+  async function checkVouch() {
+    const res = await fetch('/api/user/vouch-request').catch(() => null);
+    const data = res?.ok ? await res.json() : null;
+    if (data?.status) setVouchState(data.status);
+  }
+
+  async function copyLink() {
+    try { await navigator.clipboard.writeText(vouchLink); setCopied(true); } catch { setCopied(false); }
+  }
+
+  async function sendEmailCode() {
+    setBusy(true); setError('');
+    try { await post('/api/user/work-email/send', { email: workEmail }); setCodeSent(true); } catch (e) { setError((e as Error).message); } finally { setBusy(false); }
+  }
+
+  const canFinish = method === 'linkedin' ? Boolean(proofCode) : method === 'vouch' ? vouchState !== 'none' : emailVerified;
+  const steps: Array<[Step, string]> = [['profile', 'Your profile'], ['verify', 'Confirm it is you'], ['done', 'Review']];
+  const at = steps.findIndex(([s]) => s === step);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-slate-900 to-black text-white">
-      <div className="container mx-auto px-4 py-12 max-w-2xl">
-        {/* Header */}
-        <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold mb-2">Complete Your Profile</h1>
-          <p className="text-gray-400">
-            {step === 1 && 'Choose your role in the clinical trials ecosystem'}
-            {step === 2 && 'Tell us your role and choose how you appear to members'}
-            {step === 3 && 'Professional verification review'}
-          </p>
-        </div>
-
-        {/* Progress Bar */}
-        <div className="flex justify-between mb-8">
-          {[1, 2, 3].map((s) => (
-            <div
-              key={s}
-              className={`flex-1 h-2 mx-1 rounded-full transition-colors ${
-                s <= step ? 'bg-blue-500' : 'bg-gray-700'
-              }`}
-            />
+    <div className="min-h-screen text-white">
+      <div className="container mx-auto max-w-2xl px-4 py-12">
+        <ol aria-label="Steps" className="mb-8 flex gap-3">
+          {steps.map(([s, name], i) => (
+            <li key={s} aria-current={i === at ? 'step' : undefined}
+              className={`flex-1 border-t-[3px] pt-2 text-[11px] font-semibold uppercase tracking-[0.14em] ${i <= at ? 'border-[#c9a66b]' : 'border-white/10'} ${i === at ? 'text-[#e8cc94]' : 'text-slate-500'}`}>{i + 1} · {name}</li>
           ))}
-        </div>
+        </ol>
 
-        {/* Error Message */}
-        {error && (
-          <div className="bg-red-500/10 border border-red-500 text-red-500 px-4 py-3 rounded-lg mb-6">
-            {error}
-          </div>
-        )}
+        {error && <div role="alert" className="mb-6 rounded-lg border border-[#c46b6b]/40 bg-[#c46b6b]/10 px-4 py-3 text-[#f1b7b7]">{error}</div>}
 
-        {/* Step 1: Role Selection */}
-        {step === 1 && (
-          <div className="space-y-6">
-            <button
-              onClick={() => handleRoleSelect('operator')}
-              className="w-full p-6 border border-gray-700 rounded-lg hover:border-blue-500 transition-colors text-left"
-            >
-              <div className="flex items-start justify-between">
-                <div>
-                  <h3 className="text-xl font-semibold mb-2">Operator</h3>
-                  <p className="text-gray-400">
-                    Clinical Research Associates, Coordinators, PIs, and other trial professionals
-                  </p>
-                  <div className="flex flex-wrap gap-2 mt-3">
-                    <span className="px-2 py-1 bg-gray-700 rounded text-xs">CRA</span>
-                    <span className="px-2 py-1 bg-gray-700 rounded text-xs">CRC</span>
-                    <span className="px-2 py-1 bg-gray-700 rounded text-xs">PI</span>
-                    <span className="px-2 py-1 bg-gray-700 rounded text-xs">PM</span>
-                  </div>
-                </div>
-                <div className="text-4xl">👷</div>
-              </div>
-            </button>
-
-            <button
-              onClick={() => handleRoleSelect('organization')}
-              className="w-full p-6 border border-gray-700 rounded-lg hover:border-blue-500 transition-colors text-left"
-            >
-              <div className="flex items-start justify-between">
-                <div>
-                  <h3 className="text-xl font-semibold mb-2">Organization</h3>
-                  <p className="text-gray-400">
-                    CROs, Clinical Sites, Sponsors, and other trial organizations
-                  </p>
-                  <div className="flex flex-wrap gap-2 mt-3">
-                    <span className="px-2 py-1 bg-gray-700 rounded text-xs">CRO</span>
-                    <span className="px-2 py-1 bg-gray-700 rounded text-xs">Site</span>
-                    <span className="px-2 py-1 bg-gray-700 rounded text-xs">Sponsor</span>
-                    <span className="px-2 py-1 bg-gray-700 rounded text-xs">Vendor</span>
-                  </div>
-                </div>
-                <div className="text-4xl">🏢</div>
-              </div>
-            </button>
-          </div>
-        )}
-
-        {/* Step 2: Professional Information */}
-        {step === 2 && (
-          <div className="space-y-6">
-            {selectedRole === 'operator' ? (
+        {step === 'profile' && (
+          <section>
+            <h1 className="mb-2 text-4xl text-[#fff6ea]">Set up your <span className="text-[#e8cc94]">profile.</span></h1>
+            <p className="mb-8 text-slate-400">Members see only your handle and your verified role. Your name and employer stay private.</p>
+            <div className="space-y-6 rounded-2xl border border-white/[0.08] bg-gradient-to-br from-white/[0.055] to-white/[0.012] p-6">
               <div>
-                <label className="block text-sm font-medium mb-2">Your Role</label>
-                <select
-                  value={formData.roleCategory}
-                  onChange={(e) => setFormData({ ...formData, roleCategory: e.target.value })}
-                  className="w-full p-3 bg-gray-800 border border-gray-700 rounded-lg focus:border-blue-500 focus:outline-none"
-                >
-                  <option value="">Select your role...</option>
-                  <option value="CRA">Clinical Research Associate</option>
-                  <option value="CRC">Clinical Research Coordinator</option>
-                  <option value="PI">Principal Investigator</option>
-                  <option value="PM">Project Manager</option>
-                  <option value="DM">Data Manager</option>
-                  <option value="RM">Regulatory Manager</option>
-                  <option value="QA">Quality Assurance</option>
-                  <option value="Other">Other</option>
+                <label htmlFor="role" className={label}>Your role</label>
+                <select id="role" value={form.roleCategory} onChange={e => setForm({ ...form, roleCategory: e.target.value })} className={field}>
+                  <option value="">Select your role…</option>
+                  {ROLES.map(([v, l]) => <option key={v} value={v}>{l}</option>)}
                 </select>
               </div>
-            ) : (
               <div>
-                <label className="block text-sm font-medium mb-2">Organization Type</label>
-                <select
-                  value={formData.companyType}
-                  onChange={(e) => setFormData({ ...formData, companyType: e.target.value })}
-                  className="w-full p-3 bg-gray-800 border border-gray-700 rounded-lg focus:border-blue-500 focus:outline-none"
-                >
-                  <option value="">Select your organization type...</option>
-                  <option value="CRO">CRO</option>
-                  <option value="Site">Clinical Site</option>
-                  <option value="Sponsor">Sponsor</option>
-                  <option value="Vendor">Service Vendor</option>
-                  <option value="Other">Other</option>
+                <label htmlFor="org" className={label}>Where you work</label>
+                <select id="org" value={form.companyType} onChange={e => setForm({ ...form, companyType: e.target.value })} className={field}>
+                  <option value="">Select organization type…</option>
+                  {ORG_TYPES.map(([v, l]) => <option key={v} value={v}>{l}</option>)}
                 </select>
               </div>
-            )}
-
-            <div>
-              <label className="block text-sm font-medium mb-2">
-                LinkedIn URL <span className="text-slate-500 text-xs">(optional)</span>
-              </label>
-              <input
-                type="url"
-                value={formData.linkedinUrl}
-                onChange={(e) => setFormData({ ...formData, linkedinUrl: e.target.value })}
-                placeholder="https://www.linkedin.com/in/your-username"
-                className="w-full p-3 bg-gray-800 border border-gray-700 rounded-lg focus:border-blue-500 focus:outline-none"
-              />
-              <p className="text-xs text-gray-500 mt-1">
-                Helps BTP verify your experience privately. Never shown to members. Prefer not to share it? Leave it blank and we will follow up by email about another way to verify, such as a reference from a verified member.
-              </p>
+              <div>
+                <label htmlFor="years" className={label}>Years of experience in clinical research</label>
+                <input id="years" type="number" min={0} max={50} inputMode="numeric" value={form.yearsExperience}
+                  onChange={e => setForm({ ...form, yearsExperience: e.target.value })} className={`${field} max-w-[160px]`} />
+                <p className={hint}>BTP checks this against your LinkedIn or other evidence during review.</p>
+              </div>
+              <div>
+                <label htmlFor="handle" className={label}>Your handle</label>
+                <div className="flex gap-2">
+                  <input id="handle" value={form.handle} onChange={e => setForm({ ...form, handle: e.target.value })} maxLength={30} className={field} />
+                  <button type="button" onClick={() => void suggestHandle(true)} className="whitespace-nowrap rounded-lg border border-[rgba(232,204,148,0.38)] px-4 text-sm text-[#e8cc94] hover:bg-[rgba(201,166,107,0.08)]">Shuffle</button>
+                </div>
+                <p className={hint}>We picked a random one. Keep it, shuffle, or type your own. Never use your real name or employer.</p>
+              </div>
+              <button type="button" onClick={next} disabled={busy} className="btn-primary w-full rounded py-3 text-sm uppercase tracking-[0.16em] disabled:opacity-50">{busy ? 'Saving…' : 'Next: confirm it is you →'}</button>
             </div>
-
-            <div>
-              <label className="block text-sm font-medium mb-2">
-                Display handle <span className="text-red-500">*</span>
-              </label>
-              <input
-                type="text"
-                value={formData.anonymousHandle}
-                onChange={(e) => setFormData({ ...formData, anonymousHandle: e.target.value })}
-                placeholder="Choose a unique anonymous handle"
-                minLength={3}
-                className="w-full p-3 bg-gray-800 border border-gray-700 rounded-lg focus:border-blue-500 focus:outline-none"
-              />
-              <p className="text-xs text-gray-500 mt-1">
-                Shown to members instead of your name. Do not use your real name or employer (min 3 characters).
-              </p>
-            </div>
-
-            <button
-              onClick={handleStep2Next}
-              disabled={loading}
-              className="w-full py-3 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-600 rounded-lg font-medium transition-colors"
-            >
-              {loading ? 'Saving...' : 'Continue'}
-            </button>
-          </div>
+          </section>
         )}
 
-        {step === 3 && <div className="space-y-4 rounded-lg bg-slate-800 p-6"><h2 className="text-xl">Profile submitted for review</h2><p>BTP reviews professional verification privately during beta. Signing in verifies your account access; membership approval is a separate review. BTP will contact you by email once your membership has been reviewed.</p><button onClick={() => router.push('/situations')} className="rounded bg-blue-600 px-4 py-2">Continue</button></div>}
+        {step === 'verify' && (
+          <section>
+            <h1 className="mb-2 text-4xl text-[#fff6ea]">Confirm <span className="text-[#e8cc94]">it is you.</span></h1>
+            <p className="mb-6 text-slate-400">Choose one. BTP uses it only to confirm you work in clinical research, then deletes it as soon as your membership is approved. It is never shown to members.</p>
+            <div className="mb-5 grid grid-cols-3 gap-3" role="radiogroup" aria-label="Verification method">
+              {([['linkedin', 'LinkedIn profile'], ['work_email', 'Work email'], ['vouch', 'A verified colleague']] as Array<[Method, string]>).map(([m, name]) => (
+                <button key={m} type="button" role="radio" aria-checked={method === m} onClick={() => { setMethod(m); setError(''); }}
+                  className={`rounded-xl border p-4 text-left text-sm ${method === m ? 'border-[rgba(232,204,148,0.55)] bg-[rgba(201,166,107,0.1)] text-[#fff6ea]' : 'border-white/10 text-[#d9ccbd]'}`}>{name}</button>
+              ))}
+            </div>
+            <div className="space-y-4 rounded-2xl border border-white/[0.08] bg-gradient-to-br from-white/[0.055] to-white/[0.012] p-6">
+              {method === 'vouch' ? (
+                vouchLink || vouchState !== 'none' ? (
+                  <div>
+                    {vouchState === 'vouched'
+                      ? <p className="text-sm text-[#8fc79a]">A verified member has vouched for you. BTP will finish your review.</p>
+                      : <p className="text-sm text-[#f1e7da]">Send this private link to a BTP member who worked with you. They sign in, read your note and vouch. It works once and expires in 14 days.</p>}
+                    {vouchLink && vouchState !== 'vouched' && (
+                      <div className="mt-4 flex gap-2">
+                        <input readOnly value={vouchLink} className={`${field} font-mono text-xs`} onFocus={e => e.currentTarget.select()} />
+                        <button type="button" onClick={copyLink} className="whitespace-nowrap rounded-lg border border-[rgba(232,204,148,0.38)] px-4 text-sm text-[#e8cc94]">{copied ? 'Copied' : 'Copy'}</button>
+                      </div>
+                    )}
+                    {vouchState !== 'vouched' && <button type="button" onClick={checkVouch} className="mt-3 text-sm text-[#e8cc94] hover:underline">Check if they have vouched</button>}
+                  </div>
+                ) : (
+                  <div>
+                    <label htmlFor="vn" className={label}>How you worked together</label>
+                    <textarea id="vn" rows={4} maxLength={500} value={vouchNote} onChange={e => setVouchNote(e.target.value)} placeholder="e.g. We were coordinators on the same oncology team, 2016 to 2020." className={field} />
+                    <p className={hint}>Only your colleague and the BTP reviewer see this note. It is deleted once you are approved. For people between roles or without a work email.</p>
+                    <button type="button" onClick={createVouchLink} disabled={busy || vouchNote.trim().length < 20} className="btn-primary mt-4 w-full rounded py-3 text-sm uppercase tracking-[0.16em] disabled:opacity-50">{busy ? 'Creating…' : 'Create my vouch link'}</button>
+                  </div>
+                )
+              ) : method === 'linkedin' ? (
+                proofCode ? (
+                  <div>
+                    <p className="text-sm text-[#f1e7da]">Add this code anywhere in your LinkedIn headline or About section until you are approved:</p>
+                    <p className="my-4 text-center font-mono text-3xl tracking-[0.2em] text-[#e8cc94]">{proofCode}</p>
+                    <p className={hint}>It proves the profile is yours. Remove it after you hear from BTP. BTP also checks your years of experience on that profile.</p>
+                  </div>
+                ) : (
+                  <div>
+                    <label htmlFor="li" className={label}>Your LinkedIn profile link</label>
+                    <input id="li" type="url" value={form.linkedinUrl} onChange={e => setForm({ ...form, linkedinUrl: e.target.value })} placeholder="https://www.linkedin.com/in/your-name" className={field} />
+                    <button type="button" onClick={submitLinkedIn} disabled={busy} className="btn-primary mt-4 w-full rounded py-3 text-sm uppercase tracking-[0.16em] disabled:opacity-50">{busy ? 'Saving…' : 'Get my code'}</button>
+                  </div>
+                )
+              ) : emailVerified ? (
+                <p className="text-sm text-[#8fc79a]">Work email confirmed. BTP deletes the address once your membership is approved and keeps only a scrambled marker so it can&apos;t be reused.</p>
+              ) : (
+                <div>
+                  <label htmlFor="we" className={label}>Your work email</label>
+                  <div className="flex gap-2">
+                    <input id="we" type="email" value={workEmail} onChange={e => setWorkEmail(e.target.value)} placeholder="you@yourcompany.com" className={field} />
+                    <button type="button" onClick={sendEmailCode} disabled={busy || !workEmail.trim()} className="whitespace-nowrap rounded-lg border border-[rgba(232,204,148,0.38)] px-4 text-sm text-[#e8cc94] disabled:opacity-50">{codeSent ? 'Resend link' : 'Send link'}</button>
+                  </div>
+                  {codeSent && <p className="mt-3 text-sm text-[#f1e7da]">Check that inbox and click the link. It expires in 30 minutes. You can open it on any device.</p>}
+                  <p className={hint}>Personal addresses like Gmail are not accepted. Between roles? Use the LinkedIn option instead.</p>
+                </div>
+              )}
+              <button type="button" onClick={() => setStep('done')} disabled={!canFinish} className="btn-primary w-full rounded py-3 text-sm uppercase tracking-[0.16em] disabled:opacity-40">Submit for review →</button>
+              <button type="button" onClick={() => setStep('profile')} className="w-full text-sm text-slate-400 hover:text-white">← Back to profile</button>
+            </div>
+          </section>
+        )}
 
-        {/* Footer Info */}
-        <div className="mt-8 text-center text-sm text-gray-500">
-          <p>Your profile is reviewed privately before community access is approved.</p>
-          <p>Community access requires approval.</p>
-        </div>
+        {step === 'done' && (
+          <section className="rounded-2xl border border-[rgba(232,204,148,0.3)] bg-gradient-to-br from-[rgba(201,166,107,0.1)] to-white/[0.02] p-6">
+            <h1 className="mb-3 text-3xl text-[#fff6ea]">Submitted for <span className="text-[#e8cc94]">review.</span></h1>
+            <p className="text-slate-300">A person at BTP reviews every member privately. You will get an email when your membership is approved, and your LinkedIn link or work email is deleted at that point.</p>
+            <button type="button" onClick={() => router.push('/situations')} className="btn-primary mt-5 rounded px-5 py-3 text-sm uppercase tracking-[0.16em]">Continue</button>
+          </section>
+        )}
       </div>
     </div>
   );

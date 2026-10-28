@@ -1,5 +1,5 @@
-import { randomBytes } from 'node:crypto';
 import { prisma } from '@/lib/prisma';
+import { generateHandle } from '@/lib/handle-words';
 
 /** Placeholder role category for accounts that have signed in but not finished onboarding. */
 export const UNSPECIFIED_ROLE = 'unspecified';
@@ -39,7 +39,7 @@ export async function ensureMemberRecord(clerkId: string) {
 
   const email = await primaryEmail(clerkId);
   for (let attempt = 0; attempt < 5; attempt++) {
-    const handle = `member-${randomBytes(3).toString('hex')}`;
+    const handle = generateHandle(attempt > 1);
     try {
       return await prisma.user.create({
         data: {

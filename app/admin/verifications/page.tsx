@@ -15,6 +15,13 @@ type UserWithProfile = {
   verificationMethod: string | null;
   verifiedEmail: string | null;
   linkedinUrl: string | null;
+  linkedinProofCode?: string | null;
+  yearsExperience?: number | null;
+  workEmailPending?: string | null;
+  workEmailVerifiedAt?: string | null;
+  vouchNote?: string | null;
+  vouchedAt?: string | null;
+  vouchedBy?: string | null;
   roleCategory: string | null;
   isFoundingOperator?: boolean;
   companyType: string | null;
@@ -213,7 +220,12 @@ export default function AdminVerificationsPage() {
                           </a>
                         </p>
                       )}
-                      <p>Role: {u.roleCategory || u.companyType || 'Not specified'}</p>
+                      <p>Years of experience (self-reported): {u.yearsExperience ?? 'not given'}</p>
+                      {u.linkedinProofCode && <p>LinkedIn ownership code: <span className="font-mono text-amber-300">{u.linkedinProofCode}</span> (check it appears on the profile above)</p>}
+                      {u.workEmailPending && <p>Work email: {u.workEmailPending} {u.workEmailVerifiedAt ? <span className="text-emerald-400">· confirmed by email link</span> : <span className="text-amber-300">· link not yet clicked</span>}</p>}
+                      {u.vouchedAt && <p>Vouched for by verified member <span className="text-emerald-400">{u.vouchedBy}</span> on {new Date(u.vouchedAt).toLocaleDateString()}</p>}
+                      {u.vouchNote && <p>Their note: <span className="italic">{u.vouchNote}</span>{!u.vouchedAt && <span className="text-amber-300"> · waiting for a colleague to vouch</span>}</p>}
+                      {u.verificationStatus === 'Pending' && <p className="text-xs text-gray-500">Approving deletes the LinkedIn link, ownership code and work email from BTP.</p>}
                       <p className="text-xs mt-1">Joined: {new Date(u.createdAt).toLocaleDateString()}</p>
                     </div>
                   </div>

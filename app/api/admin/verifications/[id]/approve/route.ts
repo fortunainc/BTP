@@ -3,6 +3,17 @@ import { NextResponse } from 'next/server';
 import { withAuth } from '@/lib/api-auth';
 import { prisma } from '@/lib/prisma';
 import { logAuditEvent, AuditEventType } from '@/lib/audit-logging';
+import { sendEmail } from '@/lib/mailer';
+
+async function signInEmail(clerkId: string): Promise<string | null> {
+  try {
+    const { clerkClient } = await import('@clerk/nextjs/server');
+    const u = await (await clerkClient()).users.getUser(clerkId);
+    return (u.emailAddresses.find(e => e.id === u.primaryEmailAddressId) ?? u.emailAddresses[0])?.emailAddress ?? null;
+  } catch {
+    return null;
+  }
+}
 
 export const POST = withAuth(async (req, user) => {
     try {
@@ -43,10 +54,24 @@ export const POST = withAuth(async (req, user) => {
           verificationMethod,
           verifiedBy: user.id,
           verifiedAt: new Date(),
+          // Delete identity evidence once it has done its job.
+          linkedinUrl: null,
+          linkedinProofCode: null,
+          workEmailPending: null,
+          workEmailTokenHash: null,
+          workEmailTokenExpires: null,
+          vouchNote: null,
+          vouchTokenHash: null,
+          vouchTokenExpires: null,
         },
       });
 
       if (targetUser.verificationStatus !== 'Approved') {
+        const loginEmail = targetUser.clerkId ? await signInEmail(targetUser.clerkId) : null;
+        if (loginEmail) {
+          await sendEmail(loginEmail, 'Your BTP membership is approved',
+            `Welcome to Behind the Protocol.\n\nYour membership is approved and the community is open to you: https://btp-rho-seven.vercel.app/sign-in\n\nYou appear to members only by your handle and verified role. The LinkedIn link or work email you used for verification has now been deleted from BTP.\n\nQuestions? Reply to fortunaindustriesinc@gmail.com.`);
+        }
         await prisma.notification.create({
           data: {
             userId,
