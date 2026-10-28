@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useAuth } from '@/components/AuthContext';
 
 type Step = 'profile' | 'verify' | 'done';
-type Method = 'linkedin' | 'work_email';
+type Method = 'linkedin' | 'work_email' | 'vouch';
 
 const ROLES: Array<[string, string]> = [
   ['CRA', 'Clinical Research Associate'], ['CRC', 'Clinical Research Coordinator'], ['PI', 'Principal Investigator'],
@@ -25,6 +25,10 @@ export default function OnboardingPage() {
   const [error, setError] = useState('');
   const [form, setForm] = useState({ roleCategory: '', companyType: '', yearsExperience: '', handle: '', linkedinUrl: '' });
   const [method, setMethod] = useState<Method>('linkedin');
+  const [vouchNote, setVouchNote] = useState('');
+  const [vouchLink, setVouchLink] = useState('');
+  const [vouchState, setVouchState] = useState<'none' | 'waiting' | 'vouched'>('none');
+  const [copied, setCopied] = useState(false);
   const [proofCode, setProofCode] = useState<string | null>(null);
   const [workEmail, setWorkEmail] = useState('');
   const [codeSent, setCodeSent] = useState(false);
@@ -90,12 +94,27 @@ export default function OnboardingPage() {
     try { const data = await saveProfile(form.linkedinUrl.trim()); setProofCode(data.linkedinProofCode ?? null); } catch (e) { setError((e as Error).message); } finally { setBusy(false); }
   }
 
+  async function createVouchLink() {
+    setBusy(true); setError('');
+    try { const data = await post('/api/user/vouch-request', { note: vouchNote }); setVouchLink(data.link); setVouchState('waiting'); } catch (e) { setError((e as Error).message); } finally { setBusy(false); }
+  }
+
+  async function checkVouch() {
+    const res = await fetch('/api/user/vouch-request').catch(() => null);
+    const data = res?.ok ? await res.json() : null;
+    if (data?.status) setVouchState(data.status);
+  }
+
+  async function copyLink() {
+    try { await navigator.clipboard.writeText(vouchLink); setCopied(true); } catch { setCopied(false); }
+  }
+
   async function sendEmailCode() {
     setBusy(true); setError('');
     try { await post('/api/user/work-email/send', { email: workEmail }); setCodeSent(true); } catch (e) { setError((e as Error).message); } finally { setBusy(false); }
   }
 
-  const canFinish = method === 'linkedin' ? Boolean(proofCode) : emailVerified;
+  const canFinish = method === 'linkedin' ? Boolean(proofCode) : method === 'vouch' ? vouchState !== 'none' : emailVerified;
   const steps: Array<[Step, string]> = [['profile', 'Your profile'], ['verify', 'Confirm it is you'], ['done', 'Review']];
   const at = steps.findIndex(([s]) => s === step);
 
@@ -153,14 +172,36 @@ export default function OnboardingPage() {
           <section>
             <h1 className="mb-2 text-4xl text-[#fff6ea]">Confirm <span className="text-[#e8cc94]">it is you.</span></h1>
             <p className="mb-6 text-slate-400">Choose one. BTP uses it only to confirm you work in clinical research, then deletes it as soon as your membership is approved. It is never shown to members.</p>
-            <div className="mb-5 grid grid-cols-2 gap-3" role="radiogroup" aria-label="Verification method">
-              {([['linkedin', 'LinkedIn profile'], ['work_email', 'Work email']] as Array<[Method, string]>).map(([m, name]) => (
+            <div className="mb-5 grid grid-cols-3 gap-3" role="radiogroup" aria-label="Verification method">
+              {([['linkedin', 'LinkedIn profile'], ['work_email', 'Work email'], ['vouch', 'A verified colleague']] as Array<[Method, string]>).map(([m, name]) => (
                 <button key={m} type="button" role="radio" aria-checked={method === m} onClick={() => { setMethod(m); setError(''); }}
                   className={`rounded-xl border p-4 text-left text-sm ${method === m ? 'border-[rgba(232,204,148,0.55)] bg-[rgba(201,166,107,0.1)] text-[#fff6ea]' : 'border-white/10 text-[#d9ccbd]'}`}>{name}</button>
               ))}
             </div>
             <div className="space-y-4 rounded-2xl border border-white/[0.08] bg-gradient-to-br from-white/[0.055] to-white/[0.012] p-6">
-              {method === 'linkedin' ? (
+              {method === 'vouch' ? (
+                vouchLink || vouchState !== 'none' ? (
+                  <div>
+                    {vouchState === 'vouched'
+                      ? <p className="text-sm text-[#8fc79a]">A verified member has vouched for you. BTP will finish your review.</p>
+                      : <p className="text-sm text-[#f1e7da]">Send this private link to a BTP member who worked with you. They sign in, read your note and vouch. It works once and expires in 14 days.</p>}
+                    {vouchLink && vouchState !== 'vouched' && (
+                      <div className="mt-4 flex gap-2">
+                        <input readOnly value={vouchLink} className={`${field} font-mono text-xs`} onFocus={e => e.currentTarget.select()} />
+                        <button type="button" onClick={copyLink} className="whitespace-nowrap rounded-lg border border-[rgba(232,204,148,0.38)] px-4 text-sm text-[#e8cc94]">{copied ? 'Copied' : 'Copy'}</button>
+                      </div>
+                    )}
+                    {vouchState !== 'vouched' && <button type="button" onClick={checkVouch} className="mt-3 text-sm text-[#e8cc94] hover:underline">Check if they have vouched</button>}
+                  </div>
+                ) : (
+                  <div>
+                    <label htmlFor="vn" className={label}>How you worked together</label>
+                    <textarea id="vn" rows={4} maxLength={500} value={vouchNote} onChange={e => setVouchNote(e.target.value)} placeholder="e.g. We were coordinators on the same oncology team, 2016 to 2020." className={field} />
+                    <p className={hint}>Only your colleague and the BTP reviewer see this note. It is deleted once you are approved. For people between roles or without a work email.</p>
+                    <button type="button" onClick={createVouchLink} disabled={busy || vouchNote.trim().length < 20} className="btn-primary mt-4 w-full rounded py-3 text-sm uppercase tracking-[0.16em] disabled:opacity-50">{busy ? 'Creating…' : 'Create my vouch link'}</button>
+                  </div>
+                )
+              ) : method === 'linkedin' ? (
                 proofCode ? (
                   <div>
                     <p className="text-sm text-[#f1e7da]">Add this code anywhere in your LinkedIn headline or About section until you are approved:</p>

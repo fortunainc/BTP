@@ -60,6 +60,9 @@ export const POST = withAuth(async (req, user) => {
           workEmailPending: null,
           workEmailTokenHash: null,
           workEmailTokenExpires: null,
+          vouchNote: null,
+          vouchTokenHash: null,
+          vouchTokenExpires: null,
         },
       });
 

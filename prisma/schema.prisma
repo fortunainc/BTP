@@ -46,6 +46,11 @@ model User {
   workEmailTokenHash   String? @unique // Hash of the one-click confirmation link token
   workEmailTokenExpires DateTime?
   workEmailHash        String? @unique // Keyed one-way hash of the confirmed work email; prevents reuse, cannot be reversed
+  vouchTokenHash       String? @unique // Hash of the link a member shares with a verified former colleague
+  vouchTokenExpires    DateTime?
+  vouchNote            String? // How they worked together; shown to the voucher and reviewer, deleted at approval
+  vouchedById          String? // Verified member who vouched
+  vouchedAt            DateTime?
   workEmailVerifiedAt  DateTime? // When the member proved access to a work email
 
   // Email Verification
