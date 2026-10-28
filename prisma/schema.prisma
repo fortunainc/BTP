@@ -38,6 +38,14 @@ model User {
   verifiedBy         String? // Admin user ID who approved
   verifiedAt         DateTime?
   rejectionReason    String? // If rejected
+  yearsExperience    Int? // Self-reported at onboarding; checked against LinkedIn or other evidence at review
+
+  // Temporary proof of identity ownership. Cleared when membership is approved.
+  linkedinProofCode    String? // One-time code the member adds to their LinkedIn profile during review
+  workEmailPending     String? // Work email being verified; deleted at approval
+  workEmailCodeHash    String? // Hash of the emailed code
+  workEmailCodeExpires DateTime?
+  workEmailVerifiedAt  DateTime? // When the member proved access to a work email
 
   // Email Verification
   email         String?
