@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import { Newsreader, Inter, Cormorant_Garamond } from 'next/font/google';
 import HomeReveal from '@/components/marketing/HomeReveal';
+import TrafficBeacon from '@/components/TrafficBeacon';
 import { HOME_HTML } from '@/components/marketing/home-markup';
 import './home.css';
 
@@ -15,7 +16,7 @@ export default function HomePage() {
     <div className={`bh ${serif.variable} ${sans.variable} ${signet.variable}`}>
       {/* Approved static design; content is authored in home-markup.ts, never user supplied. */}
       <div dangerouslySetInnerHTML={{ __html: HOME_HTML }} />
-      <HomeReveal />
+      <HomeReveal /><TrafficBeacon path="/" />
     </div>
   );
 }

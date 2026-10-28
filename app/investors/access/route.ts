@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createInvestorSession, INVESTOR_COOKIE, investorConfig, SESSION_SECONDS, verifyInvestorPassword } from '@/lib/investor-auth';
 import { checkWriteRateLimit } from '@/lib/write-rate-limit';
+import { recordTraffic } from '@/lib/traffic';
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 const headers = { 'Cache-Control': 'private, no-store, max-age=0', 'X-Robots-Tag': 'noindex, nofollow, noarchive', 'Referrer-Policy': 'no-referrer' };
@@ -22,7 +23,8 @@ export async function POST(request: NextRequest) {
     const budget = await checkWriteRateLimit('investor-room-global-login-v1', '/investors/access');
     if (!budget.allowed) return new NextResponse('Too many attempts. Please try again shortly.', {status:429, headers:{...headers,'Retry-After':String(budget.retryAfter)}});
     const password = new URLSearchParams(Buffer.concat(chunks).toString('utf8')).get('password') || '';
-    if (!verifyInvestorPassword(password)) return NextResponse.redirect(new URL('/investors?error=access', request.url), { status:303, headers });
+    if (!verifyInvestorPassword(password)) { await recordTraffic('investor_room_failed', request.headers, '/investors'); return NextResponse.redirect(new URL('/investors?error=access', request.url), { status:303, headers }); }
+    await recordTraffic('investor_room_login', request.headers, '/investors');
     const response = NextResponse.redirect(new URL('/investors', request.url), { status:303, headers });
     response.cookies.set(INVESTOR_COOKIE, createInvestorSession(), { httpOnly:true, secure:process.env.NODE_ENV === 'production', sameSite:'strict', path:'/investors', maxAge:SESSION_SECONDS });
     return response;

@@ -10,6 +10,7 @@ const links = [
   { href: '/polls', label: 'Polls' },
   { href: '/help', label: 'Private help' },
   { href: '/notifications', label: 'Notifications' },
+  { href: '/invite', label: 'Invite' },
   { href: '/support', label: 'Support' },
 ];
 

@@ -1,5 +1,6 @@
 import { prisma } from '@/lib/prisma';
 import { generateHandle } from '@/lib/handle-words';
+import { creditReferral } from '@/lib/referrals';
 
 /** Placeholder role category for accounts that have signed in but not finished onboarding. */
 export const UNSPECIFIED_ROLE = 'unspecified';
@@ -38,6 +39,7 @@ export async function ensureMemberRecord(clerkId: string) {
   if (existing) return existing;
 
   const email = await primaryEmail(clerkId);
+  const referredById = await creditReferral(email);
   for (let attempt = 0; attempt < 5; attempt++) {
     const handle = generateHandle(attempt > 1);
     try {
@@ -46,6 +48,7 @@ export async function ensureMemberRecord(clerkId: string) {
           clerkId,
           handle,
           email,
+          ...(referredById ? { referredById } : {}),
           userRole: 'operator',
           roleCategory: UNSPECIFIED_ROLE,
           companyCategory: 'other',

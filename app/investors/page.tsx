@@ -5,6 +5,9 @@ import { Newsreader, Inter, Cormorant_Garamond } from 'next/font/google';
 import HomeReveal from '@/components/marketing/HomeReveal';
 import { decryptInvestorBrief, INVESTOR_COOKIE, investorConfig, validInvestorSession } from '@/lib/investor-auth';
 import envelope from '@/data/investor-brief.encrypted.json';
+import { headers } from 'next/headers';
+import { recordTraffic } from '@/lib/traffic';
+import TrafficBeacon from '@/components/TrafficBeacon';
 import './room.css';
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
@@ -44,6 +47,7 @@ export default async function Investors({searchParams}: {searchParams:Promise<{e
   if (!configured || !validInvestorSession(token)) {
     const params = await searchParams;
     return <Gate>
+      <TrafficBeacon path="/investors" />
       <div className="eyebrow">By invitation</div>
       <h1><span className="ln l1">The investor</span><span className="ln l2"><span className="g">room.</span></span></h1>
       <p className="sub">The business behind BTP: the problem, the model, the first product and where the company stands today. For prospective investors.</p>
@@ -60,6 +64,7 @@ export default async function Investors({searchParams}: {searchParams:Promise<{e
   try { brief = decryptInvestorBrief(envelope); } catch {
     return <Gate><div className="eyebrow">Investor room</div><h1><span className="ln l1">Briefing temporarily unavailable.</span></h1><p className="sub">Please <a href={CONTACT} style={{color:'#e8cc94'}}>contact BTP</a>. Your password has not been displayed or logged.</p></Gate>;
   }
+  await recordTraffic('investor_room_view', await headers(), '/investors');
   // Authored, encrypted briefing layout; only decrypted after a valid investor session.
   return <div className={shell} data-sentry-block data-sentry-mask>
     <div dangerouslySetInnerHTML={{ __html: brief.html ?? '' }} />

@@ -51,6 +51,8 @@ model User {
   vouchNote            String? // How they worked together; shown to the voucher and reviewer, deleted at approval
   vouchedById          String? // Verified member who vouched
   vouchedAt            DateTime?
+  referralCode         String? @unique // Personal invite link code for verified members
+  referredById         String? // Member whose invite link this person used
   workEmailVerifiedAt  DateTime? // When the member proved access to a work email
 
   // Email Verification
@@ -1293,4 +1295,17 @@ model AccountDeletionRequest {
   status String @default("REQUESTED")
   createdAt DateTime @default(now())
   completedAt DateTime?
+}
+
+// People who asked to join through a member's invite link (or BTP directly).
+model AccessRequest {
+  id         String    @id @default(cuid())
+  email      String    @unique
+  referrerId String?
+  status     String    @default("requested") // requested, invited, joined
+  createdAt  DateTime  @default(now())
+  invitedAt  DateTime?
+  joinedAt   DateTime?
+
+  @@index([referrerId])
 }
