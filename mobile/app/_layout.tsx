@@ -18,7 +18,7 @@ export default function RootLayout() {
 
   return (
     <BtpAuthProvider>
-      <StatusBar style="dark" backgroundColor={colors.background} />
+      <StatusBar style="light" backgroundColor={colors.background} />
       <Stack screenOptions={{ headerShown: false }}>
         <Stack.Screen name="(tabs)" />
         <Stack.Screen name="question/[id]" />
