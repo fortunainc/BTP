@@ -11,7 +11,7 @@ const ROLES: Array<[string, string]> = [
   ['CRA', 'Clinical Research Associate'], ['CRC', 'Clinical Research Coordinator'], ['PI', 'Principal Investigator'],
   ['PM', 'Project Manager'], ['DM', 'Data Manager'], ['RM', 'Regulatory Manager'], ['QA', 'Quality Assurance'], ['Other', 'Other'],
 ];
-const ORG_TYPES: Array<[string, string]> = [['CRO', 'CRO'], ['Site', 'Clinical site'], ['Sponsor', 'Pharma/biotech'], ['Vendor', 'Service vendor'], ['Other', 'Other']];
+const ORG_TYPES: Array<[string, string]> = [['CRO', 'CRO'], ['Site', 'Clinical site'], ['Sponsor', 'Pharma/biotech'], ['Vendor', 'Service vendor'], ['Independent', 'Independent or between roles'], ['Other', 'Other']];
 
 const label = 'mb-2 block text-[11px] font-semibold uppercase tracking-[0.18em] text-[#e6c98f]';
 const field = 'w-full rounded-lg border border-[rgba(232,204,148,0.25)] bg-black/40 p-3 text-white placeholder:text-[#9c8a78] focus:border-[#c9a66b] focus:outline-none';
@@ -27,7 +27,6 @@ export default function OnboardingPage() {
   const [method, setMethod] = useState<Method>('linkedin');
   const [proofCode, setProofCode] = useState<string | null>(null);
   const [workEmail, setWorkEmail] = useState('');
-  const [emailCode, setEmailCode] = useState('');
   const [codeSent, setCodeSent] = useState(false);
   const [emailVerified, setEmailVerified] = useState(false);
 
@@ -37,6 +36,16 @@ export default function OnboardingPage() {
   }, [user, authLoading, router]);
 
   useEffect(() => { void suggestHandle(false); }, []);
+
+  // Returning from the one-click link in the work email.
+  useEffect(() => {
+    const status = new URLSearchParams(window.location.search).get('email');
+    if (!status) return;
+    setStep('verify');
+    setMethod('work_email');
+    if (status === 'confirmed') setEmailVerified(true);
+    else setError(status === 'in-use' ? 'That work email is already linked to another BTP account.' : 'That link has expired or was already used. Send a new one.');
+  }, []);
 
   async function suggestHandle(fresh: boolean) {
     const res = await fetch(`/api/user/handle-suggestion${fresh ? '?fresh=1' : ''}`).catch(() => null);
@@ -84,11 +93,6 @@ export default function OnboardingPage() {
   async function sendEmailCode() {
     setBusy(true); setError('');
     try { await post('/api/user/work-email/send', { email: workEmail }); setCodeSent(true); } catch (e) { setError((e as Error).message); } finally { setBusy(false); }
-  }
-
-  async function verifyEmailCode() {
-    setBusy(true); setError('');
-    try { await post('/api/user/work-email/verify', { code: emailCode }); setEmailVerified(true); } catch (e) { setError((e as Error).message); } finally { setBusy(false); }
   }
 
   const canFinish = method === 'linkedin' ? Boolean(proofCode) : emailVerified;
@@ -171,24 +175,16 @@ export default function OnboardingPage() {
                   </div>
                 )
               ) : emailVerified ? (
-                <p className="text-sm text-[#8fc79a]">Work email confirmed. BTP will delete it once your membership is approved.</p>
+                <p className="text-sm text-[#8fc79a]">Work email confirmed. BTP deletes the address once your membership is approved and keeps only a scrambled marker so it can&apos;t be reused.</p>
               ) : (
                 <div>
                   <label htmlFor="we" className={label}>Your work email</label>
                   <div className="flex gap-2">
                     <input id="we" type="email" value={workEmail} onChange={e => setWorkEmail(e.target.value)} placeholder="you@yourcompany.com" className={field} />
-                    <button type="button" onClick={sendEmailCode} disabled={busy || !workEmail.trim()} className="whitespace-nowrap rounded-lg border border-[rgba(232,204,148,0.38)] px-4 text-sm text-[#e8cc94] disabled:opacity-50">{codeSent ? 'Resend' : 'Send code'}</button>
+                    <button type="button" onClick={sendEmailCode} disabled={busy || !workEmail.trim()} className="whitespace-nowrap rounded-lg border border-[rgba(232,204,148,0.38)] px-4 text-sm text-[#e8cc94] disabled:opacity-50">{codeSent ? 'Resend link' : 'Send link'}</button>
                   </div>
-                  {codeSent && (
-                    <div className="mt-4">
-                      <label htmlFor="ec" className={label}>6-digit code</label>
-                      <div className="flex gap-2">
-                        <input id="ec" inputMode="numeric" maxLength={6} value={emailCode} onChange={e => setEmailCode(e.target.value)} className={`${field} max-w-[180px] font-mono tracking-[0.3em]`} />
-                        <button type="button" onClick={verifyEmailCode} disabled={busy || emailCode.length !== 6} className="btn-primary rounded px-5 text-sm disabled:opacity-50">Confirm</button>
-                      </div>
-                    </div>
-                  )}
-                  <p className={hint}>Personal addresses like Gmail are not accepted.</p>
+                  {codeSent && <p className="mt-3 text-sm text-[#f1e7da]">Check that inbox and click the link. It expires in 30 minutes. You can open it on any device.</p>}
+                  <p className={hint}>Personal addresses like Gmail are not accepted. Between roles? Use the LinkedIn option instead.</p>
                 </div>
               )}
               <button type="button" onClick={() => setStep('done')} disabled={!canFinish} className="btn-primary w-full rounded py-3 text-sm uppercase tracking-[0.16em] disabled:opacity-40">Submit for review →</button>

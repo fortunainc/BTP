@@ -58,8 +58,8 @@ export const POST = withAuth(async (req, user) => {
           linkedinUrl: null,
           linkedinProofCode: null,
           workEmailPending: null,
-          workEmailCodeHash: null,
-          workEmailCodeExpires: null,
+          workEmailTokenHash: null,
+          workEmailTokenExpires: null,
         },
       });
 

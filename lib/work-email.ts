@@ -1,4 +1,4 @@
-import { createHash, randomInt, timingSafeEqual } from 'node:crypto';
+import { createHash, createHmac, randomBytes } from 'node:crypto';
 
 const PERSONAL_DOMAINS = new Set(['gmail.com', 'googlemail.com', 'yahoo.com', 'hotmail.com', 'outlook.com', 'live.com', 'msn.com',
   'icloud.com', 'me.com', 'mac.com', 'aol.com', 'proton.me', 'protonmail.com', 'gmx.com', 'mail.com', 'yandex.com', 'zoho.com']);
@@ -13,16 +13,17 @@ export function isWorkEmail(email: string): boolean {
   return !PERSONAL_DOMAINS.has(email.split('@')[1] ?? '');
 }
 
-export function newCode(): string {
-  return String(randomInt(0, 1_000_000)).padStart(6, '0');
+/** A long random token for the one-click confirmation link. */
+export function newToken(): string {
+  return randomBytes(32).toString('base64url');
 }
 
-export function hashCode(userId: string, code: string): string {
-  return createHash('sha256').update(`btp-work-email-v1:${userId}:${code}`).digest('hex');
+export function hashToken(token: string): string {
+  return createHash('sha256').update(`btp-work-email-link-v1:${token}`).digest('hex');
 }
 
-export function codeMatches(userId: string, code: string, storedHash: string): boolean {
-  const a = Buffer.from(hashCode(userId, code), 'hex');
-  const b = Buffer.from(storedHash, 'hex');
-  return a.length === b.length && timingSafeEqual(a, b);
+/** Keyed one-way hash of a work email, so the same address cannot verify two accounts and the address itself is not kept. */
+export function hashEmail(email: string): string {
+  const secret = process.env.IDENTITY_HASH_SECRET || process.env.CLERK_SECRET_KEY || '';
+  return createHmac('sha256', `btp-identity-v1:${secret}`).update(email).digest('hex');
 }

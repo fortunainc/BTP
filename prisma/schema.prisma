@@ -43,8 +43,9 @@ model User {
   // Temporary proof of identity ownership. Cleared when membership is approved.
   linkedinProofCode    String? // One-time code the member adds to their LinkedIn profile during review
   workEmailPending     String? // Work email being verified; deleted at approval
-  workEmailCodeHash    String? // Hash of the emailed code
-  workEmailCodeExpires DateTime?
+  workEmailTokenHash   String? @unique // Hash of the one-click confirmation link token
+  workEmailTokenExpires DateTime?
+  workEmailHash        String? @unique // Keyed one-way hash of the confirmed work email; prevents reuse, cannot be reversed
   workEmailVerifiedAt  DateTime? // When the member proved access to a work email
 
   // Email Verification
