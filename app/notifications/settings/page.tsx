@@ -204,7 +204,7 @@ export default function NotificationSettingsPage() {
 
   if (loading || !user || isLoading) {
     return (
-      <div className="min-h-screen bg-slate-950 flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center">
         <Loader2 className="w-8 h-8 text-cyan-500 animate-spin" />
       </div>
     );
@@ -212,14 +212,14 @@ export default function NotificationSettingsPage() {
 
   if (!settings) {
     return (
-      <div className="min-h-screen bg-slate-950 flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center">
         <p className="text-slate-400">Failed to load settings</p>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-slate-950">
+    <div className="min-h-screen">
       {/* Header */}
       <div className="border-b border-slate-800 bg-slate-900/50">
         <div className="max-w-2xl mx-auto px-4 py-4">

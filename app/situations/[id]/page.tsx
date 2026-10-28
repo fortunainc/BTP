@@ -242,7 +242,7 @@ export default function SituationDetailPage({ params }: { params: Promise<{ id: 
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-slate-950 flex justify-center items-center">
+      <div className="min-h-screen flex justify-center items-center">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-cyan-500"></div>
       </div>
     );
@@ -250,7 +250,7 @@ export default function SituationDetailPage({ params }: { params: Promise<{ id: 
 
   if (pendingAccess) {
     return (
-      <div className="min-h-screen bg-slate-950 flex flex-col justify-center items-center px-4">
+      <div className="min-h-screen flex flex-col justify-center items-center px-4">
         <MembershipPending />
       </div>
     );
@@ -258,7 +258,7 @@ export default function SituationDetailPage({ params }: { params: Promise<{ id: 
 
   if (error || !situation) {
     return (
-      <div className="min-h-screen bg-slate-950 flex flex-col justify-center items-center px-4">
+      <div className="min-h-screen flex flex-col justify-center items-center px-4">
         <p className="text-red-400 text-lg text-center">{error || 'Situation not found'}</p>
         <Link href="/situations" className="mt-4 text-cyan-400 hover:text-cyan-300">
           ← Back to Community Questions
@@ -268,7 +268,7 @@ export default function SituationDetailPage({ params }: { params: Promise<{ id: 
   }
 
   return (
-    <div className="min-h-screen bg-slate-950">
+    <div className="min-h-screen">
       <header className="border-b border-slate-800">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <Link href="/situations" className="text-cyan-400 hover:text-cyan-300 text-sm font-medium">
@@ -291,19 +291,9 @@ export default function SituationDetailPage({ params }: { params: Promise<{ id: 
           </div>
         )}
 
-        <article className="bg-slate-900 rounded-xl shadow-sm border border-slate-800 overflow-hidden">
+        <article className="overflow-hidden rounded-2xl border border-white/[0.08] bg-gradient-to-br from-white/[0.055] to-white/[0.012] shadow-[inset_0_1px_0_rgba(255,255,255,0.06)]">
           <div className="p-6">
             <div className="flex flex-wrap items-center gap-2 mb-4">
-              {situation.therapeuticArea && (
-                <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-cyan-500/10 text-cyan-300 border border-cyan-500/20">
-                  {situation.therapeuticArea.replace('_', ' ')}
-                </span>
-              )}
-              {situation.trialPhase && (
-                <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-slate-800 text-slate-300">
-                  {situation.trialPhase}
-                </span>
-              )}
               {situation.resolutionStatus && (
                 <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-amber-500/10 text-amber-300 border border-amber-500/20">
                   {situation.resolutionStatus}
@@ -312,13 +302,14 @@ export default function SituationDetailPage({ params }: { params: Promise<{ id: 
               <span className="text-sm text-slate-500 ml-auto">{situation.timeLabel}</span>
             </div>
 
-            <h1 className="text-2xl font-bold text-white mb-4">{situation.title}</h1>
+            <h1 className="mb-4 text-3xl leading-tight text-[#fff6ea]">{situation.title}</h1>
 
             <div className="prose prose-invert max-w-none">
               <p className="whitespace-pre-wrap text-slate-300">{situation.description}</p>
               <div className="mt-4">
                 <PatternSignals contributionId={id} />
               </div>
+              <a href="#answer" className="btn-primary not-prose mt-5 inline-flex items-center gap-2 rounded px-5 py-3 text-xs uppercase tracking-[0.16em] no-underline">Answer this question</a>
             </div>
 
             <div className="mt-8 pt-6 border-t border-slate-800">
@@ -331,7 +322,7 @@ export default function SituationDetailPage({ params }: { params: Promise<{ id: 
                 {answers.length > 0 ? (
                   <div className="mt-4 space-y-3">
                     {answers.map((answer) => (
-                      <div key={answer.id} className="rounded-lg border border-slate-800 bg-slate-950 p-4">
+                      <div key={answer.id} className="rounded-2xl border border-white/[0.08] bg-black/30 p-4">
                         <div className="flex items-center justify-between gap-3 mb-2">
                           <span className="text-xs font-medium text-cyan-300">{answer.role}</span>
                           <span className="text-xs text-slate-600">{answer.timeLabel}</span>
@@ -346,9 +337,10 @@ export default function SituationDetailPage({ params }: { params: Promise<{ id: 
                   <p className="mt-4 text-sm text-slate-500">No answers yet.</p>
                 )}
 
-                <div className="mt-5 rounded-lg border border-slate-800 bg-slate-950 p-4">
-                  <label className="block text-sm font-medium text-white mb-2">Answer from your experience</label>
+                <div id="answer" className="mt-5 scroll-mt-24 rounded-2xl border border-white/[0.08] bg-black/30 p-4">
+                  <label htmlFor="answer-text" className="mb-2 block text-[11px] font-semibold uppercase tracking-[0.18em] text-[#e6c98f]">Answer from your experience</label>
                   <textarea
+                    id="answer-text"
                     value={answerText}
                     onChange={(event) => setAnswerText(event.target.value.slice(0, 2000))}
                     rows={5}
@@ -357,11 +349,11 @@ export default function SituationDetailPage({ params }: { params: Promise<{ id: 
                     placeholder="Share what you would do, why, and any important limitations. Do not include names, employers, protocol IDs, or patient details."
                   />
                   <div className="mt-2 flex items-center justify-between">
-                    <span className="text-xs text-slate-600">{answerText.length}/2000</span>
+                    <span className="text-xs text-slate-500">Shown with your verified role only, never your name or employer · {answerText.length}/2000</span>
                     <button
                       onClick={handleSubmitAnswer}
                       disabled={submitting || !answerText.trim()}
-                      className="px-4 py-2 bg-cyan-600 text-white text-sm font-medium rounded-md hover:bg-cyan-700 disabled:opacity-50"
+                      className="btn-primary rounded px-4 py-2 text-sm disabled:opacity-50"
                     >
                       {submitting ? 'Publishing...' : 'Publish answer'}
                     </button>
@@ -369,9 +361,9 @@ export default function SituationDetailPage({ params }: { params: Promise<{ id: 
                 </div>
               </div>
 
-              <div className="mb-8 rounded-lg border border-purple-500/20 bg-purple-500/10 p-5">
-                <h2 className="text-lg font-semibold text-white">Need confidential help applying the answer?</h2>
-                <p className="text-sm text-slate-400 mt-1">Request a private expert consultation, review, or defined project.</p>
+              <div className="mb-8 rounded-2xl border border-[rgba(232,204,148,0.3)] bg-gradient-to-br from-[rgba(201,166,107,0.1)] to-white/[0.02] p-5">
+                <h2 className="text-xl text-[#fff6ea]">Need one-on-one help applying this?</h2>
+                <p className="text-sm text-slate-400 mt-1">BTP can match you, privately, with a verified professional who has handled it before. Scope, timing and any cost are agreed with you first.</p>
                 {!showHelpRequest ? (
                   <button
                     onClick={() => setShowHelpRequest(true)}
@@ -520,9 +512,9 @@ export default function SituationDetailPage({ params }: { params: Promise<{ id: 
             </div>
 
             <div className="mt-8 pt-6 border-t border-slate-800">
-              <h2 className="text-sm font-medium text-slate-300 mb-2">Close the loop later</h2>
-              <p className="text-xs text-slate-500 mb-4">
-                If this changed, resolved, or became worse, add an outcome. It improves related context without opening a discussion.
+              <h2 className="text-xl text-[#fff6ea] mb-2">Did an answer help?</h2>
+              <p className="text-sm text-slate-400 mb-4">
+                If you asked this question, tap <span className="text-[#e8cc94]">It worked</span> on the answer that helped. It moves to the top for the next person. If the situation changed later, add an outcome.
               </p>
 
               {!showOutcomeForm ? (
@@ -530,8 +522,7 @@ export default function SituationDetailPage({ params }: { params: Promise<{ id: 
                   onClick={() => setShowOutcomeForm(true)}
                   className="inline-flex items-center px-4 py-2 rounded-lg text-sm font-medium bg-emerald-500/10 text-emerald-300 border border-emerald-500/20 hover:bg-emerald-500/20"
                 >
-                  <span className="mr-2">🎯</span>
-                  Report Outcome
+                  Add an outcome
                 </button>
               ) : (
                 <div className="p-4 bg-emerald-500/10 border border-emerald-500/20 rounded-lg">

@@ -1,9 +1,7 @@
 'use client';
 
 import { useSignIn } from '@clerk/nextjs';
-import Image from 'next/image';
 import { FormEvent, useState } from 'react';
-import appIcon from '../../../mobile/assets/brand/app-icon.png';
 
 const SUPPORT_EMAIL = 'fortunaindustriesinc@gmail.com';
 
@@ -125,54 +123,55 @@ export default function SignInPage() {
   const disabled = loading || busy || !email.trim() || !password;
 
   return (
-    <main className="min-h-screen bg-[#EFE6D8] px-5 py-10 text-[#3A1A1E] sm:flex sm:items-center sm:justify-center">
-      <section className="mx-auto w-full max-w-md overflow-hidden rounded-[28px] border border-[#D8C7B8] bg-[#FFFDFC] shadow-[0_24px_70px_rgba(58,26,30,0.14)]">
-        <div className="bg-[#3A1A1E] px-8 py-8 text-center">
-          <Image src={appIcon} alt="Behind The Protocol" className="mx-auto h-20 w-20 rounded-[20px]" priority />
-          <p className="mt-5 font-serif text-2xl italic tracking-wide text-[#C9A66B]">Behind The Protocol</p>
-          <p className="mt-2 text-sm text-[#EFE6D8]/75">Founder and member access</p>
+    <main className="min-h-screen px-5 py-10 text-[#f2eadf] sm:flex sm:items-center sm:justify-center">
+      <section className="mx-auto w-full max-w-md overflow-hidden rounded-[22px] border border-[rgba(232,204,148,0.25)] bg-gradient-to-br from-white/[0.07] to-white/[0.015] shadow-[0_40px_80px_-30px_rgba(0,0,0,0.9)] backdrop-blur-md">
+        <div className="flex items-center gap-3 px-7 pt-8 sm:px-9">
+          <span className="rounded-[9px] border border-[rgba(240,214,165,0.35)] bg-gradient-to-br from-white/10 to-white/[0.02] px-2.5 font-signet text-2xl leading-8 text-[#e8cc94]">BTP</span>
+          <span className="text-[10.5px] font-medium uppercase leading-tight tracking-[0.14em] text-[#d9ccbd]">Behind<br />the Protocol</span>
         </div>
 
         <div className="px-7 py-8 sm:px-9">
-          <h1 className="text-3xl font-semibold tracking-tight">Welcome back</h1>
-          <p className="mt-2 text-sm leading-6 text-[#715E5B]">Sign in with the email and password connected to your BTP account.</p>
+          <h1 className="text-4xl text-[#fff6ea]">Welcome <span className="text-[#e8cc94]">back.</span></h1>
+          <p className="mt-2 text-sm leading-6 text-[#d9ccbd]">Sign in with the email and password connected to your BTP account.</p>
 
           <form onSubmit={codeSent ? verifyCode : submit} className="mt-7 space-y-5">
-            <label className="block text-sm font-semibold">
+            <label className="block text-[11px] font-semibold uppercase tracking-[0.18em] text-[#e6c98f]">
               Email
-              <input type="email" autoComplete="email" autoCapitalize="none" value={email} onChange={(event) => setEmail(event.target.value)} placeholder="you@example.com" className="mt-2 w-full rounded-xl border border-[#D8C7B8] bg-white px-4 py-3.5 text-base text-[#3A1A1E] outline-none transition placeholder:text-[#9A8985] focus:border-[#9C7A3C] focus:ring-2 focus:ring-[#C9A66B]/30" required />
+              <input type="email" autoComplete="email" autoCapitalize="none" value={email} onChange={(event) => setEmail(event.target.value)} placeholder="you@example.com" className="mt-2 w-full rounded-lg border border-[rgba(232,204,148,0.25)] bg-black/40 px-4 py-3.5 text-base text-white outline-none transition placeholder:text-[#9c8a78] focus:border-[#c9a66b] focus:ring-2 focus:ring-[#C9A66B]/25" required />
             </label>
 
             {codeSent ? (
-              <label className="block text-sm font-semibold">
+              <label className="block text-[11px] font-semibold uppercase tracking-[0.18em] text-[#e6c98f]">
                 Sign-in code
-                <input type="text" inputMode="numeric" autoComplete="one-time-code" value={code} onChange={(event) => setCode(event.target.value)} placeholder="Enter the code from your email" className="mt-2 w-full rounded-xl border border-[#D8C7B8] bg-white px-4 py-3.5 text-base text-[#3A1A1E] outline-none transition placeholder:text-[#9A8985] focus:border-[#9C7A3C] focus:ring-2 focus:ring-[#C9A66B]/30" required />
+                <input type="text" inputMode="numeric" autoComplete="one-time-code" value={code} onChange={(event) => setCode(event.target.value)} placeholder="Enter the code from your email" className="mt-2 w-full rounded-lg border border-[rgba(232,204,148,0.25)] bg-black/40 px-4 py-3.5 text-base text-white outline-none transition placeholder:text-[#9c8a78] focus:border-[#c9a66b] focus:ring-2 focus:ring-[#C9A66B]/25" required />
               </label>
             ) : (
-              <label className="block text-sm font-semibold">
+              <label className="block text-[11px] font-semibold uppercase tracking-[0.18em] text-[#e6c98f]">
                 Password
-                <input type="password" autoComplete="current-password" value={password} onChange={(event) => setPassword(event.target.value)} placeholder="Your password" className="mt-2 w-full rounded-xl border border-[#D8C7B8] bg-white px-4 py-3.5 text-base text-[#3A1A1E] outline-none transition placeholder:text-[#9A8985] focus:border-[#9C7A3C] focus:ring-2 focus:ring-[#C9A66B]/30" />
+                <input type="password" autoComplete="current-password" value={password} onChange={(event) => setPassword(event.target.value)} placeholder="Your password" className="mt-2 w-full rounded-lg border border-[rgba(232,204,148,0.25)] bg-black/40 px-4 py-3.5 text-base text-white outline-none transition placeholder:text-[#9c8a78] focus:border-[#c9a66b] focus:ring-2 focus:ring-[#C9A66B]/25" />
               </label>
             )}
 
-            {error ? <div role="alert" className="rounded-xl border border-[#B54C4C]/30 bg-[#B54C4C]/10 px-4 py-3 text-sm leading-5 text-[#7D2F2F]">{error}</div> : null}
+            {error ? <div role="alert" className="rounded-xl border border-[#c46b6b]/40 bg-[#c46b6b]/10 px-4 py-3 text-sm leading-5 text-[#f1b7b7]">{error}</div> : null}
 
-            <button type="submit" disabled={codeSent ? loading || busy || !code.trim() : disabled} className="w-full rounded-xl bg-[#3A1A1E] px-4 py-4 text-base font-bold text-white transition hover:bg-[#51242A] disabled:cursor-not-allowed disabled:opacity-45">
+            <button type="submit" disabled={codeSent ? loading || busy || !code.trim() : disabled} className="btn-primary w-full rounded px-4 py-4 text-sm uppercase tracking-[0.16em] disabled:cursor-not-allowed disabled:opacity-45">
               {busy || loading ? 'Signing in…' : codeSent ? 'Verify and enter BTP' : 'Sign in'}
             </button>
 
             {!codeSent ? (
-              <button type="button" onClick={sendCode} disabled={loading || busy || !email.trim()} className="w-full rounded-xl border border-[#9C7A3C] bg-transparent px-4 py-3.5 text-sm font-bold text-[#3A1A1E] transition hover:bg-[#C9A66B]/10 disabled:cursor-not-allowed disabled:opacity-45">
+              <button type="button" onClick={sendCode} disabled={loading || busy || !email.trim()} className="w-full rounded border border-[rgba(232,204,148,0.38)] bg-transparent px-4 py-3.5 text-sm uppercase tracking-[0.16em] text-[#f2eadf] transition hover:bg-[#C9A66B]/10 disabled:cursor-not-allowed disabled:opacity-45">
                 Email me a sign-in code
               </button>
             ) : (
-              <button type="button" onClick={() => { signIn.reset(); setCodeSent(false); setCode(''); setError(''); }} className="w-full text-sm font-semibold text-[#715E5B] underline decoration-[#C9A66B] underline-offset-4">Start over</button>
+              <button type="button" onClick={() => { signIn.reset(); setCodeSent(false); setCode(''); setError(''); }} className="w-full text-sm font-semibold text-[#d9ccbd] underline decoration-[#C9A66B] underline-offset-4">Start over</button>
             )}
           </form>
 
-          <p className="mt-6 text-center text-xs leading-5 text-[#715E5B]">
-            BTP is invite-only. Need help?{' '}
-            <a className="font-semibold text-[#3A1A1E] underline decoration-[#C9A66B] underline-offset-4" href={`mailto:${SUPPORT_EMAIL}`}>Contact support</a>
+          <p className="mt-6 text-center text-sm leading-6 text-[#d9ccbd]">
+            New to BTP?{' '}
+            <a className="text-[#e8cc94] underline decoration-[#C9A66B] underline-offset-4" href={`mailto:${SUPPORT_EMAIL}?subject=BTP%20beta%20access`}>Request beta access</a>
+            <span className="mx-2 text-slate-600">·</span>
+            <a className="text-[#d9ccbd] underline decoration-[#C9A66B] underline-offset-4" href={`mailto:${SUPPORT_EMAIL}`}>Contact support</a>
           </p>
         </div>
       </section>

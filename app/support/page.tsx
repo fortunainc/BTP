@@ -9,7 +9,7 @@ export const metadata = {
 
 export default function SupportPage() {
   return (
-    <main className="min-h-screen bg-slate-950 px-6 py-16 text-slate-100">
+    <main className="min-h-screen px-6 py-16 text-slate-100">
       <div className="mx-auto max-w-2xl rounded-2xl border border-slate-800 bg-slate-900/70 p-8">
         <p className="mb-3 text-sm font-semibold uppercase tracking-[0.2em] text-amber-300">BTP beta</p>
         <h1 className="text-3xl font-bold">Support</h1>

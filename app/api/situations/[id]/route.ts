@@ -137,6 +137,8 @@ export const GET = withAuth(async (req, user) => {
         isAuthor: interaction.userId === user.id,
         reactions: reactions[interaction.id]?.counts,
         myReactions: reactions[interaction.id]?.mine ?? [],
-      })),
+      }))
+      // Answers the asker marked "It worked" come first, then the most helpful.
+      .sort((a, b) => ((b.reactions?.WORKED ?? 0) - (a.reactions?.WORKED ?? 0)) || ((b.reactions?.HELPFUL ?? 0) - (a.reactions?.HELPFUL ?? 0))),
   });
 }, { requireAuth: true });

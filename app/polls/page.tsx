@@ -18,7 +18,7 @@ export default function PollsPage() {
   }, []);
 
   return (
-    <main className="min-h-screen bg-slate-900 px-4 py-10 text-slate-100 sm:px-8">
+    <main className="min-h-screen px-4 py-10 text-slate-100 sm:px-8">
       <div className="mx-auto max-w-2xl">
         <h1 className="text-3xl font-bold text-white">Polls</h1>
         <p className="mt-2 text-slate-400">One tap, then see how other members answered. Results show percentages only, never who voted.</p>

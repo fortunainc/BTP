@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import { Inter, Newsreader, Cormorant_Garamond } from "next/font/google";
 import "./globals.css";
 import { ClerkProvider } from '@clerk/nextjs';
 import { AuthProvider } from "@/components/AuthContext";
@@ -8,6 +8,8 @@ import { AuthProvider } from "@/components/AuthContext";
 export const dynamic = "force-dynamic";
 
 const inter = Inter({ subsets: ["latin"] });
+const newsreader = Newsreader({ subsets: ["latin"], axes: ["opsz"], variable: "--font-newsreader", display: "swap" });
+const cormorant = Cormorant_Garamond({ subsets: ["latin"], weight: "500", style: "italic", variable: "--font-cormorant", display: "swap" });
 
 export const metadata: Metadata = {
   title: "BTP | Clinical trial experience, connected.",
@@ -32,7 +34,7 @@ export default function RootLayout({
   // In production build without env vars, render without Clerk
   if (!publishableKey) {
     return (
-      <html lang="en" className="dark">
+      <html lang="en" className={`dark ${newsreader.variable} ${cormorant.variable}`}>
         <body className={`${inter.className} bg-slate-950 text-slate-100 antialiased`}>
           {children}
         </body>
@@ -50,7 +52,7 @@ export default function RootLayout({
       signUpFallbackRedirectUrl="/onboarding"
     >
       <AuthProvider>
-        <html lang="en" className="dark">
+        <html lang="en" className={`dark ${newsreader.variable} ${cormorant.variable}`}>
           <body className={`${inter.className} bg-slate-950 text-slate-100 antialiased`}>
             {children}
           </body>

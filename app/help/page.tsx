@@ -45,13 +45,14 @@ export default function PrivateHelpPage() {
   }
 
   return (
-    <main className="min-h-screen bg-slate-900 px-4 py-10 text-slate-100 sm:px-8">
+    <main className="min-h-screen px-4 py-10 text-slate-100 sm:px-8">
       <div className="mx-auto max-w-2xl">
-        <h1 className="text-3xl font-bold text-white">Request private help</h1>
+        <p className="mb-3 text-[11px] font-semibold uppercase tracking-[0.24em] text-[#dcbc82]">Private help</p>
+        <h1 className="text-4xl text-[#fff6ea]">Private help from <span className="text-[#e8cc94]">a verified expert.</span></h1>
         <p className="mt-3 text-slate-400">
-          For questions that need a focused conversation: interview preparation, an expert consultation, or a review of a workflow.
-          No community question is required. Requests are reviewed manually during beta; any introduction requires consent from
-          both sides, and scope and any fee are agreed before help begins.
+          Need more than a public answer? Tell BTP what you&apos;re working through. We match you, privately, with a verified
+          professional who has handled it before: an expert consultation, interview preparation, or a review of a workflow.
+          Any introduction needs consent from both sides, and scope, timing and any cost are agreed with you before anything starts.
         </p>
 
         {status === 'pending' ? (

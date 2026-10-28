@@ -1,65 +1,55 @@
 @import "tailwindcss";
 
 @theme {
-  /* BehindTheProtocol Premium Professional Palette */
-  
-  /* Core neutral base - deep charcoal, not black */
-  --color-background: oklch(15% 0.015 250);
-  --color-foreground: oklch(97% 0.005 250);
-  
-  /* Card surfaces - subtle elevation */
-  --color-card: oklch(18% 0.015 250);
-  --color-card-foreground: oklch(97% 0.005 250);
-  
-  /* Primary - refined deep blue, serious and trustworthy */
-  --color-primary: oklch(48% 0.12 250);
-  --color-primary-foreground: oklch(98% 0.005 250);
-  
-  /* Secondary - muted slate, professional alternative */
-  --color-secondary: oklch(35% 0.02 250);
-  --color-secondary-foreground: oklch(97% 0.005 250);
-  
-  /* Muted - subtle gray for secondary content */
-  --color-muted: oklch(45% 0.02 250);
-  --color-muted-foreground: oklch(70% 0.015 250);
-  
-  /* Accent - teal/cyan for actions, calm but visible */
-  --color-accent: oklch(55% 0.10 210);
-  --color-accent-foreground: oklch(98% 0.005 250);
-  
-  /* Destructive - muted red, not urgent */
-  --color-destructive: oklch(55% 0.15 25);
-  --color-destructive-foreground: oklch(98% 0.005 250);
-  
-  /* Borders - subtle, professional */
-  --color-border: oklch(30% 0.02 250);
-  --color-input: oklch(25% 0.02 250);
-  --color-ring: oklch(48% 0.12 250);
-  
-  /* Semantic Colors - Professional Context */
-  
-  /* Success - muted emerald/green, calm confirmation */
-  --color-emerald-success: oklch(60% 0.12 170);
-  
-  /* Warning - amber, not alarming */
-  --color-amber-warning: oklch(75% 0.12 85);
-  
-  /* Info - calm blue, informational */
-  --color-blue-info: oklch(65% 0.10 240);
-  
-  /* Urgent - muted rose, professional attention */
-  --color-rose-urgent: oklch(62% 0.14 350);
-  
-  /* Accent Colors - Sub pops of专业 color */
-  
-  /* Teal accent for primary actions */
-  --color-teal-accent: oklch(55% 0.10 210);
-  
-  /* Indigo accent for secondary actions */
-  --color-indigo-accent: oklch(55% 0.14 265);
-  
-  /* Slate accent for tertiary elements */
-  --color-slate-accent: oklch(50% 0.08 250);
+  /* BTP cinematic palette (matches homepage and investor room): oxblood black, vellum, gilt. */
+  --color-background: #070405;
+  --color-foreground: #f2eadf;
+  --color-card: #120a09;
+  --color-card-foreground: #f2eadf;
+  --color-primary: #c9a66b;
+  --color-primary-foreground: #1c0e0b;
+  --color-secondary: #2a1d1a;
+  --color-secondary-foreground: #f2eadf;
+  --color-muted: #3d2c27;
+  --color-muted-foreground: #bfae9c;
+  --color-accent: #e8cc94;
+  --color-accent-foreground: #1c0e0b;
+  --color-destructive: #c46b6b;
+  --color-destructive-foreground: #fff6ea;
+  --color-border: rgba(232, 204, 148, 0.16);
+  --color-input: #1a1110;
+  --color-ring: #c9a66b;
+  --color-emerald-success: #8fc79a;
+  --color-amber-warning: #e8cc94;
+  --color-blue-info: #e8cc94;
+  --color-rose-urgent: #d98a8a;
+  --color-teal-accent: #c9a66b;
+  --color-indigo-accent: #c9a66b;
+  --color-slate-accent: #bfae9c;
+
+  /* Remap Tailwind neutral and cool scales to the warm BTP palette so every screen follows. */
+  --color-slate-50: #faf6f0; --color-slate-100: #f2eadf; --color-slate-200: #e8dccd; --color-slate-300: #d9ccbd;
+  --color-slate-400: #bfae9c; --color-slate-500: #9c8a78; --color-slate-600: #5a4740; --color-slate-700: #3a2a25;
+  --color-slate-800: #1f1513; --color-slate-900: #120a09; --color-slate-950: #070405;
+  --color-gray-50: #faf6f0; --color-gray-100: #f2eadf; --color-gray-200: #e8dccd; --color-gray-300: #d9ccbd;
+  --color-gray-400: #bfae9c; --color-gray-500: #9c8a78; --color-gray-600: #5a4740; --color-gray-700: #3a2a25;
+  --color-gray-800: #1f1513; --color-gray-900: #120a09; --color-gray-950: #070405;
+  --color-zinc-800: #1f1513; --color-zinc-900: #120a09; --color-zinc-950: #070405;
+  --color-blue-50: #faf3e6; --color-blue-100: #f3e6c9; --color-blue-200: #ead0a0; --color-blue-300: #f0d6a0;
+  --color-blue-400: #e8cc94; --color-blue-500: #b8955c; --color-blue-600: #876836; --color-blue-700: #6e5530;
+  --color-blue-800: #4a3a22; --color-blue-900: #2e2416; --color-blue-950: #1f180e;
+  --color-indigo-50: #faf3e6; --color-indigo-100: #f3e6c9; --color-indigo-200: #ead0a0; --color-indigo-300: #f0d6a0;
+  --color-indigo-400: #e8cc94; --color-indigo-500: #b8955c; --color-indigo-600: #876836; --color-indigo-700: #6e5530;
+  --color-indigo-800: #4a3a22; --color-indigo-900: #2e2416; --color-indigo-950: #1f180e;
+  --color-cyan-50: #faf3e6; --color-cyan-100: #f3e6c9; --color-cyan-200: #ead0a0; --color-cyan-300: #f0d6a0;
+  --color-cyan-400: #e8cc94; --color-cyan-500: #b8955c; --color-cyan-600: #876836; --color-cyan-700: #6e5530;
+  --color-cyan-800: #4a3a22; --color-cyan-900: #2e2416; --color-cyan-950: #1f180e;
+  --color-sky-400: #e8cc94; --color-sky-500: #b8955c; --color-sky-600: #876836;
+  --color-teal-400: #e8cc94; --color-teal-500: #b8955c; --color-teal-600: #876836;
+  --color-purple-400: #e8cc94; --color-purple-500: #b8955c; --color-purple-600: #876836; --color-purple-900: #2e2416;
+
+  --font-serif: var(--font-newsreader), Georgia, "Times New Roman", serif;
+  --font-signet: var(--font-cormorant), Georgia, serif;
 }
 
 /* Base styles */
@@ -69,22 +59,27 @@
 
 body {
   background-color: var(--color-background);
+  background-image: radial-gradient(60% 40% at 85% 0%, rgba(42, 22, 18, 0.9) 0%, rgba(18, 10, 9, 0.6) 40%, transparent 75%);
+  background-attachment: fixed;
   color: var(--color-foreground);
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
+/* Member app headings use the BTP serif. */
+h1, h2, h3 { font-family: var(--font-serif); font-weight: 400; letter-spacing: -0.01em; }
+.font-signet { font-family: var(--font-signet); font-style: italic; font-weight: 500; }
+
 /* Custom utility classes */
 .glass-card {
-  background-color: rgba(18, 18, 18, 0.7);
+  background: linear-gradient(160deg, rgba(255,255,255,.055), rgba(255,255,255,.012));
   backdrop-filter: blur(12px);
   border: 1px solid var(--color-border);
   border-radius: 0.75rem;
 }
 
 .text-gradient {
-  background: linear-gradient(to right, oklch(60% 0.12 250), oklch(60% 0.14 210));
+  background: linear-gradient(100deg, #d7b273, #fff3d6 50%, #d7b273);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -92,8 +87,8 @@ body {
 
 /* Primary button - professional blue */
 .btn-primary {
-  background-color: oklch(48% 0.12 250);
-  color: oklch(98% 0.005 250);
+  background: linear-gradient(135deg, #ead0a0, #c9a66b 55%, #a5844a);
+  color: #1c0e0b;
   font-weight: 500;
   padding: 0.6rem 1.2rem;
   border-radius: 0.5rem;
@@ -102,7 +97,7 @@ body {
 }
 
 .btn-primary:hover {
-  background-color: oklch(53% 0.12 250);
+  filter: brightness(1.06);
   transform: translateY(-1px);
 }
 
@@ -112,8 +107,8 @@ body {
 
 /* Secondary button - neutral slate */
 .btn-secondary {
-  background-color: oklch(35% 0.02 250);
-  color: oklch(97% 0.005 250);
+  background-color: transparent;
+  color: #f2eadf;
   font-weight: 500;
   padding: 0.6rem 1.2rem;
   border-radius: 0.5rem;
@@ -122,14 +117,14 @@ body {
 }
 
 .btn-secondary:hover {
-  background-color: oklch(40% 0.02 250);
-  border-color: oklch(45% 0.02 250);
+  background-color: rgba(201,166,107,.08);
+  border-color: rgba(232,204,148,.4);
 }
 
 /* Accent button - teal for emphasis */
 .btn-accent {
-  background-color: oklch(55% 0.10 210);
-  color: oklch(98% 0.005 250);
+  background: linear-gradient(135deg, #ead0a0, #c9a66b 55%, #a5844a);
+  color: #1c0e0b;
   font-weight: 500;
   padding: 0.6rem 1.2rem;
   border-radius: 0.5rem;
@@ -138,13 +133,13 @@ body {
 }
 
 .btn-accent:hover {
-  background-color: oklch(60% 0.10 210);
+  filter: brightness(1.06);
   transform: translateY(-1px);
 }
 
 /* Input fields - professional */
 .input-field {
-  background-color: oklch(20% 0.02 250);
+  background-color: rgba(0,0,0,.35);
   border-color: var(--color-border);
   border-radius: 0.5rem;
   padding: 0.75rem 1rem;
@@ -157,9 +152,9 @@ body {
 }
 
 .input-field:focus {
-  border-color: oklch(48% 0.12 250);
+  border-color: #c9a66b;
   outline: none;
-  box-shadow: 0 0 0 3px rgba(75, 85, 99, 0.3);
+  box-shadow: 0 0 0 3px rgba(201,166,107,.2);
 }
 
 /* Custom scrollbar - subtle */
@@ -169,16 +164,16 @@ body {
 }
 
 ::-webkit-scrollbar-track {
-  background: oklch(15% 0.015 250);
+  background: #070405;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: oklch(35% 0.02 250);
+  background: #3a2a25;
   border-radius: 3px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: oklch(45% 0.02 250);
+  background: #5a4740;
 }
 
 /* Subtle animations */
@@ -199,12 +194,12 @@ body {
 
 /* Selection color */
 ::selection {
-  background-color: oklch(55% 0.10 210);
-  color: oklch(98% 0.005 250);
+  background-color: rgba(201,166,107,.35);
+  color: #fff6ea;
 }
 
 /* Focus visible */
 :focus-visible {
-  outline: 2px solid oklch(48% 0.12 250);
+  outline: 2px solid #c9a66b;
   outline-offset: 2px;
 }
