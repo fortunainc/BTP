@@ -137,18 +137,18 @@ export default function SignInPage() {
           <form onSubmit={codeSent ? verifyCode : submit} className="mt-7 space-y-5">
             <label className="block text-[11px] font-semibold uppercase tracking-[0.18em] text-[#e6c98f]">
               Email
-              <input type="email" autoComplete="email" autoCapitalize="none" value={email} onChange={(event) => setEmail(event.target.value)} placeholder="you@example.com" className="mt-2 w-full rounded-lg border border-[rgba(232,204,148,0.25)] bg-black/40 px-4 py-3.5 text-base text-white outline-none transition placeholder:text-[#9c8a78] focus:border-[#c9a66b] focus:ring-2 focus:ring-[#C9A66B]/25" required />
+              <input type="email" autoComplete="email" autoCapitalize="none" value={email} onChange={(event) => setEmail(event.target.value)} placeholder="you@example.com" className="mt-2 w-full normal-case tracking-normal font-normal rounded-lg border border-[rgba(232,204,148,0.25)] bg-black/40 px-4 py-3.5 text-base text-white outline-none transition placeholder:text-[#9c8a78] focus:border-[#c9a66b] focus:ring-2 focus:ring-[#C9A66B]/25" required />
             </label>
 
             {codeSent ? (
               <label className="block text-[11px] font-semibold uppercase tracking-[0.18em] text-[#e6c98f]">
                 Sign-in code
-                <input type="text" inputMode="numeric" autoComplete="one-time-code" value={code} onChange={(event) => setCode(event.target.value)} placeholder="Enter the code from your email" className="mt-2 w-full rounded-lg border border-[rgba(232,204,148,0.25)] bg-black/40 px-4 py-3.5 text-base text-white outline-none transition placeholder:text-[#9c8a78] focus:border-[#c9a66b] focus:ring-2 focus:ring-[#C9A66B]/25" required />
+                <input type="text" inputMode="numeric" autoComplete="one-time-code" value={code} onChange={(event) => setCode(event.target.value)} placeholder="Enter the code from your email" className="mt-2 w-full normal-case tracking-normal font-normal rounded-lg border border-[rgba(232,204,148,0.25)] bg-black/40 px-4 py-3.5 text-base text-white outline-none transition placeholder:text-[#9c8a78] focus:border-[#c9a66b] focus:ring-2 focus:ring-[#C9A66B]/25" required />
               </label>
             ) : (
               <label className="block text-[11px] font-semibold uppercase tracking-[0.18em] text-[#e6c98f]">
                 Password
-                <input type="password" autoComplete="current-password" value={password} onChange={(event) => setPassword(event.target.value)} placeholder="Your password" className="mt-2 w-full rounded-lg border border-[rgba(232,204,148,0.25)] bg-black/40 px-4 py-3.5 text-base text-white outline-none transition placeholder:text-[#9c8a78] focus:border-[#c9a66b] focus:ring-2 focus:ring-[#C9A66B]/25" />
+                <input type="password" autoComplete="current-password" value={password} onChange={(event) => setPassword(event.target.value)} placeholder="Your password" className="mt-2 w-full normal-case tracking-normal font-normal rounded-lg border border-[rgba(232,204,148,0.25)] bg-black/40 px-4 py-3.5 text-base text-white outline-none transition placeholder:text-[#9c8a78] focus:border-[#c9a66b] focus:ring-2 focus:ring-[#C9A66B]/25" />
               </label>
             )}
 
