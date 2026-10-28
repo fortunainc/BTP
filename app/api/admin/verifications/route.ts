@@ -32,6 +32,7 @@ export async function GET(req: NextRequest) {
           vouchNote: true,
           vouchedAt: true,
           vouchedById: true,
+          referredById: true,
           roleCategory: true,
           companyCategory: true,
           createdAt: true,
@@ -58,13 +59,13 @@ export async function GET(req: NextRequest) {
       }),
     ]);
 
-    const voucherIds = [...new Set(pendingUsers.map((u) => u.vouchedById).filter((v): v is string => Boolean(v)))];
+    const voucherIds = [...new Set(pendingUsers.flatMap((u) => [u.vouchedById, u.referredById]).filter((v): v is string => Boolean(v)))];
     const vouchers = voucherIds.length
       ? await prisma.user.findMany({ where: { id: { in: voucherIds } }, select: { id: true, handle: true, roleCategory: true } })
       : [];
     const voucherById = new Map(vouchers.map((v) => [v.id, `${v.handle}${v.roleCategory ? ` (${v.roleCategory})` : ''}`]));
     return NextResponse.json({
-      pending: pendingUsers.map((u) => ({ ...u, vouchedBy: u.vouchedById ? voucherById.get(u.vouchedById) ?? 'a verified member' : null })),
+      pending: pendingUsers.map((u) => ({ ...u, vouchedBy: u.vouchedById ? voucherById.get(u.vouchedById) ?? 'a verified member' : null, referredBy: u.referredById ? voucherById.get(u.referredById) ?? 'a verified member' : null })),
       all: allUsers,
     });
   } catch (error) {

@@ -2,7 +2,10 @@
 // so schema changes ship with the code that needs them. Never runs for previews or local builds.
 import { execFileSync } from 'node:child_process';
 
-const FILES = ['prisma/migrations/20261028_verification_privacy/migration.sql'];
+const FILES = [
+  'prisma/migrations/20261028_verification_privacy/migration.sql',
+  'prisma/migrations/20261028_referrals/migration.sql',
+];
 
 if (process.env.VERCEL_ENV !== 'production' || !process.env.DATABASE_URL) {
   console.log('Skipping production migrations (not a production build).');

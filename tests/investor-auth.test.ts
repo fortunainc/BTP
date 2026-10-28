@@ -3,6 +3,7 @@ import { createCipheriv, createHash, randomBytes, scryptSync } from 'node:crypto
 import { NextRequest } from 'next/server';
 import { createInvestorSession, decryptInvestorBrief, investorConfig, SESSION_SECONDS, validInvestorSession, verifyInvestorPassword } from '@/lib/investor-auth';
 vi.mock('@/lib/write-rate-limit', () => ({checkWriteRateLimit:vi.fn()}));
+vi.mock('@/lib/traffic', () => ({recordTraffic:vi.fn(async()=>undefined)}));
 import { checkWriteRateLimit } from '@/lib/write-rate-limit';
 import { POST } from '@/app/investors/access/route';
 import { POST as logout } from '@/app/investors/logout/route';
