@@ -30,6 +30,7 @@ export default function WaitlistForm() {
     <div className="bw-trap" aria-hidden="true"><label htmlFor="website">Website</label><input id="website" name="website" tabIndex={-1} autoComplete="off"/></div>
     <label className="bw-check"><input type="checkbox" name="paid"/><span>I’m also interested in paid product reviews.<small>Optional. Help companies improve tools used in clinical trials. Each opportunity has its own scope and consent.</small></span></label>
     <label className="bw-check"><input type="checkbox" name="consent" required/><span>BTP may contact me about my access request and interests. <Link href="/privacy">Privacy policy</Link>.</span></label>
+    <p className="bw-small">BTP plans to use aggregated community insights to understand shared challenges and inform research and product evaluations. Companies do not receive your private conversations or identity. <Link href="/privacy#aggregated">Learn more</Link>.</p>
     {params.get('ref') && <p className="bw-small">You arrived through a member referral. We’ll check that it is active when you submit.</p>}
     {error && <p role="alert" className="bw-error">{error}</p>}<button disabled={busy}>{busy ? 'Saving…' : 'Join the waitlist →'}</button>
     <p className="bw-small">No account needed to join the list. Paid reviews are optional and separate from community membership.</p></form></>}</section></main>

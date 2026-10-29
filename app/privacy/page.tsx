@@ -50,11 +50,17 @@ export default function PrivacyPage() {
           <p className="mt-3 leading-7 text-[#715E5B]">BTP scans contributions for identifying details, but no automated safeguard is perfect. Members must not submit:</p>
           <ul className="mt-4 space-y-3 text-[#715E5B]">{prohibited.map((item) => <li key={item}>• {item}</li>)}</ul>
         </section>
+        <section id="aggregated" className="scroll-mt-6 rounded-2xl border border-[#D8C7B8] bg-[#FFFDFC] p-6">
+          <h2 className="text-2xl font-bold">Aggregated community insights</h2>
+          <p className="mt-4 leading-7 text-[#715E5B]">BTP plans to use aggregated insights from community discussions to identify common clinical research challenges and inform commercial research and product evaluations. Companies do not receive access to private conversations or contributors’ identities.</p>
+          <p className="mt-4 leading-7 text-[#715E5B]">Aggregated means we look for patterns across contributions, rather than sharing individual conversations. This is different from selling or sharing private conversations, which BTP does not do. The rules above still apply: confidential employer, sponsor, site, or vendor information does not belong in BTP and is not used in this work.</p>
+          <p className="mt-4 leading-7 text-[#715E5B]">Taking part in a paid product review is optional and separate from ordinary community participation. You never need to join a review to ask questions, answer them, or stay a member.</p>
+        </section>
         <section className="space-y-4 border-t border-[#D8C7B8] pt-8 text-sm leading-6 text-[#715E5B]">
           <p>BTP does not promise absolute anonymity. Content details, employer monitoring, legal process, or a security incident could create re-identification risk. We minimize that risk through generalized labels, access controls, redaction, and private moderation.</p>
           <p>BTP does not sell identifiable member activity or ordinary community conversations. Paid research or sponsored participation requires separate, explicit opt-in.</p>
           <p>To request access, correction, export, or deletion of account data, email <a className="font-semibold underline" href="mailto:fortunaindustriesinc@gmail.com">fortunaindustriesinc@gmail.com</a>.</p>
-          <p>Last updated: October 16, 2026.</p>
+          <p>Last updated: October 29, 2026.</p>
         </section>
       </div>
     </main>
