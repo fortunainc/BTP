@@ -43,6 +43,8 @@ export default function middleware(req: NextRequest, event: NextFetchEvent) {
   if (process.env.VERCEL_ENV === 'preview' && process.env.BTP_PREVIEW_DATABASE_ISOLATED !== 'true' && req.nextUrl.pathname.startsWith('/api/')) {
     return NextResponse.json({ error: 'Preview data access is disabled until an isolated database is configured.' }, { status: 503 });
   }
+  // Waitlist pages and submissions are public and do not require a Clerk session.
+  if (req.nextUrl.pathname === '/join' || req.nextUrl.pathname.startsWith('/join/') || req.nextUrl.pathname === '/api/join') return NextResponse.next();
   return clerkHandler(req, event);
 }
 

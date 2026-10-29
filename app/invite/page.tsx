@@ -26,7 +26,7 @@ export default function InvitePage() {
       <div className="mx-auto max-w-2xl">
         <p className="mb-3 text-[11px] font-semibold uppercase tracking-[0.24em] text-[#dcbc82]">Invite</p>
         <h1 className="text-4xl text-[#fff6ea]">Bring in someone <span className="text-[#e8cc94]">you trust.</span></h1>
-        <p className="mt-3 text-slate-400">Share your personal link with clinical research colleagues. They get an invitation to create an account, and every new member is still verified privately by BTP.</p>
+        <p className="mt-3 text-slate-400">Share your personal link with clinical research colleagues. They join the waitlist with your referral attached. BTP reviews access and sends invitations. Share only with clinical research professionals you know.</p>
         {error && <div role="alert" className="mt-6 rounded-lg border border-[#c46b6b]/40 bg-[#c46b6b]/10 px-4 py-3 text-[#f1b7b7]">{error}</div>}
         {data && (
           <div className="mt-8 space-y-5 rounded-2xl border border-white/[0.08] bg-gradient-to-br from-white/[0.055] to-white/[0.012] p-6">
