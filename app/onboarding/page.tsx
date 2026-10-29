@@ -133,7 +133,7 @@ export default function OnboardingPage() {
         {step === 'profile' && (
           <section>
             <h1 className="mb-2 text-4xl text-[#fff6ea]">Set up your <span className="text-[#e8cc94]">profile.</span></h1>
-            <p className="mb-8 text-slate-400">Members see only your handle and your verified role. Your name and employer stay private.</p>
+            <p className="mb-8 text-slate-400">Members see only your handle and your verified role. Your name and employer stay private. BTP plans to use aggregated community insights to understand shared challenges and inform research and product evaluations. Companies do not receive your private conversations or identity. <a href="/privacy#aggregated" className="underline">Learn more</a>.</p>
             <div className="space-y-6 rounded-2xl border border-white/[0.08] bg-gradient-to-br from-white/[0.055] to-white/[0.012] p-6">
               <div>
                 <label htmlFor="role" className={label}>Your role</label>
