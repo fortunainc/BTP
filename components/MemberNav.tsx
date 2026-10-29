@@ -19,7 +19,7 @@ export function MemberNav() {
   const pathname = usePathname();
   const { signOut } = useClerk();
   const { isAdmin } = useAuth();
-  const items = isAdmin ? [...links, { href: '/admin/founder', label: 'Founder' }, { href: '/admin/waitlist', label: 'Waitlist' }, { href: '/admin/investors', label: 'Investors' }] : links;
+  const items = isAdmin ? [...links, { href: '/admin/founder', label: 'Founder' }, { href: '/admin/waitlist', label: 'Waitlist' }, { href: '/admin/company-inquiries', label: 'Companies' }, { href: '/admin/investors', label: 'Investors' }] : links;
   return (
     <nav aria-label="Member navigation" className="sticky top-0 z-40 border-b border-[rgba(232,204,148,0.16)] bg-[rgba(7,4,5,0.72)] backdrop-blur-md">
       <div className="mx-auto flex max-w-7xl flex-wrap items-center gap-x-6 gap-y-2 px-4 py-3 text-sm sm:px-8">

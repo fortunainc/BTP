@@ -1316,6 +1316,24 @@ model AccessRequest {
   @@index([referrerId])
 }
 
+// Product review inquiries from companies. Kept apart from the operator waitlist (AccessRequest).
+model CompanyInquiry {
+  id        String   @id @default(cuid())
+  name      String
+  email     String
+  company   String
+  website   String
+  product   String
+  goals     String
+  access    String   // demo, prototype, walkthrough, not_yet
+  status    String   @default("new") // new, in_discussion, closed
+  source    String   @default("companies page")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
+
+  @@index([createdAt])
+}
+
 // Investors approved by the founder for the private investor room and data room.
 model Investor {
   id           String    @id @default(cuid())
