@@ -146,7 +146,7 @@
 .bh .earn{padding:36px}
 .bh .earnArt{height:360px}
 .bh .navlinks a:not(.pill):not(.co){display:none}
-.bh .navlinks{gap:16px}.bh .navlinks a.co{font-size:13px;white-space:nowrap}
+.bh nav{gap:14px}.bh .navlinks{gap:14px}.bh .navlinks a.co{font-size:13px;white-space:nowrap}.bh .navlinks .pill{padding:7px 12px;font-size:13px}
 .bh .logo span:last-child{display:none}}
 @media(max-width:700px){.bh .market .track span{font-size:8.5px;letter-spacing:.1em}
 .bh .market .track span:nth-child(3),.bh .market .track span:nth-child(5){display:none}}
