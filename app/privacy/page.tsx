@@ -4,6 +4,7 @@ import Link from 'next/link';
 export const metadata: Metadata = { title: 'BTP | Privacy and trust' };
 
 const collected = [
+  'Waitlist email, professional role, optional paid review interest, signup source and member referral, used to manage access and contact you about your stated interests. Waitlist interest is not consent to research or commercial reuse. Contact support to correct or remove your request.',
   'Account email and authentication identifiers',
   'Your private verification method and status',
   'A member-chosen handle and broad professional category',

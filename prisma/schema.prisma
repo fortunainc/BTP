@@ -1299,6 +1299,12 @@ model AccountDeletionRequest {
 
 // People who asked to join through a member's invite link (or BTP directly).
 model AccessRequest {
+  role String?
+  paidReviewInterest Boolean @default(false)
+  source String @default("direct")
+  professionalVerifiedAt DateTime?
+  professionalVerifiedBy String?
+  verificationNote String?
   id         String    @id @default(cuid())
   email      String    @unique
   referrerId String?

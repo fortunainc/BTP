@@ -6,6 +6,7 @@ const FILES = [
   'prisma/migrations/20261028_verification_privacy/migration.sql',
   'prisma/migrations/20261028_referrals/migration.sql',
   'prisma/migrations/20261029_investor_access/migration.sql',
+  'prisma/migrations/20261030_operator_waitlist/migration.sql',
 ];
 
 if (process.env.VERCEL_ENV !== 'production' || !process.env.DATABASE_URL) {
