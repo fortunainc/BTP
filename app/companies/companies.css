@@ -24,3 +24,4 @@
 .co-radios{border:0;padding:0;margin:22px 0 0;min-width:0}.co-radios .bw-check span{flex:1;min-width:0}.co-radios legend{font-size:14px;margin-bottom:4px}.co-radios .bw-check{margin:12px 0}
 .co-done h3{margin-top:10px}
 @media(max-width:760px){.co header{gap:12px}.co .bw-brand small{display:none}.co .co-pill{font-size:13px;padding:7px 12px}.co main{padding:0 22px}.co-hero{padding:36px 0 40px}.co-hero h1{font-size:38px}.co-covers,.co-why,.co-form{grid-template-columns:1fr}.co-form{gap:24px}.co-nav a:first-child{display:none}.co-sec{padding:44px 0}.co-steps li{gap:14px}}
+.co .co-radios input[type=radio]{width:18px;height:18px;flex-shrink:0;padding:0;margin:3px 0 0;accent-color:#d6b67b;border:0}
