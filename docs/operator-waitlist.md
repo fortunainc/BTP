@@ -19,3 +19,6 @@ Production build and TypeScript pass. The quality suite covers waitlist validati
 ## Tracking boundaries
 
 Signup, invitation and account creation are distinct. Account creation is not a verified member count. Referral tables measure attributed signups, not link clicks. The source field accepts short campaign labels via `utm_source`; do not put personal information in campaign links. Existing signups are preserved, with missing role shown honestly.
+
+## Founder interest (October 30)
+`/join?audience=founder&utm_source=sinclair` opens the founder/product-team waiting list. `/join` also exposes the audience selector. Founder requests use the existing role field and store explicit contact permission under the existing first-submission-wins rules. They do not create accounts, confer membership, retain a member referral or opt into being a paid reviewer. Admin filters identify founder interest and the API blocks membership verification/invitations for these entries. The companies page offers this shorter route alongside its detailed inquiry. No schema migration or new credential is needed. Existing requests remain unchanged; a repeat public submission does not change the original audience.
