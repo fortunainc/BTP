@@ -49,6 +49,8 @@ import { scanForAggressiveTriggers } from '@/lib/micro-opportunity';
 import { getOrCreateUserMetrics, trackEvent, EVENT_TYPES } from '@/lib/analytics-tracker';
 import type { ExecutionSignal } from '@/lib/translation-engine';
 import { buildLedgerEvent } from '@/lib/knowledge-ledger';
+import { PUBLIC_AUTHOR_SELECT, publicAuthor } from '@/lib/public-author';
+import { issueCategoryWhere, isUnansweredParam, UNANSWERED_WHERE } from '@/lib/situation-filters';
 
 // Valid therapeutic areas
 const THERAPEUTIC_AREAS = [
@@ -68,20 +70,6 @@ const THERAPEUTIC_AREAS = [
   'Other'
 ];
 
-// Valid issue categories
-const ISSUE_CATEGORIES = [
-  'Enrollment',
-  'Protocol burden',
-  'Sponsor expectations',
-  'Data integrity',
-  'Regulatory',
-  'Operational',
-  'Staffing',
-  'Site Overload',
-  'Patient Retention',
-  'Budget/Reimbursement',
-  'Other'
-];
 
 /**
  * GET /api/situations
@@ -101,6 +89,8 @@ export const GET = withAuth(async (request: NextRequest, user) => {
     const therapeuticArea = searchParams.get('therapeuticArea');
     const issueCategory = searchParams.get('issueCategory');
     const timeBucket = searchParams.get('timeBucket'); // 'today', 'week', 'month'
+    // unanswered=1 (or true): only questions with no visible answer, same rule as hasVisibleAnswer.
+    const unanswered = isUnansweredParam(searchParams.get('unanswered'));
     
     // Build where clause
     // Public questions remain discoverable regardless of their internal signal score.
@@ -118,8 +108,13 @@ export const GET = withAuth(async (request: NextRequest, user) => {
       where.therapeuticArea = therapeuticArea;
     }
     
-    if (issueCategory && ISSUE_CATEGORIES.includes(issueCategory)) {
-      where.issueCategory = issueCategory;
+    const categoryWhere = issueCategoryWhere(issueCategory);
+    if (categoryWhere) {
+      where.issueCategory = categoryWhere;
+    }
+
+    if (unanswered) {
+      where.interactions = UNANSWERED_WHERE;
     }
     
     // Time bucket filter
@@ -157,7 +152,8 @@ export const GET = withAuth(async (request: NextRequest, user) => {
         urgencyLevel: true,
         resolutionStatus: true,
         createdAt: true,
-        // NO userId - complete anonymity
+        // NO userId. Only the public author fields (handle shown for approved members only).
+        user: { select: PUBLIC_AUTHOR_SELECT },
         interactions: {
           where: {
             interactionType: 'ANSWER',
@@ -187,6 +183,7 @@ export const GET = withAuth(async (request: NextRequest, user) => {
         issueCategory: situation.issueCategory,
         urgencyLevel: situation.urgencyLevel,
         resolutionStatus: situation.resolutionStatus,
+        ...publicAuthor(situation.user),
         // Time bucket instead of exact timestamp
         timeBucket: timeBucketInfo.bucket,
         timeLabel: timeBucketInfo.label,
@@ -206,7 +203,8 @@ export const GET = withAuth(async (request: NextRequest, user) => {
       filters: {
         therapeuticArea,
         issueCategory,
-        timeBucket
+        timeBucket,
+        unanswered
       }
     });
     
@@ -619,9 +617,10 @@ export const POST = withAuth(async (req, user) => {
       return createApiResponse({
         success: true,
         id: situation.id,
-        message: requiresReview 
-          ? 'Your situation has been submitted and is being reviewed for anonymity compliance.'
-          : 'Your situation has been shared anonymously.',
+        message: requiresReview
+          ? 'Your question is awaiting review.'
+          : 'Your question is posted.',
+        pendingReview: requiresReview,
         redactionsApplied: redactions.length,
         timeBucket: bucketTimestamp(situation.createdAt).label,
         

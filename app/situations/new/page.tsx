@@ -27,6 +27,7 @@ import { useRouter } from 'next/navigation';
 import { useAuth } from '@clerk/nextjs';
 import Link from 'next/link';
 import { Loader2, Shield, Eye, CheckCircle, AlertTriangle, User } from 'lucide-react';
+import { SUPPORT_EMAIL } from '@/lib/site';
 
 // Optional chips — NOT required
 const SIGNAL_CHIPS = [
@@ -133,7 +134,7 @@ export default function NewSituationPage() {
         {suspended ? (
           <div className="mx-auto max-w-xl rounded-lg border border-slate-700 bg-slate-800/50 p-6 text-slate-300">
             <h2 className="text-xl font-semibold text-white">Your account is suspended</h2>
-            <p className="mt-3">Contact BTP support if you believe this is a mistake: fortunaindustriesinc@gmail.com.</p>
+            <p className="mt-3">Contact BTP support if you believe this is a mistake: <a className="underline" href={`mailto:${SUPPORT_EMAIL}`}>{SUPPORT_EMAIL}</a>.</p>
           </div>
         ) : <MembershipPending />}
       </div>

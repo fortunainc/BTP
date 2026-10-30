@@ -1,6 +1,6 @@
 import Link from 'next/link';
+import { SUPPORT_EMAIL } from '@/lib/site';
 
-const SUPPORT_EMAIL = 'fortunaindustriesinc@gmail.com';
 
 export const metadata = {
   title: 'BTP | Support',

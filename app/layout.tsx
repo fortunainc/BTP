@@ -3,6 +3,7 @@ import { Inter, Newsreader, Cormorant_Garamond } from "next/font/google";
 import "./globals.css";
 import { ClerkProvider } from '@clerk/nextjs';
 import { AuthProvider } from "@/components/AuthContext";
+import { SITE_URL } from '@/lib/site';
 
 // Clerk-backed member and founder surfaces require request-time auth context.
 export const dynamic = "force-dynamic";
@@ -14,7 +15,7 @@ const cormorant = Cormorant_Garamond({ subsets: ["latin"], weight: "500", style:
 export const metadata: Metadata = {
   title: "BTP | Clinical trial experience, connected.",
   description: "Practical peer experience and private help for clinical research professionals. Ask questions, learn from peers, and follow up on what helped.",
-  metadataBase: new URL("https://btp-rho-seven.vercel.app"),
+  metadataBase: new URL(SITE_URL),
   openGraph: {
     title: "BTP | Clinical trial experience, connected.",
     description: "Practical peer experience and private help for clinical research professionals. Invitation-only beta.",

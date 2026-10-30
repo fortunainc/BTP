@@ -17,7 +17,7 @@ Subject: Your BTP beta invitation
 
 Thanks for your interest in Behind the Protocol. BTP is an invitation-only community where clinical research professionals ask operational questions, learn from verified peers, and come back with what worked.
 
-1. Sign up at https://btp-rho-seven.vercel.app/sign-up. A personal email is fine.
+1. Sign up at https://behindtheprotocol.ai/sign-up. A personal email is fine.
 2. Choose a display handle that does not include your name or employer.
 3. I review each profile privately and will email you once access is open.
 

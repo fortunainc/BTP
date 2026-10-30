@@ -1,10 +1,14 @@
 import { router } from "expo-router";
 import { useState } from "react";
-import { Alert, Pressable, StyleSheet, Text, TextInput, View } from "react-native";
+import { StyleSheet, Text, TextInput, View } from "react-native";
+
 import { AppScreen } from "@/components/AppScreen";
-import { colors, spacing } from "@/constants/theme";
-import { api, liveApiConfigured } from "@/lib/api";
+import { Button, StateBox } from "@/components/ui";
+import { colors, fonts, radius, spacing, type } from "@/constants/theme";
+import { api } from "@/lib/api";
 import { useBtpAuth } from "@/lib/auth";
+import { announce, confirmSuccess } from "@/lib/feedback";
+import type { PostResult } from "@/types/question";
 
 const MIN_QUESTION_LENGTH = 20;
 const MAX_QUESTION_LENGTH = 5000;
@@ -12,64 +16,98 @@ const MAX_QUESTION_LENGTH = 5000;
 export default function AskScreen() {
   const auth = useBtpAuth();
   const [question, setQuestion] = useState("");
-  const [sanitized, setSanitized] = useState<string | null>(null);
-  const [message, setMessage] = useState("");
+  const [reviewed, setReviewed] = useState<string | null>(null);
+  const [reviewNote, setReviewNote] = useState("");
+  const [result, setResult] = useState<PostResult | null>(null);
+  const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
-  const activeText = sanitized ?? question;
-  const activeLength = activeText.trim().length;
-  const canSubmit = activeLength >= MIN_QUESTION_LENGTH && activeLength <= MAX_QUESTION_LENGTH;
+  const activeLength = (reviewed ?? question).trim().length;
+  const longEnough = activeLength >= MIN_QUESTION_LENGTH;
 
   const review = async () => {
-    if (!liveApiConfigured || !auth.signedIn) {
-      Alert.alert("Preview mode", "Connect the API and sign in to review a live question.");
-      return;
-    }
-    setBusy(true);
+    setBusy(true); setError("");
     try {
-      const result = await api.questions.review(await auth.getToken(), question.trim());
-      setSanitized(result.redactedContent);
-      setMessage(result.message);
-    } catch (error) {
-      Alert.alert("Could not review", error instanceof Error ? error.message : "Try again");
-    } finally {
-      setBusy(false);
-    }
+      const r = await api.questions.review(await auth.getToken(), question.trim());
+      setReviewed(r.redactedContent);
+      setReviewNote(r.redactionsApplied > 0 ? `We removed ${r.redactionsApplied} detail${r.redactionsApplied === 1 ? "" : "s"} that could identify you or your site. Edit anything else that should go.` : "Read it once more and remove anything that could identify you, your site or a patient.");
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "We couldn’t review your question. Try again.");
+    } finally { setBusy(false); }
   };
 
-  const publish = async () => {
-    if (!sanitized || !canSubmit) return;
-    setBusy(true);
+  const post = async () => {
+    if (!reviewed || !longEnough) return;
+    setBusy(true); setError("");
     try {
-      const result = await api.questions.create(await auth.getToken(), sanitized.trim());
-      setQuestion("");
-      setSanitized(null);
-      Alert.alert("Question posted", result.message, [
-        { text: "View", onPress: () => router.push({ pathname: "/question/[id]", params: { id: result.id } }) },
-      ]);
-    } catch (error) {
-      Alert.alert("Could not post", error instanceof Error ? error.message : "Try again");
-    } finally {
-      setBusy(false);
-    }
+      const r = await api.questions.create(await auth.getToken(), reviewed.trim());
+      setResult(r); setQuestion(""); setReviewed(null);
+      confirmSuccess();
+      announce(r.pendingReview ? "Your question is awaiting review." : "Your question is posted.");
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "We couldn’t post your question. Try again.");
+    } finally { setBusy(false); }
   };
+
+  if (result) {
+    return <AppScreen contentStyle={styles.center}>
+      {result.pendingReview ? <View style={styles.outcome}>
+        <View style={[styles.status, styles.statusWaiting]}><Text style={[styles.statusText, { color: colors.ink }]}>Awaiting review</Text></View>
+        <Text accessibilityRole="header" style={styles.outcomeTitle}>Your question is awaiting review.</Text>
+        <Text style={styles.outcomeCopy}>BTP reviews some posts before they appear. It will show in Community once approved.</Text>
+        <Button label="Back to Community" onPress={() => { setResult(null); router.navigate("/"); }} variant="ghost" />
+      </View> : <View style={[styles.outcome, styles.outcomePosted]}>
+        <View style={styles.status}><Text style={styles.statusText}>Posted</Text></View>
+        <Text accessibilityRole="header" style={styles.outcomeTitle}>Your question is posted.</Text>
+        <Text style={styles.outcomeCopy}>Members see it with your handle and general role. New replies show up in Activity.</Text>
+        <Button label="View your question" onPress={() => { const id = result.id; setResult(null); router.push({ pathname: "/question/[id]", params: { id } }); }} />
+      </View>}
+      <Button label="Ask another question" onPress={() => setResult(null)} variant="quiet" />
+    </AppScreen>;
+  }
+
+  if (reviewed !== null) {
+    return <AppScreen>
+      <Text style={type.eyebrow}>Review your question</Text>
+      <Text accessibilityRole="header" style={styles.title}>Check it before <Text style={styles.accent}>it is shared.</Text></Text>
+      <Text style={styles.subtitle}>{reviewNote}</Text>
+      <TextInput accessibilityLabel="Your reviewed question" editable={!busy} maxLength={MAX_QUESTION_LENGTH} multiline onChangeText={setReviewed} scrollEnabled={false} style={styles.input} textAlignVertical="top" value={reviewed} />
+      {!longEnough ? <Text style={styles.validation}>Your question needs at least {MIN_QUESTION_LENGTH} characters.</Text> : null}
+      {error ? <StateBox copy={error} title="Not posted" tone="error" /> : null}
+      <Button busy={busy} disabled={!longEnough} label="Post to the community" onPress={() => void post()} />
+      <Button disabled={busy} label="Back to edit" onPress={() => { setReviewed(null); setError(""); }} variant="ghost" />
+    </AppScreen>;
+  }
 
   return <AppScreen>
-    <View style={styles.heading}><Text style={styles.kicker}>ASK BTP</Text><Text style={styles.title}>What question do you need help answering?</Text><Text style={styles.subtitle}>Share enough context for someone experienced to help. BTP checks identifying details before posting.</Text></View>
-    <TextInput maxLength={MAX_QUESTION_LENGTH} multiline editable={!busy} onChangeText={(value) => { setQuestion(value); setSanitized(null); }} placeholder="Describe the situation and what you need to decide..." placeholderTextColor={colors.muted} style={styles.input} textAlignVertical="top" value={question} />
-    {sanitized === null ? <Text style={styles.counter}>{question.length.toLocaleString()} / {MAX_QUESTION_LENGTH.toLocaleString()}</Text> : null}
-    {sanitized !== null ? <View style={styles.review}>
-      <Text style={styles.noticeTitle}>Review the safe version</Text>
-      <TextInput maxLength={MAX_QUESTION_LENGTH} multiline editable={!busy} onChangeText={setSanitized} style={styles.reviewInput} textAlignVertical="top" value={sanitized} />
-      <Text style={styles.counter}>{sanitized.length.toLocaleString()} / {MAX_QUESTION_LENGTH.toLocaleString()}</Text>
-      <Text style={styles.noticeText}>{message}</Text>
-      {activeLength < MIN_QUESTION_LENGTH ? <Text style={styles.validation}>The safe version needs at least {MIN_QUESTION_LENGTH} characters.</Text> : null}
-    </View> : <View style={styles.notice}><Text style={styles.noticeTitle}>Keep it safe</Text><Text style={styles.noticeText}>Leave out patient information, company names, protocol numbers and confidential study details.</Text></View>}
-    <Pressable disabled={busy || !canSubmit} onPress={sanitized !== null ? publish : review} style={({ pressed }) => [styles.button, (busy || !canSubmit) && styles.disabled, pressed && styles.pressed]}><Text style={styles.buttonText}>{busy ? "Working…" : sanitized !== null ? "Post to verified members" : "Review my question"}</Text></Pressable>
+    <Text style={type.eyebrow}>Ask the community</Text>
+    <Text accessibilityRole="header" style={styles.title}>What are you <Text style={styles.accent}>trying to solve?</Text></Text>
+    <Text style={styles.subtitle}>Describe what is happening and what you need to decide.</Text>
+    <TextInput accessibilityLabel="Your question" editable={!busy} maxLength={MAX_QUESTION_LENGTH} multiline onChangeText={setQuestion} placeholder="For example: our referrals arrive with no prescreen answers. How do other sites handle the first call?" placeholderTextColor={colors.faint} scrollEnabled={false} style={styles.input} textAlignVertical="top" value={question} />
+    <Text style={styles.counter}>{question.length.toLocaleString()} / {MAX_QUESTION_LENGTH.toLocaleString()}</Text>
+    <View style={styles.notice}>
+      <Text style={styles.noticeText}><Text style={styles.noticeStrong}>Leave out</Text> patient information, confidential documents, and study, site, sponsor or company names. BTP checks for identifying details before anything is posted.</Text>
+    </View>
+    {error ? <StateBox copy={error} title="Not reviewed" tone="error" /> : null}
+    <Button busy={busy} disabled={question.trim().length < MIN_QUESTION_LENGTH} label="Review your question" onPress={() => void review()} />
   </AppScreen>;
 }
 
 const styles = StyleSheet.create({
-  heading: { gap: spacing.sm }, kicker: { fontFamily: "Geist", color: colors.accent, fontSize: 12, fontWeight: "800", letterSpacing: 1.5 }, title: { fontFamily: "Geist", color: colors.ink, fontSize: 28, fontWeight: "700", lineHeight: 35 }, subtitle: {fontFamily: "Geist", color: colors.muted, fontSize: 15, lineHeight: 22 },
-  input: { backgroundColor: colors.surface, borderColor: colors.border, borderRadius: 18, borderWidth: 1, color: colors.ink, fontSize: 16, lineHeight: 24, minHeight: 190, padding: spacing.md },
-  counter: { fontFamily: "Geist", alignSelf: "flex-end", color: colors.muted, fontSize: 12 }, notice: { backgroundColor: colors.accentSoft, borderRadius: 14, gap: 4, padding: 14 }, review: { backgroundColor: colors.accentSoft, borderRadius: 14, gap: 8, padding: 14 }, reviewInput: { fontFamily: "Geist", backgroundColor: colors.white, borderColor: colors.border, borderRadius: 10, borderWidth: 1, color: colors.ink, fontSize: 15, lineHeight: 22, minHeight: 130, padding: 12 }, noticeTitle: { fontFamily: "Geist", color: colors.accent, fontSize: 13, fontWeight: "800" }, noticeText: { fontFamily: "Geist", color: colors.ink, fontSize: 13, lineHeight: 19 }, validation: { fontFamily: "Geist", color: colors.accent, fontSize: 12, fontWeight: "700", lineHeight: 18 }, button: { alignItems: "center", backgroundColor: colors.accent, borderRadius: 15, padding: 16 }, disabled: { opacity: .4 }, pressed: { opacity: .75 }, buttonText: { fontFamily: "Geist", color: colors.white, fontSize: 16, fontWeight: "700" },
+  center: { justifyContent: "center" },
+  title: { ...type.display },
+  accent: { color: colors.accentBright, fontFamily: fonts.serifItalic },
+  subtitle: { ...type.body, color: colors.muted },
+  input: { backgroundColor: colors.surface, borderColor: colors.border, borderRadius: radius.lg, borderWidth: 1, color: colors.inkStrong, fontFamily: fonts.sans, fontSize: 16, lineHeight: 24, minHeight: 170, padding: spacing.md },
+  counter: { ...type.meta, alignSelf: "flex-end", marginTop: -6 },
+  notice: { backgroundColor: colors.accentSoft, borderRadius: radius.md, padding: 14 },
+  noticeText: { color: colors.ink, fontFamily: fonts.sans, fontSize: 14, lineHeight: 21 },
+  noticeStrong: { color: colors.accentBright, fontFamily: fonts.sansSemiBold },
+  validation: { color: colors.danger, fontFamily: fonts.sansMedium, fontSize: 13 },
+  outcome: { backgroundColor: colors.surface, borderColor: colors.border, borderRadius: radius.lg, borderWidth: 1, gap: 12, padding: spacing.lg },
+  outcomePosted: { borderColor: colors.borderStrong },
+  status: { alignSelf: "flex-start", backgroundColor: colors.accentSoft, borderRadius: radius.pill, paddingHorizontal: 11, paddingVertical: 5 },
+  statusWaiting: { backgroundColor: "rgba(191,174,156,.14)" },
+  statusText: { color: colors.accentBright, fontFamily: fonts.sansSemiBold, fontSize: 12 },
+  outcomeTitle: { ...type.title },
+  outcomeCopy: { ...type.body, color: colors.muted },
 });

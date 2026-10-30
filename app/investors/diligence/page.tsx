@@ -7,11 +7,12 @@ import { INVESTOR_COOKIE } from '@/lib/investor-auth';
 import { logInvestorActivity, roomViewer } from '@/lib/investor-access';
 import { DILIGENCE_CATEGORIES } from '@/lib/diligence';
 import { Gate } from '../ui';
+import { SUPPORT_EMAIL } from '@/lib/site';
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
 export const metadata: Metadata = { title: 'BTP | Data room', description: 'Diligence materials for BTP investors.', robots: { index: false, follow: false, nocache: true } };
 
-const DILIGENCE_CONTACT = 'mailto:fortunaindustriesinc@gmail.com?subject=BTP%20diligence%20materials%20request';
+const DILIGENCE_CONTACT = `mailto:${SUPPORT_EMAIL}?subject=BTP%20diligence%20materials%20request`;
 const DESCRIPTIONS: Record<string, string> = {
   'Company and legal': 'Formation and ownership documents and key agreements.',
   Financials: 'Financial position, model and assumptions.',

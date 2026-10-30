@@ -1,18 +1,14 @@
-import { useCallback, useEffect, useState } from "react";
+import { Ionicons } from "@expo/vector-icons";
+import { router, useFocusEffect } from "expo-router";
+import { useCallback, useState } from "react";
 import { ActivityIndicator, Alert, Pressable, StyleSheet, Text, View } from "react-native";
-import { router } from "expo-router";
 
 import { AppScreen } from "@/components/AppScreen";
-import { colors, spacing } from "@/constants/theme";
-import { api, liveApiConfigured } from "@/lib/api";
+import { Button } from "@/components/ui";
+import { colors, fonts, radius, spacing, type } from "@/constants/theme";
+import { api } from "@/lib/api";
 import { useBtpAuth } from "@/lib/auth";
 import type { ContentReport, PrivateHelpRequest } from "@/types/question";
-
-const rows = [
-  { label: "Professional verification", detail: "Approved privately for beta" },
-  { label: "Trust Center", detail: "How identity and reporting work", action: "trust" },
-  { label: "Notifications", detail: "In-app Activity; push and email are not enabled" },
-];
 
 export default function YouScreen() {
   const auth = useBtpAuth();
@@ -22,106 +18,130 @@ export default function YouScreen() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const load = useCallback(async () => {
-    if (!liveApiConfigured || !signedIn) return;
+    if (!signedIn) return;
     setLoading(true); setError("");
-    try { const token = await getToken(); const [helpItems, reportItems] = await Promise.all([api.help.list(token), api.reports.list(token)]); setRequests(helpItems); setReports(reportItems); } catch { setError("Could not refresh your history. Your previous results are still shown."); } finally { setLoading(false); }
+    try { const token = await getToken(); const [help, rep] = await Promise.all([api.help.list(token), api.reports.list(token)]); setRequests(help); setReports(rep); }
+    catch { setError("Couldn’t refresh your history. Tap to try again."); }
+    finally { setLoading(false); }
   }, [getToken, signedIn]);
-  useEffect(() => { void load(); }, [load]);
-  const profileName = member?.handle?.trim() || "BTP member";
-  const profileDetails = [generalizedRole(member?.roleCategory), generalizedCompany(member?.companyCategory), verificationLabel(member?.verificationStatus)].filter(Boolean).join(" · ");
+  useFocusEffect(useCallback(() => { void load(); }, [load]));
+
+  const handle = member?.handle?.trim() || "BTP member";
+  const role = member?.roleLabel || generalizedRole(member?.roleCategory);
+  const verified = member?.verificationStatus?.toLowerCase() === "approved";
+  const open = requests.filter((r) => !["COMPLETED", "CLOSED"].includes(r.status)).length;
+
   const requestAccountDeletion = () => Alert.alert("Request account deletion?", "BTP will receive a private request for your signed-in account. A request does not immediately delete your account.", [
     { text: "Cancel", style: "cancel" },
     { text: "Submit request", style: "destructive", onPress: () => { void (async () => {
-      try { await api.requestDeletion(await getToken()); Alert.alert("Request received", "BTP will review and fulfill your deletion request. Contact support if you need an update."); }
-      catch (e) { Alert.alert("Request not submitted", e instanceof Error ? e.message : "Please retry."); }
+      try { await api.requestDeletion(await getToken()); Alert.alert("Request received", "BTP will review and complete your deletion request. Contact support if you need an update."); }
+      catch (e) { Alert.alert("Request not submitted", e instanceof Error ? e.message : "Please try again."); }
     })(); } },
   ]);
-  return (
-    <AppScreen>
-      <Text style={styles.title}>You</Text>
-      <View style={styles.profile}>
-        <View style={styles.avatar}><Text style={styles.initials}>{initials(profileName)}</Text></View>
-        <View style={styles.profileCopy}><Text style={styles.handle}>{profileName}</Text><Text style={styles.role}>{profileDetails || "Identity protected"}</Text><Text style={styles.privacy}>Your identity is not shown with community questions or answers.</Text></View>
+
+  return <AppScreen>
+    <Text accessibilityRole="header" style={styles.title}>You</Text>
+    <View style={styles.profile}>
+      <View style={styles.avatar}><Text style={styles.initials}>{initials(handle)}</Text></View>
+      <View style={{ flex: 1 }}>
+        <Text style={styles.handle}>{handle}</Text>
+        <Text style={styles.role}>{[role, verified ? "Verified" : null].filter(Boolean).join(" · ")}</Text>
       </View>
-      {auth.configured && <Pressable onPress={() => void auth.signOut()} style={styles.signOut}><Text style={styles.signOutText}>Sign out</Text></Pressable>}
-      <View style={styles.list}>
-        {rows.map((row, index) => (
-          <Pressable disabled={!row.action} key={row.label} onPress={() => row.action === "trust" && router.push("/trust-center")} style={[styles.row, index < rows.length - 1 && styles.divider]}>
-            <View style={styles.rowCopy}><Text style={styles.rowText}>{row.label}</Text><Text style={styles.betaLabel}>{row.detail}</Text></View>
-            {row.action && <Text style={styles.chevron}>›</Text>}
-          </Pressable>
-        ))}
+    </View>
+    <Text style={styles.fine}>Members see your handle and general role. Your name, email and employer are never shown. Never use your real name or employer as your handle.</Text>
+
+    <View style={styles.list}>
+      <Row icon="bookmark-outline" label="Saved answers" onPress={() => router.push("/saved")} />
+      <Row detail={open ? `${open} open request${open === 1 ? "" : "s"}` : "Help a community answer can’t cover"} icon="briefcase-outline" label="Private help" onPress={() => router.push("/private-help")} />
+      <Row icon="shield-checkmark-outline" label="Privacy and trust" onPress={() => router.push("/trust-center")} />
+      <Row detail="Shown in Activity in the app" icon="notifications-outline" label="Notifications" last />
+    </View>
+
+    {error ? <Pressable onPress={() => void load()}><Text style={styles.error}>{error}</Text></Pressable> : null}
+
+    {requests.length ? <>
+      <View style={styles.sectionHeader}><Text style={styles.section}>Your private help requests</Text>{loading ? <ActivityIndicator color={colors.accent} size="small" /> : null}</View>
+      {requests.map((r) => <View key={r.id} style={styles.card}>
+        <View style={styles.cardTop}><Text style={styles.cardTitle}>{labelHelpType(r.helpType)}</Text><Text style={styles.status}>{labelStatus(r.status)}</Text></View>
+        <Text numberOfLines={2} style={styles.cardText}>{r.details}</Text>
+        {r.memberUpdate ? <Text style={styles.cardText}>{r.memberUpdate}</Text> : null}
+        {r.status === "COMPLETED" && !r.feedback ? <Pressable accessibilityRole="button" onPress={() => router.push({ pathname: "/private-help", params: { requestId: r.id } })}><Text style={styles.link}>Share private feedback</Text></Pressable> : null}
+        {r.feedback ? <Text style={styles.cardText}>Feedback received. Thank you.</Text> : null}
+        <Text style={styles.date}>{new Date(r.createdAt).toLocaleDateString()}</Text>
+      </View>)}
+    </> : null}
+
+    <View style={styles.sectionHeader}><Text style={styles.section}>Your reports</Text></View>
+    <Text style={styles.fine}>Only you and BTP can see these outcomes.</Text>
+    {reports.length === 0 ? <Text style={styles.cardText}>None submitted. You can report a question or answer from its page.</Text> : reports.slice(0, 5).map((r) => <View key={r.id} style={styles.card}>
+      <View style={styles.cardTop}><Text style={styles.cardTitle}>{labelReportReason(r.reason)}</Text><Text style={styles.status}>{labelStatus(r.status)}</Text></View>
+      <Text style={styles.cardText}>{r.status === "Pending" ? "Received by BTP for private review." : r.action === "hidden" ? "Reviewed. The content was hidden." : r.action === "restored" ? "Reviewed again. The content was restored." : "Reviewed. No removal was needed."}</Text>
+      <Text style={styles.date}>{new Date(r.createdAt).toLocaleDateString()}</Text>
+    </View>)}
+
+    <Pressable accessibilityRole="button" onPress={() => router.push("/paid-reviews")} style={({ pressed }) => [styles.shape, pressed && { opacity: 0.8 }]}>
+      <View style={{ flex: 1, gap: 3 }}>
+        <Text style={styles.shapeTitle}>Help shape what gets built.</Text>
+        <Text style={styles.cardText}>Interested in paid product reviews? Tell us about your experience.</Text>
       </View>
-      <Pressable accessibilityRole="button" onPress={() => void requestAccountDeletion()} style={styles.deleteAccount}>
-        <Text style={styles.deleteAccountText}>Request account deletion</Text>
-      </Pressable>
-      <Text style={styles.deletionNote}>BTP will verify your request and delete your account and associated personal data. Community contributions may be retained only in de-identified form to protect shared discussions.</Text>
-      <>{error && <Pressable onPress={() => void load()}><Text style={styles.deleteAccountText}>{error} Tap to retry.</Text></Pressable>}</>
-      <View style={styles.sectionHeader}><Text style={styles.sectionTitle}>Your reports</Text></View>
-      <Text style={styles.sectionCopy}>Only you and BTP can see these report outcomes.</Text>
-      {reports.length === 0 && !error && !loading ? <View style={styles.helpCard}><Text style={styles.helpTitle}>No reports submitted</Text><Text style={styles.helpDetail}>If something threatens privacy or trust, report it from the question or answer.</Text></View> : reports.slice(0, 5).map(report => <View key={report.id} style={styles.helpCard}><View style={styles.helpTop}><Text style={styles.helpTitle}>{labelReportReason(report.reason)}</Text><View style={styles.status}><Text style={styles.statusText}>{labelStatus(report.status)}</Text></View></View><Text style={styles.helpDetail}>{report.status === "Pending" ? "Received by BTP for private review." : report.action === "hidden" ? "Reviewed. The content was hidden." : report.action === "restored" ? "Reviewed again. The content was restored." : "Reviewed. No removal was required."}</Text><Text style={styles.helpTime}>{new Date(report.createdAt).toLocaleDateString()}</Text></View>)}
-      <View style={styles.sectionHeader}><Text style={styles.sectionTitle}>Private help</Text>{loading && <ActivityIndicator color={colors.accent} size="small" />}</View>
-      <Text style={styles.sectionCopy}>Requests are reviewed and matched by BTP privately during beta.</Text><Pressable onPress={() => router.push("/private-help")} style={styles.signOut}><Text style={styles.rowText}>Request interview preparation</Text></Pressable>
-      {!liveApiConfigured || !auth.signedIn ? <View style={styles.helpCard}><Text style={styles.helpTitle}>No active requests</Text><Text style={styles.helpDetail}>Requests you make from a question will appear here.</Text></View> : requests.length === 0 && !loading && !error ? <View style={styles.helpCard}><Text style={styles.helpTitle}>No active requests</Text><Text style={styles.helpDetail}>When a community answer is not enough, request dedicated help from the question.</Text></View> : requests.map(request => <View key={request.id} style={styles.helpCard}><View style={styles.helpTop}><Text style={styles.helpTitle}>{labelHelpType(request.helpType)}</Text><View style={styles.status}><Text style={styles.statusText}>{labelStatus(request.status)}</Text></View></View><Text numberOfLines={2} style={styles.helpDetail}>{request.details}</Text>{request.status === "COMPLETED" && !request.feedback && <Pressable onPress={() => router.push({ pathname: "/private-help", params: { requestId: request.id } })}><Text style={styles.rowText}>Share private feedback</Text></Pressable>}{request.feedback && <Text style={styles.helpDetail}>Feedback received. Thank you.</Text>}{request.memberUpdate && <Text style={styles.helpDetail}>{request.memberUpdate}</Text>}<Text style={styles.helpTime}>{new Date(request.createdAt).toLocaleDateString()}</Text></View>)}
-    </AppScreen>
-  );
+      <Ionicons color={colors.faint} name="chevron-forward" size={18} />
+    </Pressable>
+
+    {auth.configured ? <Button label="Sign out" onPress={() => void auth.signOut()} variant="ghost" /> : null}
+    <Pressable accessibilityRole="button" onPress={requestAccountDeletion} style={styles.deleteButton}><Text style={styles.delete}>Request account deletion</Text></Pressable>
+    <Text style={[styles.fine, { textAlign: "center" }]}>BTP will verify your request and delete your account and associated personal data. Community contributions may be kept only in de-identified form to protect shared discussions.</Text>
+  </AppScreen>;
 }
 
-const labelHelpType = (value: string) => ({ CONSULTATION: "Private consultation", INTERVIEW_PREP: "Interview preparation", WRITTEN_REVIEW: "Written review", DOCUMENT_REVIEW: "Document or workflow review", PROJECT_HELP: "Defined project help" }[value] || "Private help");
-const labelStatus = (value: string) => ({ NEW: "Received", REVIEWING: "In review", MATCHING: "Finding a match", MATCHED: "Matched", COMPLETED: "Completed", CLOSED: "Closed" }[value] || value.replaceAll("_", " ").toLowerCase());
-const labelReportReason = (value: string) => ({ IDENTIFYING_INFORMATION: "Identifying information", CONFIDENTIAL_INFORMATION: "Confidential information", PATIENT_INFORMATION: "Patient information", HARASSMENT: "Harassment", MISINFORMATION: "Potentially unsafe information", URGENT_SAFETY_OR_MISCONDUCT: "Urgent safety or misconduct", OTHER: "Other concern" }[value] || "Reported concern");
-const initials = (handle: string) => handle.split(/[^A-Za-z0-9]+/).filter(Boolean).slice(0, 2).map(part => part[0]).join("").toUpperCase() || "BM";
+function Row({ icon, label, detail, onPress, last }: { icon: keyof typeof Ionicons.glyphMap; label: string; detail?: string; onPress?: () => void; last?: boolean }) {
+  return <Pressable accessibilityRole={onPress ? "button" : "text"} disabled={!onPress} onPress={onPress} style={({ pressed }) => [styles.row, !last && styles.divider, pressed && { backgroundColor: colors.surfaceRaised }]}>
+    <Ionicons color={colors.accentBright} name={icon} size={19} />
+    <View style={{ flex: 1, gap: 2 }}><Text style={styles.rowText}>{label}</Text>{detail ? <Text style={styles.rowDetail}>{detail}</Text> : null}</View>
+    {onPress ? <Ionicons color={colors.faint} name="chevron-forward" size={18} /> : null}
+  </Pressable>;
+}
+
+const labelHelpType = (v: string) => ({ CONSULTATION: "Private conversation", INTERVIEW_PREP: "Interview preparation", WRITTEN_REVIEW: "Written review", DOCUMENT_REVIEW: "Workflow review", PROJECT_HELP: "Project help" }[v] || "Private help");
+const labelStatus = (v: string) => ({ NEW: "Received", REVIEWING: "In review", MATCHING: "Finding a match", MATCHED: "Matched", COMPLETED: "Completed", CLOSED: "Closed", Pending: "Received", Reviewed: "Reviewed" }[v] || v.replaceAll("_", " ").toLowerCase());
+const labelReportReason = (v: string) => ({ IDENTIFYING_INFORMATION: "Identifying information", CONFIDENTIAL_INFORMATION: "Confidential information", PATIENT_INFORMATION: "Patient information", HARASSMENT: "Harassment", MISINFORMATION: "Potentially unsafe information", URGENT_SAFETY_OR_MISCONDUCT: "Urgent safety or misconduct", OTHER: "Other concern" }[v] || "Reported concern");
+const initials = (h: string) => h.split(/[^A-Za-z0-9]+/).filter(Boolean).slice(0, 2).map((p) => p[0]).join("").toLowerCase().slice(0, 2) || "bm";
 const generalizedRole = (value?: string | null) => {
-  const role = (value || "").toLowerCase();
-  if (!role) return "Verified BTP member";
-  if (role.includes("crc") || role.includes("coordinator") || role.includes("site")) return "Site professional";
-  if (role.includes("cra") || role.includes("monitor")) return "CRA / monitor";
-  if (role.includes("regulatory")) return "Regulatory professional";
-  if (role.includes("quality")) return "Quality professional";
-  if (role.includes("investigator") || role === "pi") return "Investigator";
-  if (role.includes("operations") || role.includes("ctm") || role.includes("project")) return "Clinical operations professional";
+  const r = (value || "").toLowerCase();
+  if (!r) return "BTP member";
+  if (r.includes("crc") || r.includes("coordinator") || r.includes("site")) return "Site professional";
+  if (r.includes("cra") || r.includes("monitor")) return "CRA or monitor";
+  if (r.includes("regulatory")) return "Regulatory professional";
+  if (r.includes("quality")) return "Quality professional";
+  if (r.includes("investigator") || r === "pi") return "Investigator";
+  if (r.includes("operations") || r.includes("ctm") || r.includes("project")) return "Clinical operations professional";
   return "Clinical research professional";
 };
-const generalizedCompany = (value?: string | null) => {
-  const company = (value || "").toLowerCase();
-  if (!company) return null;
-  if (company.includes("site")) return "Site";
-  if (company.includes("sponsor") || company.includes("biotech") || company.includes("pharma")) return "Sponsor";
-  if (company.includes("cro") || company.includes("research organization")) return "CRO";
-  if (company.includes("vendor") || company.includes("provider")) return "Service provider";
-  return "Clinical research organization";
-};
-const verificationLabel = (value?: string | null) => value?.toLowerCase() === "approved" ? "Verified" : value || null;
 
 const styles = StyleSheet.create({
-  title: { fontFamily: "Geist", color: colors.ink, fontSize: 30, fontWeight: "700" },
-  profile: { alignItems: "center", flexDirection: "row", gap: spacing.md, paddingVertical: spacing.sm },
-  avatar: { alignItems: "center", backgroundColor: colors.accent, borderRadius: 28, height: 56, justifyContent: "center", width: 56 },
-  initials: { fontFamily: "Geist", color: colors.white, fontSize: 17, fontWeight: "800" },
-  profileCopy: { flex: 1 },
-  handle: { fontFamily: "Geist", color: colors.ink, fontSize: 17, fontWeight: "700" },
-  role: { fontFamily: "Geist", color: colors.muted, fontSize: 13, marginTop: 3 },
-  privacy: { fontFamily: "Geist", color: colors.muted, fontSize: 11, lineHeight: 16, marginTop: 3 },
-  list: { backgroundColor: colors.surface, borderColor: colors.border, borderRadius: 18, borderWidth: 1, overflow: "hidden" },
-  row: { alignItems: "center", flexDirection: "row", justifyContent: "space-between", marginHorizontal: spacing.md, paddingVertical: 17 },
-  rowCopy: { flex: 1, gap: 3 },
+  title: { ...type.display, fontSize: 28 },
+  profile: { alignItems: "center", flexDirection: "row", gap: 13 },
+  avatar: { alignItems: "center", borderColor: colors.accent, borderRadius: 26, borderWidth: 1, height: 52, justifyContent: "center", width: 52 },
+  initials: { color: colors.accentBright, fontFamily: fonts.mark, fontSize: 22 },
+  handle: { color: colors.inkStrong, fontFamily: fonts.sansSemiBold, fontSize: 17 },
+  role: { ...type.small, marginTop: 2 },
+  fine: { ...type.meta, color: colors.faint, lineHeight: 18 },
+  list: { backgroundColor: colors.surface, borderColor: colors.border, borderRadius: radius.lg, borderWidth: 1, overflow: "hidden" },
+  row: { alignItems: "center", flexDirection: "row", gap: 13, minHeight: 58, paddingHorizontal: spacing.md, paddingVertical: 12 },
   divider: { borderBottomColor: colors.border, borderBottomWidth: 1 },
-  rowText: { fontFamily: "Geist", color: colors.ink, fontSize: 15, fontWeight: "600" },
-  betaLabel: { fontFamily: "Geist", color: colors.muted, fontSize: 11 },
-  chevron: { color: colors.muted, fontFamily: "Geist", fontSize: 25, marginLeft: spacing.sm },
-  signOut: { alignItems: "center", borderColor: colors.border, borderRadius: 14, borderWidth: 1, padding: 14 },
-  signOutText: { fontFamily: "Geist", color: colors.danger, fontWeight: "700" },
-  deleteAccount: { alignItems: "center", paddingHorizontal: spacing.sm, paddingVertical: 4 },
-  deleteAccountText: { fontFamily: "Geist", color: colors.danger, fontSize: 13, fontWeight: "700", textDecorationLine: "underline" },
-  deletionNote: { fontFamily: "Geist", color: colors.muted, fontSize: 11, lineHeight: 16, marginTop: -8, textAlign: "center" },
+  rowText: { color: colors.inkStrong, fontFamily: fonts.sansMedium, fontSize: 15.5 },
+  rowDetail: { ...type.meta },
+  error: { color: colors.danger, fontFamily: fonts.sans, fontSize: 13, textAlign: "center" },
   sectionHeader: { alignItems: "center", flexDirection: "row", justifyContent: "space-between", marginTop: spacing.sm },
-  sectionTitle: { fontFamily: "Geist", color: colors.ink, fontSize: 20, fontWeight: "700" },
-  sectionCopy: { fontFamily: "Geist", color: colors.muted, fontSize: 13, lineHeight: 19, marginTop: -8 },
-  helpCard: { backgroundColor: colors.surface, borderColor: colors.border, borderRadius: 16, borderWidth: 1, gap: 7, padding: spacing.md },
-  helpTop: { alignItems: "center", flexDirection: "row", gap: spacing.sm, justifyContent: "space-between" },
-  helpTitle: { fontFamily: "Geist", color: colors.ink, flex: 1, fontSize: 15, fontWeight: "700" },
-  helpDetail: { fontFamily: "Geist", color: colors.muted, fontSize: 13, lineHeight: 19 },
-  helpTime: { fontFamily: "Geist", color: colors.muted, fontSize: 11 },
-  status: { backgroundColor: colors.accentSoft, borderRadius: 20, paddingHorizontal: 9, paddingVertical: 5 },
-  statusText: { fontFamily: "Geist", color: colors.accent, fontSize: 11, fontWeight: "700", textTransform: "capitalize" },
+  section: { ...type.section },
+  card: { backgroundColor: colors.surface, borderColor: colors.border, borderRadius: radius.md, borderWidth: 1, gap: 6, padding: 14 },
+  cardTop: { alignItems: "center", flexDirection: "row", gap: spacing.sm, justifyContent: "space-between" },
+  cardTitle: { color: colors.inkStrong, flex: 1, fontFamily: fonts.sansSemiBold, fontSize: 15 },
+  cardText: { ...type.small },
+  status: { backgroundColor: colors.accentSoft, borderRadius: radius.pill, color: colors.accentBright, fontFamily: fonts.sansSemiBold, fontSize: 11.5, overflow: "hidden", paddingHorizontal: 9, paddingVertical: 4 },
+  date: { ...type.meta, color: colors.faint },
+  link: { color: colors.accentBright, fontFamily: fonts.sansSemiBold, fontSize: 14 },
+  shape: { alignItems: "center", borderColor: colors.border, borderRadius: radius.md, borderStyle: "dashed", borderWidth: 1, flexDirection: "row", gap: 10, marginTop: spacing.sm, padding: 14 },
+  shapeTitle: { color: colors.ink, fontFamily: fonts.serif, fontSize: 17 },
+  deleteButton: { alignItems: "center", minHeight: 36, justifyContent: "center" },
+  delete: { color: colors.danger, fontFamily: fonts.sansMedium, fontSize: 13.5, textDecorationLine: "underline" },
 });

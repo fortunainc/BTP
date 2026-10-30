@@ -29,5 +29,5 @@ const styles = StyleSheet.create({
   safe: { backgroundColor: colors.background, flex: 1 },
   keyboard: { flex: 1 },
   scroll: { flexGrow: 1 },
-  content: { flex: 1, gap: spacing.md, padding: spacing.lg },
+  content: { flex: 1, gap: spacing.md, padding: spacing.lg, paddingBottom: 40, paddingTop: spacing.sm },
 });

@@ -3,6 +3,7 @@
  */
 
 import { Resend } from 'resend';
+import { COMPANY_NAME, EMAIL_FROM, SUPPORT_EMAIL } from '@/lib/site';
 
 // Lazy initialization to avoid build-time errors
 let resend: Resend | null = null;
@@ -38,7 +39,8 @@ export class EmailVerificationService {
 
       // Send email via Resend
       const { error } = await getResendClient().emails.send({
-        from: process.env.RESEND_FROM_EMAIL || 'BehindTheProtocol <no-reply@behindtheprotocol.com>',
+        from: EMAIL_FROM,
+        replyTo: SUPPORT_EMAIL,
         to: data.to,
         subject: 'Verify Your BehindTheProtocol Account',
         html: this.getVerificationEmailHTML(data.code, data.handle),
@@ -126,8 +128,8 @@ export class EmailVerificationService {
           </div>
           
           <div style="text-align: center; margin-top: 30px; color: #9ca3af; font-size: 12px;">
-            <p>BehindTheProtocol © 2025</p>
-            <p>This is an automated email. Please do not reply.</p>
+            <p>© ${new Date().getFullYear()} ${COMPANY_NAME}</p>
+            <p>Questions? Write to <a href="mailto:${SUPPORT_EMAIL}" style="color: #9ca3af;">${SUPPORT_EMAIL}</a>.</p>
           </div>
         </body>
       </html>

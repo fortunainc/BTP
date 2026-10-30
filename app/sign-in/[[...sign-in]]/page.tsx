@@ -3,8 +3,8 @@
 import Link from 'next/link';
 import { useSignIn } from '@clerk/nextjs';
 import { FormEvent, useState } from 'react';
+import { SUPPORT_EMAIL } from '@/lib/site';
 
-const SUPPORT_EMAIL = 'fortunaindustriesinc@gmail.com';
 
 function clerkMessage(error: unknown): string {
   const candidate = error as { errors?: Array<{ longMessage?: string; message?: string }> };
