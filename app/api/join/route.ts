@@ -28,5 +28,5 @@ export async function POST(req: NextRequest) {
       source: referrer ? 'member referral' : data.source, referrerId: referrer?.id ?? null,
     } });
     return NextResponse.json({ success: true }, { headers });
-  } catch { return NextResponse.json({ error: 'We could not save your request. Please try again.' }, { status: 503, headers }); }
+  } catch { return NextResponse.json({ error: 'We could not save your request. Your details are still here. Please try again.' }, { status: 503, headers }); }
 }

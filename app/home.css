@@ -154,3 +154,7 @@
 .bh section{padding:80px 0}}
 @media(prefers-reduced-motion:reduce){.bh *,.bh *::before,.bh *::after{animation:none!important;transition:none!important}
 .bh .eyebrow,.bh h1 span.ln,.bh .sub,.bh .ctas,.bh .reveal{opacity:1!important;transform:none!important}}@media(max-width:560px){.bh .hero .eco{width:min(300px,70vw)}.bh .eco .pill{padding:8px 11px}.bh .eco .pill b{font-size:18px}.bh .eco .pill small{font-size:8.5px;letter-spacing:.1em}}
+.bh .access{margin:14px 0 0;font:400 13px var(--sans);color:#d2c3b2}
+.bh .stat .st{display:block;font:500 19px/1.3 var(--serif);color:#f6efe4;margin-bottom:8px}
+.bh .stat .src{display:block;margin-top:12px;font:400 12px/1.5 var(--sans);color:#b9a993}
+.bh .stat .src a{color:inherit;text-decoration:underline;text-underline-offset:2px}

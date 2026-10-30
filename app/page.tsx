@@ -5,7 +5,7 @@ import TrafficBeacon from '@/components/TrafficBeacon';
 import { HOME_HTML } from '@/components/marketing/home-markup';
 import './home.css';
 
-export const metadata: Metadata = { title: 'BTP | Clinical trial experience, connected.', description: 'Behind the Protocol connects clinical-trial professionals to practical peer experience, operational discussions, and private help.' };
+export const metadata: Metadata = { title: 'BTP | Clinical trial experience, connected.', description: 'A private, verified community for coordinators, CRAs and clinical research teams. Access reviewed by BTP.' };
 
 const serif = Newsreader({ subsets: ['latin'], axes: ['opsz'], variable: '--font-newsreader', display: 'swap' });
 const sans = Inter({ subsets: ['latin'], variable: '--font-inter', display: 'swap' });

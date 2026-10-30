@@ -26,7 +26,7 @@ export function Gate({ children }: { children: React.ReactNode }) {
         <div className="heroBody">{children}</div>
       </div>
     </header>
-    <footer><div className="wrap">Behind the Protocol · Fortuna Industries Inc. · <Link href="/privacy" style={{color:'inherit'}}>Privacy</Link> · <Link href="/support" style={{color:'inherit'}}>Support</Link></div></footer>
+    <footer><div className="wrap">Behind the Protocol · Behind The Protocol Inc. · <Link href="/privacy" style={{color:'inherit'}}>Privacy</Link> · <Link href="/support" style={{color:'inherit'}}>Support</Link></div></footer>
   </div>;
 }
 

@@ -15,7 +15,7 @@ export async function POST(req: NextRequest) {
   if (!body || typeof body !== 'object' || Array.isArray(body)) return NextResponse.json({ error: 'Please check the form.' }, { status: 400, headers });
   if (body.fax) return NextResponse.json({ success: true }, { headers }); // hidden trap field
   const parsed = parseCompanyInquiry(body);
-  if (!parsed.ok) return NextResponse.json({ error: 'Please check the highlighted fields.', fields: parsed.errors }, { status: 400, headers });
+  if (!parsed.ok) return NextResponse.json({ error: 'Please check the highlighted fields. Your answers are still here.', fields: parsed.errors }, { status: 400, headers });
   try {
     const ip = req.headers.get('x-forwarded-for')?.split(',')[0].trim() || 'unknown';
     const budget = await checkWriteRateLimit(createHash('sha256').update('company-inquiry:' + ip).digest('hex'), '/api/companies');
