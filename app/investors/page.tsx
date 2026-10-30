@@ -24,23 +24,24 @@ export default async function Investors({searchParams}: {searchParams:Promise<{e
     return <Gate>
       <TrafficBeacon path="/investors" />
       <div className="eyebrow">By invitation</div>
-      <h1><span className="ln l1">The investor</span><span className="ln l2"><span className="g">room.</span></span></h1>
-      <p className="sub">The business behind BTP: the problem, the model, the first product and where the company stands today. For prospective investors.</p>
+      <h1><span className="ln l1">Inside</span><span className="ln l2"><span className="g">BTP.</span></span></h1>
+      <p className="sub">The business behind the community. Explore the first commercial offer, the revenue model, and the opportunity to build on what clinical research professionals know.</p>
       <div className="gcard reveal in">
         {params.error && <p role="alert" className="gerr">{ERRORS[params.error] ?? ERRORS.access}</p>}
         {!configured ? <p role="status">Private access is being prepared. Please contact BTP for an invitation.</p>
-          : params.sent ? <p role="status" className="gsent">Thank you. If your email is approved, your private link is on its way. If not, BTP has your request and will be in touch.</p>
+          : params.sent ? <p role="status" className="gsent">Thank you. BTP reviews access requests. Approved investors receive a personal link.</p>
           : <>
             <form method="post" action="/investors/request">
               <label htmlFor="email">Your email</label><input id="email" name="email" type="email" autoComplete="email" required maxLength={254} />
               <label htmlFor="name">Name and firm</label><input id="name" name="name" type="text" autoComplete="organization" maxLength={120} placeholder="Optional" />
-              <button className="btn gold" type="submit">Request access <span aria-hidden>→</span></button>
+              <button className="btn gold" type="submit">Request investor access <span aria-hidden>→</span></button>
             </form>
-            <details className="gpw"><summary>Have an access password?</summary>
-              <form method="post" action="/investors/access"><label htmlFor="password">Access password</label><input id="password" name="password" type="password" autoComplete="current-password" required maxLength={256} /><button className="btn gold" type="submit">Enter the room <span aria-hidden>→</span></button></form>
+            <details className="gpw"><summary>Have a shared access password?</summary>
+              <form method="post" action="/investors/access"><label htmlFor="password">Access password</label><input id="password" name="password" type="password" autoComplete="current-password" required maxLength={256} /><button className="btn gold" type="submit">Enter investor room <span aria-hidden>→</span></button></form>
             </details>
           </>}
-        <p>Access is personal and approved by BTP. Please do not forward links or briefing material. Questions? <a href={CONTACT}>Contact BTP</a>.</p>
+        <p>BTP reviews access requests. Approved investors receive a personal link.</p>
+        <p>A shared password opens the same briefing without a personal link. Please do not forward links or briefing material. Questions? <a href={CONTACT}>Contact BTP</a>.</p>
       </div>
     </Gate>;
   }

@@ -1,4 +1,4 @@
 import Link from 'next/link';
 import s from './site.module.css';
 export function SiteHeader() { return <header className={s.nav}><Link className={s.logo} href="/" aria-label="BTP — Behind the Protocol home"><span className={s.monogram}>btp</span><span>BEHIND<br/>THE PROTOCOL</span></Link><nav aria-label="Main navigation" className={s.navlinks}><Link href="/#who">Who it’s for</Link><Link href="/#how">How it works</Link><Link href="/investors">Investors</Link><Link href="/sign-in" className={s.secondary}>Member sign in <span aria-hidden>↗</span></Link></nav></header>; }
-export function SiteFooter() { return <footer className={s.footer}><span>© {new Date().getFullYear()} Fortuna Industries Inc. · Behind the Protocol</span><div><Link href="/privacy">Privacy</Link><Link href="/support">Support</Link><Link href="/investors">Investors</Link></div></footer>; }
+export function SiteFooter() { return <footer className={s.footer}><span>© {new Date().getFullYear()} Behind The Protocol Inc. · Behind the Protocol</span><div><Link href="/privacy">Privacy</Link><Link href="/support">Support</Link><Link href="/investors">Investors</Link></div></footer>; }

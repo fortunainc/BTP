@@ -21,7 +21,7 @@ export default function CompanyInquiriesAdmin() {
     <Link href="/admin/founder" className="text-[#e2c58e]">← Founder view</Link>
     <p className="mt-6 text-xs uppercase tracking-[0.2em] text-[#d9bc83]">Company inquiry</p>
     <h1 className="mt-2 text-4xl">Product review inquiries.</h1>
-    <p className="mt-3 text-slate-400">From the For companies page. Stored separately from the operator waitlist. Nothing here is sent to anyone automatically.</p>
+    <p className="mt-3 text-slate-400">From the For startups page. Stored separately from the operator waitlist. Nothing here is sent to anyone automatically.</p>
     <div className="my-8 grid grid-cols-3 gap-4">{STATUS.map(([k, l]) => <div key={k} className="rounded-xl border border-[#5c4b32] p-5"><p className="text-3xl text-[#e2c58e]">{all.filter(r => r.status === k).length}</p><p>{l}</p></div>)}</div>
     <div className="mb-6"><a href="/api/admin/company-inquiries?format=csv" className="rounded border border-[#5c4b32] p-3 text-[#e2c58e]">Download all as CSV</a></div>
     {error && <p role="alert" className="my-4 text-red-300">{error}</p>}

@@ -1,5 +1,6 @@
 'use client';
 
+import Link from 'next/link';
 import { useSignIn } from '@clerk/nextjs';
 import { FormEvent, useState } from 'react';
 
@@ -132,7 +133,7 @@ export default function SignInPage() {
 
         <div className="px-7 py-8 sm:px-9">
           <h1 className="text-4xl text-[#fff6ea]">Welcome <span className="text-[#e8cc94]">back.</span></h1>
-          <p className="mt-2 text-sm leading-6 text-[#d9ccbd]">Sign in with the email and password connected to your BTP account.</p>
+          <p className="mt-2 text-sm leading-6 text-[#d9ccbd]">Sign in with your password, or have a sign-in code sent to your email.</p>
 
           <form onSubmit={codeSent ? verifyCode : submit} className="mt-7 space-y-5">
             <label className="block text-[11px] font-semibold uppercase tracking-[0.18em] text-[#e6c98f]">
@@ -169,7 +170,7 @@ export default function SignInPage() {
 
           <p className="mt-6 text-center text-sm leading-6 text-[#d9ccbd]">
             New to BTP?{' '}
-            <a className="text-[#e8cc94] underline decoration-[#C9A66B] underline-offset-4" href={`mailto:${SUPPORT_EMAIL}?subject=BTP%20beta%20access`}>Request beta access</a>
+            <Link className="text-[#e8cc94] underline decoration-[#C9A66B] underline-offset-4" href="/join">Request early access</Link>
             <span className="mx-2 text-slate-600">·</span>
             <a className="text-[#d9ccbd] underline decoration-[#C9A66B] underline-offset-4" href={`mailto:${SUPPORT_EMAIL}`}>Contact support</a>
           </p>

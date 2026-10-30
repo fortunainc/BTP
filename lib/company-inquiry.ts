@@ -8,7 +8,7 @@ const normalizeEmail = (v: unknown) => {
 export const INQUIRY_ACCESS = [
   ['demo', 'A demo or sandbox account we can share'],
   ['prototype', 'A usable prototype'],
-  ['walkthrough', 'A walkthrough or screen recording only'],
+  ['walkthrough', 'A recording or live demonstration only'],
   ['not_yet', 'Not yet'],
 ] as const;
 export const INQUIRY_STATUS = ['new', 'in_discussion', 'closed'] as const;
@@ -35,9 +35,9 @@ export function parseCompanyInquiry(body: Record<string, unknown>) {
   const email = normalizeEmail(body.email); if (!email) errors.email = 'Enter a valid work email.';
   const company = text(body.company, 2, 160); if (!company) errors.company = 'Enter your company name.';
   const website = normalizeWebsite(body.website); if (!website) errors.website = 'Enter your company website, for example example.com.';
-  const product = text(body.product, 10, 1200); if (!product) errors.product = 'Briefly describe the product and who uses it (at least 10 characters).';
-  const goals = text(body.goals, 10, 1200); if (!goals) errors.goals = 'Tell us what you want to learn or improve (at least 10 characters).';
-  const access = typeof body.access === 'string' && ACCESS_KEYS.includes(body.access) ? body.access : null; if (!access) errors.access = 'Choose what you can share.';
+  const product = text(body.product, 10, 1200); if (!product) errors.product = 'Tell us briefly what the product does and who uses it.';
+  const goals = text(body.goals, 10, 1200); if (!goals) errors.goals = 'Tell us what you most want to learn.';
+  const access = typeof body.access === 'string' && ACCESS_KEYS.includes(body.access) ? body.access : null; if (!access) errors.access = 'Choose what reviewers can see or use.';
   if (Object.keys(errors).length) return { ok: false as const, errors };
   return { ok: true as const, data: { name: name!, email: email!, company: company!, website: website!, product: product!, goals: goals!, access: access! } };
 }
