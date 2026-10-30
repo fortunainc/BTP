@@ -51,6 +51,7 @@ export default function YouScreen() {
     <Text style={styles.fine}>Members see your handle and general role. Your name, email and employer are never shown. Never use your real name or employer as your handle.</Text>
 
     <View style={styles.list}>
+      <Row icon="information-circle-outline" label="About BTP" onPress={() => router.push("/about")} />
       <Row icon="bookmark-outline" label="Saved answers" onPress={() => router.push("/saved")} />
       <Row detail={open ? `${open} open request${open === 1 ? "" : "s"}` : "Help a community answer can’t cover"} icon="briefcase-outline" label="Private help" onPress={() => router.push("/private-help")} />
       <Row icon="shield-checkmark-outline" label="Privacy and trust" onPress={() => router.push("/trust-center")} />
