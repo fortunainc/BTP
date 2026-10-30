@@ -2,6 +2,7 @@ import { Stack } from "expo-router";
 import { useFonts } from "expo-font";
 import { StatusBar } from "expo-status-bar";
 import { ActivityIndicator, View } from "react-native";
+import { WelcomeGate } from "@/components/WelcomeGate";
 import { BtpAuthProvider } from "@/lib/auth";
 import { colors } from "@/constants/theme";
 
@@ -25,14 +26,17 @@ export default function RootLayout() {
   return (
     <BtpAuthProvider>
       <StatusBar style="light" backgroundColor={colors.background} />
-      <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: colors.background } }}>
-        <Stack.Screen name="(tabs)" />
-        <Stack.Screen name="question/[id]" />
-        <Stack.Screen name="private-help" />
-        <Stack.Screen name="saved" />
-        <Stack.Screen name="paid-reviews" />
-        <Stack.Screen name="trust-center" options={{ presentation: "modal" }} />
-      </Stack>
+      <WelcomeGate>
+        <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: colors.background } }}>
+          <Stack.Screen name="(tabs)" />
+          <Stack.Screen name="question/[id]" />
+          <Stack.Screen name="private-help" />
+          <Stack.Screen name="saved" />
+          <Stack.Screen name="about" />
+          <Stack.Screen name="paid-reviews" />
+          <Stack.Screen name="trust-center" options={{ presentation: "modal" }} />
+        </Stack>
+      </WelcomeGate>
     </BtpAuthProvider>
   );
 }
