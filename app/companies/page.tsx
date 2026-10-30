@@ -29,7 +29,7 @@ export default function CompaniesPage() {
         <p className="bw-kicker">BTP Product Review · For founders and product teams</p>
         <h1>Build what clinical trial teams <em>actually need.</em></h1>
         <p className="bw-lead">Get your product in front of professionals matched to the work it needs to support. Leave knowing what to improve and why.</p>
-        <div className="co-ctas"><a className="co-btn" href="#inquire">Discuss your product →</a></div>
+        <div className="co-ctas"><a className="co-btn" href="#inquire">Discuss your product →</a><Link href="/join?audience=founder">Not ready yet? Join the waiting list →</Link></div>
       </section>
 
       <section className="co-sec" aria-labelledby="how">

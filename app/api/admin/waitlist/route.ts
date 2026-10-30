@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { verifyAdminAccess } from '@/lib/admin-auth';
 import { prisma } from '@/lib/prisma';
 import { isApprovedMember } from '@/lib/access-policy';
+import { FOUNDER_WAITLIST_ROLE } from '@/lib/waitlist-options';
 import { csvCell } from '@/lib/waitlist';
 const headers = { 'Cache-Control': 'private, no-store' };
 export async function GET(req: NextRequest) {
@@ -13,7 +14,7 @@ export async function GET(req: NextRequest) {
   const byId = new Map(members.map(m => [m.id, m]));
   const entries = rows.map(r => {
     const ref = r.referrerId ? byId.get(r.referrerId) : undefined;
-    return { ...r, referrer: ref?.handle || null, eligible: Boolean(r.professionalVerifiedAt || (ref && isApprovedMember(ref))) };
+    return { ...r, referrer: ref?.handle || null, eligible: r.role !== FOUNDER_WAITLIST_ROLE && Boolean(r.professionalVerifiedAt || (ref && isApprovedMember(ref))) };
   });
   if (req.nextUrl.searchParams.get('format') === 'csv') {
     const fields = ['Email', 'Role', 'Paid review interest', 'Source', 'Referrer', 'Eligible', 'Status', 'Requested'];
@@ -34,6 +35,7 @@ export async function PATCH(req: NextRequest) {
   if (typeof body.id !== 'string') return NextResponse.json({ error: 'Choose a request.' }, { status: 400, headers });
   const row = await prisma.accessRequest.findUnique({ where: { id: body.id } });
   if (!row) return NextResponse.json({ error: 'Request not found.' }, { status: 404, headers });
+  if (row.role === FOUNDER_WAITLIST_ROLE) return NextResponse.json({ error: 'This is founder product-review interest, not a community access request.' }, { status: 409, headers });
   if (body.action === 'verify') {
     const note = typeof body.note === 'string' ? body.note.trim() : '';
     if (note.length < 8 || note.length > 300) return NextResponse.json({ error: 'Briefly record how you checked their professional experience.' }, { status: 400, headers });

@@ -9,6 +9,7 @@ vi.mock('@/lib/admin-auth', () => ({ verifyAdminAccess: mocks.auth }));
 vi.mock('@/lib/write-rate-limit', () => ({ checkWriteRateLimit: mocks.limit }));
 import { POST } from '@/app/api/join/route';
 import { GET, PATCH } from '@/app/api/admin/waitlist/route';
+import { FOUNDER_WAITLIST_ROLE } from '@/lib/waitlist-options';
 import { csvCell } from '@/lib/waitlist';
 const payload = { email: ' Person@Example.com ', role: 'Coordinator', contactConsent: true, paidReviewInterest: false };
 const req = (body: unknown, path='/api/join', origin='https://btp.test', method='POST') => new NextRequest('https://btp.test'+path, { method, headers: { origin, 'content-type':'application/json' }, body: JSON.stringify(body) });
@@ -52,5 +53,22 @@ describe('waitlist access and consent', () => {
  });
  it('escapes spreadsheet formulas and quotes in CSV exports',()=>{
   expect(csvCell('=HYPERLINK("evil")')).toBe('"\'=HYPERLINK(""evil"")"');
+ });
+});
+
+describe('founder waiting list separation', () => {
+ it('saves founder interest without reviewer opt-in or referral membership', async () => {
+  expect((await POST(req({...payload,role:FOUNDER_WAITLIST_ROLE,paidReviewInterest:true,code:'abcdefg',source:'sinclair'}))).status).toBe(200);
+  expect(mocks.db.accessRequest.upsert).toHaveBeenCalledWith(expect.objectContaining({update:{},create:expect.objectContaining({role:FOUNDER_WAITLIST_ROLE,paidReviewInterest:false,referrerId:null,source:'sinclair'})}));
+  expect(mocks.db.user.findUnique).not.toHaveBeenCalled();
+ });
+ it('requires founder contact consent', async () => {
+  expect((await POST(req({...payload,role:FOUNDER_WAITLIST_ROLE,contactConsent:false}))).status).toBe(400);
+  expect(mocks.db.accessRequest.upsert).not.toHaveBeenCalled();
+ });
+ it('blocks founder verification and membership invitations even if verification was set', async () => {
+  mocks.db.accessRequest.findUnique.mockResolvedValue({id:'f',role:FOUNDER_WAITLIST_ROLE,professionalVerifiedAt:new Date()});
+  for (const action of ['verify','invite']) expect((await PATCH(req({id:'f',action,note:'checked experience'},'/api/admin/waitlist','https://btp.test','PATCH'))).status).toBe(409);
+  expect(mocks.db.accessRequest.update).not.toHaveBeenCalled();
  });
 });
