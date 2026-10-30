@@ -2,7 +2,7 @@
   "expo": {
     "name": "BTP",
     "slug": "btp-mobile",
-    "version": "0.1.0",
+    "version": "0.2.0",
     "orientation": "portrait",
     "scheme": "btp",
     "userInterfaceStyle": "dark",
@@ -11,7 +11,7 @@
     "splash": {
       "image": "./assets/brand/splash.png",
       "resizeMode": "cover",
-      "backgroundColor": "#3A1A1E"
+      "backgroundColor": "#070405"
     },
     "ios": {
       "supportsTablet": false,
@@ -24,7 +24,7 @@
       "package": "com.btp.mobile",
       "adaptiveIcon": {
         "foregroundImage": "./assets/brand/app-icon.png",
-        "backgroundColor": "#3A1A1E"
+        "backgroundColor": "#070405"
       }
     },
     "plugins": [

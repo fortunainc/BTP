@@ -1,5 +1,6 @@
 import { isApprovedMember } from '@/lib/access-policy';
 import { withAuth, createApiResponse } from '@/lib/api-auth';
+import { verifiedRoleLabel } from '@/lib/role-label';
 
 /**
  * Minimal bearer-token probe for the Expo app. Clerk's route-handler auth reads
@@ -11,6 +12,8 @@ export const GET = withAuth(async (_request, user) => createApiResponse({
     id: user.id,
     handle: user.handle,
     roleCategory: user.roleCategory,
+    // The same general role label other members see on this member's posts.
+    roleLabel: isApprovedMember(user) ? verifiedRoleLabel(user.roleCategory) : null,
     companyCategory: user.companyCategory,
     verificationStatus: user.verificationStatus,
     approved: isApprovedMember(user),

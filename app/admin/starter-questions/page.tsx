@@ -19,7 +19,9 @@ export default function StarterQuestions() {
       });
       const body = await res.json().catch(() => ({}));
       if (!res.ok) throw new Error(body.error || 'failed');
-      const held = typeof body.message === 'string' && body.message.includes('reviewed');
+      const held = typeof body.pendingReview === 'boolean'
+        ? body.pendingReview
+        : typeof body.message === 'string' && /review/i.test(body.message);
       setStatus((s) => s.map((x, j) => (j === i ? (held ? 'held' : 'posted') : x)));
     } catch {
       setStatus((s) => s.map((x, j) => (j === i ? 'error' : x)));

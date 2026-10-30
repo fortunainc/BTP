@@ -13,6 +13,7 @@ import { buildInteractionSummary } from '@/lib/operator-return-loop';
 import { getOrCreateUserMetrics, trackEvent, EVENT_TYPES } from '@/lib/analytics-tracker';
 import { verifiedRoleLabel } from '@/lib/role-label';
 import { reactionSummary } from '@/lib/engagement';
+import { PUBLIC_AUTHOR_SELECT, authorHandle, authorRoleLabel, publicAuthor } from '@/lib/public-author';
 
 /**
  * GET /api/situations/[id]
@@ -36,6 +37,8 @@ export const GET = withAuth(async (req, user) => {
       contributionType: { in: ['question', 'situation'] },
     },
     include: {
+      // Public author fields only; handle is returned for approved members only.
+      user: { select: PUBLIC_AUTHOR_SELECT },
       interactions: {
         where: { displayStatus: 'VISIBLE' },
         select: {
@@ -45,12 +48,7 @@ export const GET = withAuth(async (req, user) => {
           context: true,
           displayStatus: true,
           createdAt: true,
-          user: {
-            select: {
-              roleCategory: true,
-              verificationStatus: true,
-            },
-          },
+          user: { select: PUBLIC_AUTHOR_SELECT },
         },
       },
     },
@@ -119,6 +117,7 @@ export const GET = withAuth(async (req, user) => {
       urgencyLevel: situation.urgencyLevel,
       resolutionStatus: situation.resolutionStatus,
       isAuthor: situation.userId === user.id,
+      ...publicAuthor(situation.user),
       timeBucket: timeBucketInfo.bucket,
       timeLabel: timeBucketInfo.label,
     },
@@ -133,6 +132,8 @@ export const GET = withAuth(async (req, user) => {
         role: interaction.user?.verificationStatus === 'Approved'
           ? verifiedRoleLabel(interaction.user.roleCategory)
           : 'BTP member',
+        authorHandle: authorHandle(interaction.user),
+        authorRole: authorRoleLabel(interaction.user),
         timeLabel: bucketTimestamp(interaction.createdAt).label,
         isAuthor: interaction.userId === user.id,
         reactions: reactions[interaction.id]?.counts,

@@ -1,13 +1,15 @@
 import { ClerkProvider, getClerkInstance, useAuth, useSignIn } from "@clerk/clerk-expo";
 import * as SecureStore from "expo-secure-store";
 import { createContext, type PropsWithChildren, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
-import { ActivityIndicator, Alert, Keyboard, KeyboardAvoidingView, Platform, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
-import { BookQuote } from "@/components/BookQuote";
-import { colors, spacing } from "@/constants/theme";
+import { ActivityIndicator, Alert, Keyboard, KeyboardAvoidingView, Linking, Platform, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { Button, Mark } from "@/components/ui";
+import { colors, fonts, radius, spacing, type } from "@/constants/theme";
 import { api, ApiError, liveApiConfigured } from "@/lib/api";
+import { SITE_URL } from "@/lib/links";
 import { CLERK_PROXY_URL, CLERK_PUBLISHABLE_KEY, configurationIssues, devAuthToken, localPreviewEnabled } from "@/lib/config";
 
-export type BtpMember = { id: string; handle: string; roleCategory?: string | null; companyCategory?: string | null; verificationStatus?: string | null; approved: boolean };
+export type BtpMember = { id: string; handle: string; roleCategory?: string | null; roleLabel?: string | null; companyCategory?: string | null; verificationStatus?: string | null; approved: boolean };
 type AuthState = { configured: boolean; ready: boolean; signedIn: boolean; member: BtpMember | null; getToken: () => Promise<string | null>; signOut: () => Promise<void> };
 const AuthContext = createContext<AuthState>({ configured: Boolean(devAuthToken), ready: true, signedIn: Boolean(devAuthToken), member: null, getToken: async () => devAuthToken ?? null, signOut: async () => undefined });
 const tokenCache = { getToken: (key: string) => SecureStore.getItemAsync(key), saveToken: (key: string, value: string) => SecureStore.setItemAsync(key, value) };
@@ -52,25 +54,39 @@ function ClerkBridge({ children }: PropsWithChildren) {
   }, []);
   const stableSignOut = useCallback(() => signOutRef.current(), []);
   const [slow, setSlow] = useState(false);
-  useEffect(() => { if (isLoaded) return; const t = setTimeout(() => setSlow(true), 15000); return () => clearTimeout(t); }, [isLoaded]);
+  useEffect(() => { if (isLoaded) return; const t = setTimeout(() => setSlow(true), 10000); return () => clearTimeout(t); }, [isLoaded]);
   useEffect(() => { if (isLoaded && isSignedIn && userId) void checkMembership(); }, [checkMembership, isLoaded, isSignedIn, userId]);
   useEffect(() => { if (isLoaded && !isSignedIn) { setMember(null); setError(""); setNotFound(false); setChecking(true); } }, [isLoaded, isSignedIn]);
   const value = useMemo<AuthState>(() => ({ configured: true, ready: true, signedIn: true, member, getToken: () => getTokenRef.current(), signOut: stableSignOut }), [member, stableSignOut]);
-  if (!isLoaded) return <View style={styles.center}><ActivityIndicator color={colors.accent}/>{slow ? <Text style={styles.checking}>Can’t reach BTP. Check your connection, then close and reopen the app.</Text> : null}</View>;
+  if (!isLoaded) return <View style={styles.center}><Mark size={30} /><ActivityIndicator color={colors.accent}/>{slow ? <Text style={styles.checking}>Can’t reach BTP. Check your connection, then close and reopen the app.</Text> : null}</View>;
   if (!isSignedIn) return <SignInScreen/>;
   if (!liveApiConfigured) return <AccessScreen title="App setup needed" copy="This build is not connected to the BTP service." onRetry={checkMembership} onSignOut={stableSignOut} retryLabel="Try again" />;
-  if (checking) return <View style={styles.center}><ActivityIndicator color={colors.accent}/><Text style={styles.checking}>Checking your BTP membership…</Text></View>;
+  if (checking) return <View style={styles.center}><ActivityIndicator color={colors.accent}/><Text style={styles.checking}>Checking your access…</Text></View>;
   if (error) return <AccessScreen title="Could not verify access" copy={error} onRetry={checkMembership} onSignOut={stableSignOut} retryLabel="Retry" />;
   if (notFound) return <AccessScreen title="Account not ready" copy="BTP could not set up your member account. Try again, or contact BTP support." onRetry={checkMembership} onSignOut={stableSignOut} retryLabel="Check again" />;
   if (!member?.approved) {
     const rejected = member?.verificationStatus?.toLowerCase() === "rejected";
-    return <AccessScreen title={rejected ? "Access not approved" : "Verification pending"} copy={rejected ? "This account is not approved for the BTP beta. Contact BTP if you think this is an error." : "BTP is reviewing your invitation and professional verification. You’ll be able to enter once it is approved."} onRetry={checkMembership} onSignOut={stableSignOut} retryLabel="Check status" />;
+    return rejected
+      ? <AccessScreen status="Not approved" tone="error" title="Access was not approved." copy="If you think this is a mistake, contact BTP support." onRetry={() => Linking.openURL(`${SITE_URL}/support`)} onSignOut={stableSignOut} retryLabel="Contact support" />
+      : <AccessScreen status="Access review in progress" title="Your request is with BTP." copy="BTP reviews every account before granting access. You’ll get an email when it is approved." privacy onRetry={checkMembership} onSignOut={stableSignOut} retryLabel="Check status" secondary={{ label: "Finish verification on the website", onPress: () => void Linking.openURL(`${SITE_URL}/onboarding`) }} />;
   }
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
 
-function AccessScreen({ title, copy, onRetry, onSignOut, retryLabel }: { title: string; copy: string; onRetry: () => Promise<void>; onSignOut: () => Promise<void>; retryLabel: string }) {
-  return <View style={styles.access}><Text style={styles.brand}>BTP</Text><Text style={styles.title}>{title}</Text><Text style={styles.copy}>{copy}</Text><Pressable onPress={() => void onRetry()} style={styles.button}><Text style={styles.buttonText}>{retryLabel}</Text></Pressable><Pressable onPress={() => void onSignOut()} style={styles.secondary}><Text style={styles.secondaryText}>Sign out</Text></Pressable></View>;
+function AccessScreen({ title, copy, onRetry, onSignOut, retryLabel, status, tone, privacy, secondary }: { title: string; copy: string; onRetry: () => Promise<unknown> | void; onSignOut: () => Promise<void>; retryLabel: string; status?: string; tone?: "error"; privacy?: boolean; secondary?: { label: string; onPress: () => void } }) {
+  return <SafeAreaView style={styles.flex}><ScrollView contentContainerStyle={styles.access}>
+    <Mark size={24} />
+    {status ? <View style={[styles.status, tone === "error" && styles.statusError]}><Text style={[styles.statusText, tone === "error" && { color: colors.danger }]}>{status}</Text></View> : null}
+    <Text style={styles.title}>{title}</Text>
+    <Text style={styles.copy}>{copy}</Text>
+    {privacy ? <View style={styles.split}>
+      <View style={styles.splitCol}><Text style={styles.splitHead}>Kept private by BTP</Text><Text style={styles.splitItem}>Email and name</Text><Text style={styles.splitItem}>Employer</Text><Text style={styles.splitItem}>Verification evidence</Text></View>
+      <View style={styles.splitCol}><Text style={styles.splitHead}>Members see</Text><Text style={styles.splitItem}>Your handle</Text><Text style={styles.splitItem}>A general role</Text><Text style={styles.splitItem}>What you post</Text></View>
+    </View> : null}
+    <Button label={retryLabel} onPress={() => void onRetry()} />
+    {secondary ? <Button label={secondary.label} onPress={secondary.onPress} variant="ghost" /> : null}
+    <Pressable accessibilityRole="button" onPress={() => void onSignOut()} style={styles.textButton}><Text style={styles.note}>Wrong account? <Text style={styles.link}>Sign out</Text></Text></Pressable>
+  </ScrollView></SafeAreaView>;
 }
 
 type Step = "password" | "email" | "email2" | "totp" | "phone" | "backup";
@@ -127,30 +143,66 @@ function SignInScreen() {
   const canSubmit = !busy && (step === "password" ? Boolean(email.trim() && password) : Boolean(code.trim()));
   const canEmail = !busy && Boolean(email.trim());
   const codeHint = step === "totp" ? "Enter the code from your authenticator." : step === "backup" ? "Enter a backup code." : step === "phone" ? "Enter the code sent to your phone." : `Enter the code sent to ${email.trim() || "your email"}.`;
-  return <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : undefined} style={styles.flex}><ScrollView contentContainerStyle={styles.signIn} keyboardShouldPersistTaps="handled" keyboardDismissMode="on-drag"><Text style={styles.brand}>BTP</Text><Text style={styles.title}>{step === "password" ? "Welcome back" : "Verify your sign-in"}</Text><Text style={styles.copy}>Invite-only access for verified clinical-trial professionals.</Text>
-    {step === "password" && <BookQuote compact />}
+  return <SafeAreaView style={styles.flex}><KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : undefined} style={styles.flex}><ScrollView automaticallyAdjustKeyboardInsets contentContainerStyle={styles.signIn} keyboardShouldPersistTaps="handled" keyboardDismissMode="on-drag">
+    <Mark size={26} />
     {step === "password"
-      ? <><TextInput accessibilityLabel="Email" autoCapitalize="none" autoComplete="email" autoCorrect={false} keyboardType="email-address" onChangeText={setEmail} onSubmitEditing={() => passwordRef.current?.focus()} placeholder="Email address" placeholderTextColor={colors.muted} returnKeyType="next" submitBehavior="submit" style={styles.input} textContentType="emailAddress" value={email}/>
-         <TextInput ref={passwordRef} accessibilityLabel="Password" autoCapitalize="none" autoComplete="password" onChangeText={setPassword} onSubmitEditing={() => { if (canSubmit) void submit(); else Keyboard.dismiss(); }} placeholder="Password (or use an email code below)" placeholderTextColor={colors.muted} returnKeyType="go" secureTextEntry style={styles.input} textContentType="password" value={password}/></>
-      : <><Text style={styles.copy}>{codeHint}</Text><TextInput accessibilityLabel="Verification code" autoCapitalize="none" autoComplete="one-time-code" autoFocus keyboardType={step === "backup" ? "default" : "number-pad"} onChangeText={setCode} placeholder="Verification code" placeholderTextColor={colors.muted} style={styles.input} textContentType="oneTimeCode" value={code}/></>}
-    <Pressable disabled={!canSubmit} onPress={() => void submit()} style={[styles.button, !canSubmit && styles.disabled]}><Text style={styles.buttonText}>{busy ? "Please wait…" : "Continue"}</Text></Pressable>
+      ? <Text accessibilityRole="header" style={styles.line}>Hard questions. Practical answers. <Text style={styles.lineAccent}>Experience you won’t find in a protocol.</Text></Text>
+      : <Text accessibilityRole="header" style={styles.title}>Verify your sign in</Text>}
+    <Text style={styles.copy}>{step === "password" ? "Welcome back. Sign in with your password, or have a sign-in code sent to your email." : codeHint}</Text>
     {step === "password"
-      ? <Pressable disabled={!canEmail} onPress={() => void run(sendEmailCode)} style={[styles.secondary, !canEmail && styles.disabled]}><Text style={styles.secondaryText}>Email me a sign-in code</Text></Pressable>
-      : <>{(step === "email" || step === "email2") && <Pressable disabled={busy} onPress={() => void resend()} style={styles.secondary}><Text style={styles.secondaryText}>Resend code</Text></Pressable>}
-          <Pressable disabled={busy} onPress={() => goTo("password")} style={styles.secondary}><Text style={styles.secondaryText}>Start again</Text></Pressable>
-          {(step === "totp" || step === "phone") && <Pressable onPress={() => goTo("backup")}><Text style={styles.secondaryText}>Use a backup code</Text></Pressable>}</>}
-    <Text style={styles.note}>No password? Enter your email and tap “Email me a sign-in code”. New here? Request access at the BTP website.</Text></ScrollView></KeyboardAvoidingView>;
+      ? <><Text style={styles.label}>Email</Text><TextInput accessibilityLabel="Email" autoCapitalize="none" autoComplete="email" autoCorrect={false} keyboardType="email-address" onChangeText={setEmail} onSubmitEditing={() => passwordRef.current?.focus()} placeholder="you@example.com" placeholderTextColor={colors.faint} returnKeyType="next" submitBehavior="submit" style={styles.input} textContentType="emailAddress" value={email}/>
+         <Text style={styles.label}>Password</Text><TextInput ref={passwordRef} accessibilityLabel="Password" autoCapitalize="none" autoComplete="password" onChangeText={setPassword} onSubmitEditing={() => { if (canSubmit) void submit(); else Keyboard.dismiss(); }} placeholder="Password" placeholderTextColor={colors.faint} returnKeyType="go" secureTextEntry style={styles.input} textContentType="password" value={password}/></>
+      : <TextInput accessibilityLabel="Verification code" autoCapitalize="none" autoComplete="one-time-code" autoFocus keyboardType={step === "backup" ? "default" : "number-pad"} onChangeText={setCode} placeholder="Verification code" placeholderTextColor={colors.faint} style={styles.input} textContentType="oneTimeCode" value={code}/>}
+    <Button busy={busy} disabled={!canSubmit} label={step === "password" ? "Sign in" : "Continue"} onPress={() => void submit()} />
+    {step === "password"
+      ? <Button disabled={!canEmail} label="Email me a sign-in code" onPress={() => void run(sendEmailCode)} variant="ghost" />
+      : <>{(step === "email" || step === "email2") && <Button disabled={busy} label="Resend code" onPress={() => void resend()} variant="ghost" />}
+          <Button disabled={busy} label="Start again" onPress={() => goTo("password")} variant="ghost" />
+          {(step === "totp" || step === "phone") && <Pressable accessibilityRole="button" onPress={() => goTo("backup")} style={styles.textButton}><Text style={styles.link}>Use a backup code</Text></Pressable>}</>}
+    <Pressable accessibilityRole="link" onPress={() => void Linking.openURL(`${SITE_URL}/join`)} style={styles.textButton}><Text style={styles.note}>New to BTP? <Text style={styles.link}>Request early access</Text></Text></Pressable>
+    <Text style={[styles.note, styles.footer]}>Behind The Protocol Inc. · <Text onPress={() => void Linking.openURL(`${SITE_URL}/privacy`)} style={styles.footLink}>Privacy</Text> · <Text onPress={() => void Linking.openURL(`${SITE_URL}/support`)} style={styles.footLink}>Support</Text></Text>
+  </ScrollView></KeyboardAvoidingView></SafeAreaView>;
 }
 
 export function BtpAuthProvider({ children }: PropsWithChildren) {
-  if (localPreviewEnabled) {
-    return <View style={styles.previewShell}><View style={styles.previewBanner}><Text style={styles.previewBannerText}>LOCAL PREVIEW · MEMBERSHIP CHECKS DISABLED</Text></View><View style={styles.previewContent}>{children}</View></View>;
+  // Inline condition so release builds strip the preview shell and its sample member.
+  if (__DEV__ && process.env.EXPO_PUBLIC_ENABLE_LOCAL_PREVIEW === "true") {
+    const previewAuth: AuthState = { configured: true, ready: true, signedIn: true, member: { id: "preview", handle: "quietpine", roleCategory: "Site coordinator", roleLabel: "Site coordinator", verificationStatus: "Approved", approved: true }, getToken: async () => devAuthToken ?? null, signOut: async () => undefined };
+    return <View style={styles.previewShell}><View style={styles.previewBanner}><Text style={styles.previewBannerText}>LOCAL PREVIEW · SAMPLE CONTENT · NOT THE LIVE COMMUNITY</Text></View><View style={styles.previewContent}><AuthContext.Provider value={previewAuth}>{children}</AuthContext.Provider></View></View>;
   }
   if (!CLERK_PUBLISHABLE_KEY || !liveApiConfigured) {
-    return <View style={styles.access}><Text style={styles.brand}>BTP</Text><Text style={styles.title}>App setup required</Text><Text style={styles.copy}>This build cannot connect securely because {configurationIssues.join(" and ")} {configurationIssues.length === 1 ? "is" : "are"} not configured. Install a correctly configured build or contact BTP.</Text></View>;
+    return <View style={styles.access}><Mark size={24} /><Text style={styles.title}>App setup required</Text><Text style={styles.copy}>This build cannot connect securely because {configurationIssues.join(" and ")} {configurationIssues.length === 1 ? "is" : "are"} not configured. Install a correctly configured build or contact BTP.</Text></View>;
   }
   return <ClerkProvider publishableKey={CLERK_PUBLISHABLE_KEY} tokenCache={tokenCache}><ClerkBridge>{children}</ClerkBridge></ClerkProvider>;
 }
 export function useBtpAuth() { return useContext(AuthContext); }
 
-const styles=StyleSheet.create({center: { alignItems:"center",backgroundColor:colors.background,flex:1,gap:spacing.md,justifyContent:"center",padding:spacing.lg},checking: { fontFamily: "Geist", color:colors.muted,fontSize:14},access: { backgroundColor:colors.background,flex:1,gap:spacing.md,justifyContent:"center",padding:spacing.lg},flex: { flex:1, backgroundColor:colors.background },signIn: { backgroundColor:colors.background,flexGrow:1,gap:spacing.md,justifyContent:"center",padding:spacing.lg},brand: {fontFamily: "CormorantGaramond-Italic", color:colors.accent,fontSize:28,letterSpacing:1},title: { fontFamily: "Geist", color:colors.ink,fontSize:32,fontWeight:"700"},copy: { fontFamily: "Geist", color:colors.muted,fontSize:15,lineHeight:22,marginBottom:spacing.sm},input: { fontFamily: "Geist", backgroundColor:colors.surface,borderColor:colors.border,borderRadius:14,borderWidth:1,color:colors.ink,fontSize:16,padding:15},button: { alignItems:"center",backgroundColor:colors.accent,borderRadius:14,padding:16},buttonText: { fontFamily: "Geist", color:colors.white,fontSize:16,fontWeight:"700"},secondary: { alignItems:"center",borderColor:colors.border,borderRadius:14,borderWidth:1,padding:15},secondaryText: { fontFamily: "Geist", color:colors.ink,fontSize:15,fontWeight:"700"},disabled: { opacity:.45},note: { fontFamily: "Geist", color:colors.muted,fontSize:12,lineHeight:18,textAlign:"center"},previewShell: { flex:1},previewContent: { flex:1},previewBanner: { alignItems:"center",backgroundColor:"#7C2D12",paddingHorizontal:spacing.sm,paddingVertical:6},previewBannerText: { fontFamily: "Geist", color:colors.white,fontSize:10,fontWeight:"900",letterSpacing:.5}});
+const styles = StyleSheet.create({
+  center: { alignItems: "center", backgroundColor: colors.background, flex: 1, gap: spacing.md, justifyContent: "center", padding: spacing.lg },
+  checking: { ...type.small, textAlign: "center" },
+  flex: { backgroundColor: colors.background, flex: 1 },
+  access: { backgroundColor: colors.background, flexGrow: 1, gap: spacing.md, justifyContent: "center", padding: spacing.lg },
+  signIn: { backgroundColor: colors.background, flexGrow: 1, gap: 12, justifyContent: "center", padding: spacing.lg },
+  line: { color: colors.inkStrong, fontFamily: fonts.serif, fontSize: 27, lineHeight: 34, marginTop: spacing.sm },
+  lineAccent: { color: colors.accentBright, fontFamily: fonts.serifItalic },
+  title: { ...type.display, marginTop: spacing.xs },
+  copy: { ...type.body, color: colors.muted, marginBottom: spacing.xs },
+  label: { color: colors.ink, fontFamily: fonts.sansMedium, fontSize: 13.5, marginBottom: -4 },
+  input: { backgroundColor: colors.surface, borderColor: colors.border, borderRadius: radius.md, borderWidth: 1, color: colors.inkStrong, fontFamily: fonts.sans, fontSize: 16, minHeight: 50, paddingHorizontal: 15, paddingVertical: 13 },
+  textButton: { alignItems: "center", minHeight: 40, justifyContent: "center" },
+  note: { ...type.small, textAlign: "center" },
+  link: { color: colors.accentBright, fontFamily: fonts.sansSemiBold, textDecorationLine: "underline" },
+  footer: { fontSize: 12.5, marginTop: spacing.md },
+  footLink: { textDecorationLine: "underline" },
+  status: { alignSelf: "flex-start", backgroundColor: colors.accentSoft, borderRadius: radius.pill, paddingHorizontal: 11, paddingVertical: 5 },
+  statusError: { backgroundColor: colors.dangerSoft },
+  statusText: { color: colors.accentBright, fontFamily: fonts.sansSemiBold, fontSize: 12 },
+  split: { flexDirection: "row", gap: spacing.sm },
+  splitCol: { backgroundColor: colors.surface, borderColor: colors.border, borderRadius: radius.md, borderWidth: 1, flex: 1, gap: 4, padding: 12 },
+  splitHead: { color: colors.accentBright, fontFamily: fonts.sansSemiBold, fontSize: 12.5, marginBottom: 2 },
+  splitItem: { color: colors.ink, fontFamily: fonts.sans, fontSize: 13, lineHeight: 19 },
+  previewShell: { flex: 1 },
+  previewContent: { flex: 1 },
+  previewBanner: { alignItems: "center", backgroundColor: "#5A3A12", paddingHorizontal: spacing.sm, paddingVertical: 5 },
+  previewBannerText: { color: colors.inkStrong, fontFamily: fonts.sansBold, fontSize: 10, letterSpacing: 0.5 },
+});

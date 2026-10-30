@@ -1,19 +1,80 @@
-import { Ionicons } from "@expo/vector-icons";
-import { router } from "expo-router";
-import { useCallback, useEffect, useState } from "react";
+import { router, useFocusEffect } from "expo-router";
+import { useCallback, useState } from "react";
 import { Pressable, RefreshControl, ScrollView, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { colors, spacing } from "@/constants/theme";
-import { api, liveApiConfigured } from "@/lib/api";
+
+import { Button, Loading, StateBox } from "@/components/ui";
+import { colors, fonts, radius, spacing, type } from "@/constants/theme";
+import { api } from "@/lib/api";
 import { useBtpAuth } from "@/lib/auth";
 import type { ActivityItem } from "@/types/question";
 
-const preview: ActivityItem[]=[{id:"p1",title:"Someone answered your question",detail:"A verified site professional shared an approach.",displayTime:"12m",read:false},{id:"p2",title:"What happened?",detail:"Close the loop on a question you asked last week.",displayTime:"1d",read:false}];
-export default function ActivityScreen(){const auth=useBtpAuth();const[items,setItems]=useState<ActivityItem[]>(()=>liveApiConfigured?[]:preview);const[loading,setLoading]=useState(false);const[error,setError]=useState("");
- const[actionBusy,setActionBusy]=useState(false);
- const load=useCallback(async()=>{if(!liveApiConfigured||!auth.signedIn)return;setLoading(true);setError("");try{setItems(await api.activity.list(await auth.getToken()));}catch(e){setError(e instanceof Error?e.message:"Could not load activity");}finally{setLoading(false);}},[auth]);useEffect(()=>{void load();},[load]);
- const open=(item:ActivityItem)=>{if(item.questionId)router.push({pathname:"/question/[id]",params:{id:item.questionId}});if(liveApiConfigured&&auth.signedIn&&!item.read){setItems(current=>current.map(candidate=>candidate.id===item.id?{...candidate,read:true}:candidate));void (async()=>{try{await api.activity.markRead(await auth.getToken(),item.id);}catch{setItems(current=>current.map(candidate=>candidate.id===item.id?{...candidate,read:false}:candidate));}})();}};
- const markAllRead=async()=>{setActionBusy(true);setError("");try{await api.activity.markAllRead(await auth.getToken());setItems(current=>current.map(item=>({...item,read:true})));}catch(e){setError(e instanceof Error?e.message:"Could not mark activity as read");}finally{setActionBusy(false);}};
- const hasUnread=items.some(item=>!item.read);
- return <SafeAreaView edges={["top"]} style={s.safe}><ScrollView contentContainerStyle={s.content} refreshControl={<RefreshControl refreshing={loading} onRefresh={load}/>}><View style={s.header}><View style={s.headerCopy}><Text style={s.title}>Activity</Text><Text style={s.subtitle}>Only updates that move a case forward.</Text></View>{liveApiConfigured&&hasUnread&&<Pressable disabled={actionBusy} onPress={()=>void markAllRead()}><Text style={[s.link,actionBusy&&s.disabled]}>Mark read</Text></Pressable>}</View>{error&&<View style={s.state}><Text style={s.errorTitle}>Activity is unavailable</Text><Text style={s.stateText}>{error}</Text><Pressable onPress={()=>void load()} style={s.retry}><Text style={s.retryText}>Retry</Text></Pressable></View>}{!loading&&!error&&items.length===0&&<View style={s.state}><Text style={s.emptyTitle}>No activity yet</Text><Text style={s.stateText}>Answers, followed-case updates, and outcome reminders will appear here.</Text></View>}{items.map(item=><Pressable key={item.id} onPress={()=>open(item)} style={[s.item,!item.read&&s.unread]}><View style={s.icon}><Ionicons color={colors.accent} name="notifications-outline" size={22}/></View><View style={s.copy}><Text style={s.itemTitle}>{item.title}</Text><Text style={s.detail}>{item.detail}</Text></View><Text style={s.time}>{item.displayTime}</Text></Pressable>)}</ScrollView></SafeAreaView>}
-const s=StyleSheet.create({safe: { backgroundColor:colors.background,flex:1},content: { gap:spacing.md,padding:spacing.lg},header: { alignItems:"flex-end",flexDirection:"row",gap:spacing.sm,justifyContent:"space-between"},headerCopy: { flex:1},title: { fontFamily: "Geist", color:colors.ink,fontSize:30,fontWeight:"700"},subtitle: {fontFamily: "Geist", color:colors.muted,fontSize:15},link: { fontFamily: "Geist", color:colors.accent,fontWeight:"700"},disabled: { fontFamily: "Geist", opacity:.45},item: { alignItems:"flex-start",backgroundColor:colors.surface,borderColor:colors.border,borderRadius:17,borderWidth:1,flexDirection:"row",gap:spacing.sm,padding:spacing.md},unread: { borderColor:colors.accent},icon: { alignItems:"center",backgroundColor:colors.accentSoft,borderRadius:20,height:40,justifyContent:"center",width:40},copy: { flex:1,gap:4},itemTitle: { fontFamily: "Geist", color:colors.ink,fontSize:15,fontWeight:"700"},detail: { fontFamily: "Geist", color:colors.muted,fontSize:13,lineHeight:19},time: { fontFamily: "Geist", color:colors.muted,fontSize:11},state: { alignItems:"center",backgroundColor:colors.surface,borderColor:colors.border,borderRadius:17,borderWidth:1,gap:spacing.sm,padding:spacing.lg},stateText: { fontFamily: "Geist", color:colors.muted,fontSize:14,lineHeight:20,textAlign:"center"},errorTitle: { fontFamily: "Geist", color:colors.danger,fontSize:16,fontWeight:"700"},emptyTitle: { fontFamily: "Geist", color:colors.ink,fontSize:16,fontWeight:"700"},retry: { borderColor:colors.accent,borderRadius:12,borderWidth:1,paddingHorizontal:spacing.lg,paddingVertical:spacing.sm},retryText: { fontFamily: "Geist", color:colors.accent,fontWeight:"700"}});
+export default function ActivityScreen() {
+  const { getToken, signedIn } = useBtpAuth();
+  const [items, setItems] = useState<ActivityItem[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
+  const [error, setError] = useState("");
+  const [busy, setBusy] = useState(false);
+
+  const load = useCallback(async (pull = false) => {
+    if (!signedIn) return;
+    if (pull) setRefreshing(true);
+    setError("");
+    try { setItems(await api.activity.list(await getToken())); }
+    catch { setError("Check your connection and try again."); }
+    finally { setLoading(false); setRefreshing(false); }
+  }, [getToken, signedIn]);
+  useFocusEffect(useCallback(() => { void load(); }, [load]));
+
+  const open = (item: ActivityItem) => {
+    if (item.questionId) router.push({ pathname: "/question/[id]", params: { id: item.questionId } });
+    if (!item.read) {
+      setItems((current) => current.map((c) => c.id === item.id ? { ...c, read: true } : c));
+      void (async () => { try { await api.activity.markRead(await getToken(), item.id); } catch { setItems((current) => current.map((c) => c.id === item.id ? { ...c, read: false } : c)); } })();
+    }
+  };
+  const markAllRead = async () => {
+    setBusy(true);
+    try { await api.activity.markAllRead(await getToken()); setItems((current) => current.map((i) => ({ ...i, read: true }))); }
+    catch { setError("Couldn’t mark everything as read. Try again."); }
+    finally { setBusy(false); }
+  };
+  const hasUnread = items.some((i) => !i.read);
+
+  return <SafeAreaView edges={["top"]} style={s.safe}>
+    <ScrollView contentContainerStyle={s.content} refreshControl={<RefreshControl onRefresh={() => void load(true)} refreshing={refreshing} tintColor={colors.accent} />}>
+      <View style={s.header}>
+        <Text accessibilityRole="header" style={s.title}>Activity</Text>
+        {hasUnread ? <Pressable accessibilityRole="button" disabled={busy} hitSlop={10} onPress={() => void markAllRead()}><Text style={[s.link, busy && { opacity: 0.45 }]}>Mark all read</Text></Pressable> : null}
+      </View>
+      <Text style={s.subtitle}>Replies to your questions, and updates on your answers and reports.</Text>
+      {loading ? <Loading label="Loading activity" />
+        : error && !items.length ? <StateBox action={<Button label="Try again" onPress={() => void load()} style={{ alignSelf: "stretch" }} variant="ghost" />} copy={error} title="We couldn’t load Activity." tone="error" />
+        : !items.length ? <StateBox copy="Replies to your questions and updates on your answers will appear here." title="Nothing new yet." />
+        : items.map((item) => <Pressable accessibilityHint={item.questionId ? "Opens the question" : undefined} accessibilityLabel={`${item.read ? "" : "Unread. "}${item.title} ${item.detail}`} accessibilityRole="button" key={item.id} onPress={() => open(item)} style={({ pressed }) => [s.item, !item.read && s.unread, pressed && { backgroundColor: colors.surfaceRaised }]}>
+            <View style={[s.dot, item.read && { backgroundColor: "transparent" }]} />
+            <View style={s.copy}><Text style={s.itemTitle}>{item.title}</Text>{item.detail ? <Text numberOfLines={2} style={s.detail}>{item.detail}</Text> : null}</View>
+            <Text style={s.time}>{item.displayTime}</Text>
+          </Pressable>)}
+      {error && items.length ? <Text style={s.inlineError}>{error}</Text> : null}
+    </ScrollView>
+  </SafeAreaView>;
+}
+
+const s = StyleSheet.create({
+  safe: { backgroundColor: colors.background, flex: 1 },
+  content: { gap: 12, padding: spacing.lg, paddingTop: spacing.sm },
+  header: { alignItems: "center", flexDirection: "row", justifyContent: "space-between" },
+  title: { ...type.display, fontSize: 28 },
+  link: { color: colors.accentBright, fontFamily: fonts.sansSemiBold, fontSize: 14 },
+  subtitle: { ...type.small, marginBottom: 4 },
+  item: { alignItems: "flex-start", backgroundColor: colors.surface, borderColor: colors.border, borderRadius: radius.lg, borderWidth: 1, flexDirection: "row", gap: 12, padding: spacing.md },
+  unread: { borderColor: colors.borderStrong },
+  dot: { backgroundColor: colors.accentBright, borderRadius: 4, height: 8, marginTop: 7, width: 8 },
+  copy: { flex: 1, gap: 4 },
+  itemTitle: { color: colors.inkStrong, fontFamily: fonts.sansSemiBold, fontSize: 15, lineHeight: 21 },
+  detail: { ...type.small },
+  time: { ...type.meta, color: colors.faint },
+  inlineError: { color: colors.danger, fontFamily: fonts.sans, fontSize: 13, textAlign: "center" },
+});

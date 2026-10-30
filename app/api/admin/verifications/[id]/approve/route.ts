@@ -70,7 +70,7 @@ export const POST = withAuth(async (req, user) => {
         const loginEmail = targetUser.clerkId ? await signInEmail(targetUser.clerkId) : null;
         if (loginEmail) {
           await sendEmail(loginEmail, 'Your BTP membership is approved',
-            `Welcome to Behind the Protocol.\n\nYour membership is approved and the community is open to you: https://btp-rho-seven.vercel.app/sign-in\n\nYou appear to members only by your handle and verified role. The LinkedIn link or work email you used for verification has now been deleted from BTP.\n\nQuestions? Reply to fortunaindustriesinc@gmail.com.`);
+            `Welcome to Behind the Protocol.\n\nYour membership is approved and the community is open to you: https://behindtheprotocol.ai/sign-in\n\nYou appear to members only by your handle and verified role. The LinkedIn link or work email you used for verification has now been deleted from BTP.\n\nQuestions? Reply to fortunaindustriesinc@gmail.com.`);
         }
         await prisma.notification.create({
           data: {
