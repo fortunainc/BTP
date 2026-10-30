@@ -3,7 +3,7 @@
  */
 
 import { Resend } from 'resend';
-import { COMPANY_NAME, SUPPORT_EMAIL } from '@/lib/site';
+import { COMPANY_NAME, EMAIL_FROM, SUPPORT_EMAIL } from '@/lib/site';
 
 // Lazy initialization to avoid build-time errors
 let resend: Resend | null = null;
@@ -39,7 +39,7 @@ export class EmailVerificationService {
 
       // Send email via Resend
       const { error } = await getResendClient().emails.send({
-        from: process.env.RESEND_FROM_EMAIL || 'BehindTheProtocol <no-reply@behindtheprotocol.com>',
+        from: EMAIL_FROM,
         replyTo: SUPPORT_EMAIL,
         to: data.to,
         subject: 'Verify Your BehindTheProtocol Account',

@@ -1,5 +1,5 @@
 import { Resend } from 'resend';
-import { SITE_URL, SUPPORT_EMAIL } from '@/lib/site';
+import { EMAIL_FROM, SITE_URL, SUPPORT_EMAIL } from '@/lib/site';
 
 let resend: Resend | null = null;
 
@@ -62,7 +62,7 @@ async function sendEmail(to: string, subject: string, html: string) {
 
   try {
     const result = await client.emails.send({
-      from: 'Behind the Protocol <notifications@behindtheprotocol.com>',
+      from: EMAIL_FROM,
       replyTo: SUPPORT_EMAIL,
       to,
       subject,
