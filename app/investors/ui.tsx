@@ -1,12 +1,13 @@
 import Link from 'next/link';
 import { Newsreader, Inter, Cormorant_Garamond } from 'next/font/google';
 import './room.css';
+import { SUPPORT_EMAIL } from '@/lib/site';
 
 const serif = Newsreader({ subsets: ['latin'], axes: ['opsz'], variable: '--font-newsreader', display: 'swap' });
 const sans = Inter({ subsets: ['latin'], variable: '--font-inter', display: 'swap' });
 const signet = Cormorant_Garamond({ subsets: ['latin'], weight: '500', style: 'italic', variable: '--font-cormorant', display: 'swap' });
 export const shell = `ir ${serif.variable} ${sans.variable} ${signet.variable}`;
-export const CONTACT = 'mailto:fortunaindustriesinc@gmail.com?subject=BTP%20investor%20room%20access';
+export const CONTACT = `mailto:${SUPPORT_EMAIL}?subject=BTP%20investor%20room%20access`;
 
 // Fixed (not random) drifting particles so server output is stable.
 const BOKEH = Array.from({ length: 34 }, (_, i) => {

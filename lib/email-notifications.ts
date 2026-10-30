@@ -1,4 +1,5 @@
 import { Resend } from 'resend';
+import { SITE_URL, SUPPORT_EMAIL } from '@/lib/site';
 
 let resend: Resend | null = null;
 
@@ -62,6 +63,7 @@ async function sendEmail(to: string, subject: string, html: string) {
   try {
     const result = await client.emails.send({
       from: 'Behind the Protocol <notifications@behindtheprotocol.com>',
+      replyTo: SUPPORT_EMAIL,
       to,
       subject,
       html,
@@ -74,7 +76,7 @@ async function sendEmail(to: string, subject: string, html: string) {
 }
 
 export async function sendThreadReplyNotification(data: ThreadReplyNotificationData) {
-  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://behindtheprotocol.com';
+  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || SITE_URL;
   
   const html = `
     <!DOCTYPE html>
@@ -117,7 +119,7 @@ export async function sendThreadReplyNotification(data: ThreadReplyNotificationD
 }
 
 export async function sendNewMessageNotification(data: NewMessageNotificationData) {
-  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://behindtheprotocol.com';
+  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || SITE_URL;
   
   const html = `
     <!DOCTYPE html>
@@ -160,7 +162,7 @@ export async function sendNewMessageNotification(data: NewMessageNotificationDat
 }
 
 export async function sendJobMatchNotification(data: JobMatchNotificationData) {
-  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://behindtheprotocol.com';
+  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || SITE_URL;
   
   const html = `
     <!DOCTYPE html>
@@ -203,7 +205,7 @@ export async function sendJobMatchNotification(data: JobMatchNotificationData) {
 }
 
 export async function sendMostHelpfulNotification(data: MostHelpfulNotificationData) {
-  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://behindtheprotocol.com';
+  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || SITE_URL;
   
   const html = `
     <!DOCTYPE html>

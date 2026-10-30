@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useClerk } from '@clerk/nextjs';
 import { useAuth } from '@/components/AuthContext';
+import { SUPPORT_EMAIL } from '@/lib/site';
 
 const links = [
   { href: '/situations', label: 'Questions' },
@@ -50,7 +51,7 @@ export function MembershipPending() {
         once your review is complete. If you have not finished your profile, <Link className="underline" href="/onboarding">complete it now</Link>.
       </p>
       <p className="mt-3 text-sm text-slate-400">
-        Questions? Email <a className="underline" href="mailto:fortunaindustriesinc@gmail.com">fortunaindustriesinc@gmail.com</a>.
+        Questions? Email <a className="underline" href={`mailto:${SUPPORT_EMAIL}`}>{SUPPORT_EMAIL}</a>.
       </p>
     </div>
   );

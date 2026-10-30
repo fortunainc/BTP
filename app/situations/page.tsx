@@ -13,6 +13,7 @@ import { useAuth } from '@clerk/nextjs';
 import PatternBadge from '@/components/PatternBadge';
 import { MembershipPending } from '@/components/MemberNav';
 import { DailyQuestion, type Poll } from '@/components/PollCard';
+import { SUPPORT_EMAIL } from '@/lib/site';
 
 interface Situation {
   id: string;
@@ -167,7 +168,7 @@ export default function SituationsPage() {
           </div>
         ) : pending ? (
           <div className="py-12">{suspended ? (
-            <div className="mx-auto max-w-xl rounded-lg border border-slate-700 bg-slate-800/50 p-6 text-slate-300"><h2 className="text-xl font-semibold text-white">Your account is suspended</h2><p className="mt-3">Contact BTP support if you believe this is a mistake: fortunaindustriesinc@gmail.com.</p></div>
+            <div className="mx-auto max-w-xl rounded-lg border border-slate-700 bg-slate-800/50 p-6 text-slate-300"><h2 className="text-xl font-semibold text-white">Your account is suspended</h2><p className="mt-3">Contact BTP support if you believe this is a mistake: <a className="underline" href={`mailto:${SUPPORT_EMAIL}`}>{SUPPORT_EMAIL}</a>.</p></div>
           ) : <MembershipPending />}</div>
         ) : error ? (
           <div className="text-center py-12 text-slate-500">{error}</div>
