@@ -1,5 +1,4 @@
 /** Founder-approved starter questions, published under the BTP team profile. */
-const PREFIX = 'Starter question from the BTP team: ';
 
 export const STARTER_QUESTIONS: string[] = [
   'Monitoring visit next week and I am behind on queries. What do you prioritize in the last 3 days so the visit goes smoothly?',
@@ -12,7 +11,7 @@ export const STARTER_QUESTIONS: string[] = [
   'Running 8 studies alone with no backup coordinator. How did you make the case to your manager for help?',
   'CRAs: how many monitoring days a month is sustainable, and how do you push back when you are over-allocated?',
   'CRC to CRA, or stay site-side? What certification or experience actually got you the next role and a raise?',
-].map((q) => PREFIX + q);
+];
 
 export const STARTER_POLL = {
   question: 'What eats most of your week outside patient care?',

@@ -21,12 +21,13 @@ export type PublicAuthorSource = {
 
 /** Same rule the answer list already used: approved members get their generalized verified role. */
 export function authorRoleLabel(author: PublicAuthorSource): string {
-  if (author?.handle === TEAM_HANDLE) return 'BTP team';
+  if (author?.handle === TEAM_HANDLE) return 'Community question';
   return author?.verificationStatus === 'Approved' ? verifiedRoleLabel(author.roleCategory) : 'BTP member';
 }
 
 /** Public handle only for approved, unsuspended members; otherwise null. */
 export function authorHandle(author: PublicAuthorSource): string | null {
+  if (author?.handle === TEAM_HANDLE) return null;
   if (!author || author.verificationStatus !== 'Approved' || author.isSuspended) return null;
   return author.handle || null;
 }

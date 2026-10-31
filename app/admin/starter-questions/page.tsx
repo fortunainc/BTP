@@ -51,12 +51,12 @@ export default function StarterQuestions() {
   return (
     <main className="mx-auto max-w-2xl space-y-6 p-8">
       <h1 className="text-2xl">Starter questions</h1>
-      <p>Publishes each question under the <b>BTP_Team</b> profile, labeled as a starter question. Click once; already-posted questions are skipped while this page is open.</p>
+      <p>Publishes each question under the <b>BTP_Team</b> profile. Click once; already-posted questions are skipped while this page is open.</p>
       <button disabled={busy} onClick={postAll} className="rounded border p-2">{busy ? 'Publishing…' : 'Publish all questions'}</button>
       <ol className="list-decimal space-y-3 pl-6">
         {STARTER_QUESTIONS.map((q, i) => (
           <li key={q}>
-            <span>{q.replace('Starter question from the BTP team: ', '')}</span>
+            <span>{q}</span>
             {status[i] !== 'idle' && <span role="status" className="ml-2 text-sm font-semibold">{label[status[i]]}</span>}
             {status[i] === 'error' && <button className="ml-2 underline" onClick={() => post(i)}>Retry</button>}
           </li>
