@@ -67,6 +67,7 @@ describe('public author fields', () => {
     expect(authorHandle({ ...approved, verificationStatus: 'Pending' })).toBeNull();
     expect(authorHandle({ ...approved, isSuspended: true })).toBeNull();
     expect(authorHandle(null)).toBeNull();
+    expect(publicAuthor({ ...approved, handle: 'BTP_Team' })).toEqual({ authorHandle: null, authorRole: 'Community question' });
     expect(publicAuthor(approved)).toEqual({ authorHandle: 'quiet_heron', authorRole: 'Verified site professional' });
     expect(publicAuthor({ ...approved, verificationStatus: 'Pending' })).toEqual({ authorHandle: null, authorRole: 'BTP member' });
   });

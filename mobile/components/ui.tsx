@@ -63,6 +63,8 @@ export function Card({ children, style }: PropsWithChildren<{ style?: StyleProp<
 
 /** Handle and general role, the only identity shown with posts. */
 export function AuthorLine({ handle, role, time, mine }: { handle?: string | null; role?: string | null; time?: string; mine?: boolean }) {
+  // Editorial prompts retain their origin privately, without a member attribution.
+  if (role === "Community question") return time ? <Text style={styles.author}>{time}</Text> : null;
   const parts = [role || "BTP member", time].filter(Boolean).join(" · ");
   return (
     <Text numberOfLines={1} style={styles.author}>
