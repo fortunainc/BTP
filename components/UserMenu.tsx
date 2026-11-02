@@ -68,12 +68,12 @@ export default function UserMenu() {
               Profile
             </Link>
             <Link
-              href="/settings"
+              href="/account/security"
               onClick={() => setIsOpen(false)}
               className="flex items-center gap-2 px-3 py-2 text-sm text-slate-300 hover:bg-slate-700 rounded-md transition-colors"
             >
               <Settings className="w-4 h-4" />
-              Settings
+              Account & password
             </Link>
             <button
               onClick={handleSignOut}

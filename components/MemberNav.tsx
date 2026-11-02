@@ -13,6 +13,7 @@ const links = [
   { href: '/help', label: 'Private help' },
   { href: '/notifications', label: 'Notifications' },
   { href: '/invite', label: 'Invite' },
+  { href: '/account/security', label: 'Account & password' },
   { href: '/support', label: 'Support' },
 ];
 
