@@ -145,12 +145,15 @@
 .bh .grid3,.bh .trust,.bh .earn{grid-template-columns:1fr}
 .bh .earn{padding:36px}
 .bh .earnArt{height:360px}
-.bh .navlinks a:not(.pill):not(.co){display:none}
+.bh .navlinks a:not(.pill):not(.co):not([href="/investors"]){display:none}
 .bh nav{gap:14px}.bh .navlinks{gap:14px}.bh .navlinks a.co{font-size:13px;white-space:nowrap}.bh .navlinks .pill{padding:7px 12px;font-size:13px}
 .bh .logo span:last-child{display:none}}
 @media(max-width:700px){.bh .market .track span{font-size:8.5px;letter-spacing:.1em}
 .bh .market .track span:nth-child(3),.bh .market .track span:nth-child(5){display:none}}
 @media(max-width:560px){.bh .grid4{grid-template-columns:1fr}
+.bh nav{flex-wrap:wrap;gap:12px}
+.bh .navlinks{flex:0 0 100%;flex-wrap:wrap;justify-content:space-between;gap:8px;font-size:13px}
+.bh .navlinks .pill{padding:7px 10px}
 .bh section{padding:80px 0}}
 @media(prefers-reduced-motion:reduce){.bh *,.bh *::before,.bh *::after{animation:none!important;transition:none!important}
 .bh .eyebrow,.bh h1 span.ln,.bh .sub,.bh .ctas,.bh .reveal{opacity:1!important;transform:none!important}}@media(max-width:560px){.bh .hero .eco{width:min(300px,70vw)}.bh .eco .pill{padding:8px 11px}.bh .eco .pill b{font-size:18px}.bh .eco .pill small{font-size:8.5px;letter-spacing:.1em}}
