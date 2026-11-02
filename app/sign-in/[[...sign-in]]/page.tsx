@@ -1,8 +1,10 @@
 'use client';
 
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { useSignIn } from '@clerk/nextjs';
 import { FormEvent, useState } from 'react';
+import { safeSignInDestination, navigateAfterSignIn } from '@/lib/sign-in-navigation';
 import { SUPPORT_EMAIL } from '@/lib/site';
 
 
@@ -11,19 +13,26 @@ function clerkMessage(error: unknown): string {
   return candidate.errors?.[0]?.longMessage || candidate.errors?.[0]?.message || 'Check your email and password and try again.';
 }
 
-/** Only same-site destinations; anything resolving to another origin falls back to the member home. */
-function safeRedirect(destination: string | null): string {
-  if (!destination) return '/situations';
-  try {
-    const url = new URL(destination, window.location.origin);
-    return url.origin === window.location.origin ? `${url.pathname}${url.search}${url.hash}` : '/situations';
-  } catch {
-    return '/situations';
-  }
-}
-
 export default function SignInPage() {
   const { signIn, fetchStatus } = useSignIn();
+  const router = useRouter();
+
+  async function finishSignIn() {
+    const redirectTo = safeSignInDestination(new URLSearchParams(window.location.search).get('redirect_url'), window.location.origin);
+    const { error: finalizeError } = await signIn.finalize({
+      navigate: async ({ session, decorateUrl }) => {
+        if (session?.currentTask) {
+          setError('Your account needs an additional verification step. Please contact BTP support.');
+          return;
+        }
+        const url = decorateUrl(redirectTo);
+        // Clerk may use an external URL for Safari cookie recovery. Normal
+        // navigation must stay client-side so session activation can finish.
+        navigateAfterSignIn(url, { replace: url => router.replace(url), assign: url => window.location.assign(url) });
+      },
+    });
+    if (finalizeError) setError(finalizeError.longMessage || finalizeError.message || 'Could not finish signing in. Please try again.');
+  }
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [code, setCode] = useState('');
@@ -52,18 +61,7 @@ export default function SignInPage() {
         return;
       }
 
-      const params = new URLSearchParams(window.location.search);
-      const destination = params.get('redirect_url');
-      const redirectTo = safeRedirect(destination);
-      await signIn.finalize({
-        navigate: ({ session, decorateUrl }) => {
-          if (session?.currentTask) {
-            setError('Your account requires one additional security step. Contact BTP support to complete access.');
-            return;
-          }
-          window.location.replace(decorateUrl(redirectTo));
-        },
-      });
+      await finishSignIn();
     } catch (cause) {
       setError(clerkMessage(cause));
     } finally {
@@ -109,10 +107,7 @@ export default function SignInPage() {
         setError('Your account requires another verification step. Contact BTP support.');
         return;
       }
-      const params = new URLSearchParams(window.location.search);
-      const destination = params.get('redirect_url');
-      const redirectTo = safeRedirect(destination);
-      await signIn.finalize({ navigate: ({ decorateUrl }) => window.location.replace(decorateUrl(redirectTo)) });
+      await finishSignIn();
     } catch (cause) {
       setError(clerkMessage(cause));
     } finally {
