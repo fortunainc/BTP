@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { NextRequest } from 'next/server';
 const m=vi.hoisted(()=>({
- db:{accessRequest:{findUnique:vi.fn(),upsert:vi.fn(),update:vi.fn(),findMany:vi.fn()},companyInquiry:{upsert:vi.fn(),findUnique:vi.fn(),findMany:vi.fn()},investor:{upsert:vi.fn(),findUnique:vi.fn(),findMany:vi.fn()},requestFollowUp:{upsert:vi.fn(),findMany:vi.fn()},user:{findMany:vi.fn(),findUnique:vi.fn()},$transaction:vi.fn()},auth:vi.fn(),limit:vi.fn(),
+ db:{accessRequest:{findUnique:vi.fn(),upsert:vi.fn(),update:vi.fn(),findMany:vi.fn()},companyInquiry:{upsert:vi.fn(),findUnique:vi.fn(),findMany:vi.fn()},investor:{upsert:vi.fn(),findUnique:vi.fn(),findMany:vi.fn()},requestFollowUp:{upsert:vi.fn(),findMany:vi.fn()},diligenceRequest:{findMany:vi.fn(),findUnique:vi.fn()},user:{findMany:vi.fn(),findUnique:vi.fn()},$transaction:vi.fn()},auth:vi.fn(),limit:vi.fn(),
 }));
 vi.mock('@/lib/prisma',()=>({prisma:m.db}));
 vi.mock('@/lib/admin-auth',()=>({verifyAdminAccess:m.auth}));
@@ -16,6 +16,7 @@ beforeEach(()=>{
  m.db.$transaction.mockImplementation(fn=>fn(m.db));
  for(const model of [m.db.accessRequest,m.db.companyInquiry,m.db.investor]){model.upsert.mockResolvedValue({id:'r1'});model.findMany.mockResolvedValue([]);}
  m.db.requestFollowUp.findMany.mockResolvedValue([]);
+ m.db.diligenceRequest.findMany.mockResolvedValue([]);
 });
 describe('short signup',()=>{
  it('saves operator interest and only records contact permission, not approval',async()=>{

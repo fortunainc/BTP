@@ -12,7 +12,6 @@ export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
 export const metadata: Metadata = { title: 'BTP | Data room', description: 'Diligence materials for BTP investors.', robots: { index: false, follow: false, nocache: true } };
 
-const DILIGENCE_CONTACT = `mailto:${SUPPORT_EMAIL}?subject=BTP%20diligence%20materials%20request`;
 const DESCRIPTIONS: Record<string, string> = {
   'Company and legal': 'Formation and ownership documents and key agreements.',
   Financials: 'Financial position, model and assumptions.',
@@ -23,7 +22,10 @@ const DESCRIPTIONS: Record<string, string> = {
 const kb = (n: number) => (n > 1_000_000 ? `${(n / 1_000_000).toFixed(1)} MB` : `${Math.max(1, Math.round(n / 1000))} KB`);
 
 /** Private data room: files the founder has added, grouped by section. Same access as the investor room. */
-export default async function DataRoom() {
+const ERRORS: Record<string, string> = { empty: 'Choose at least one section or add a note.', email: 'Enter your email so BTP can reply.', unavailable: 'Your request could not be sent. Please try again, or email BTP directly.' };
+
+export default async function DataRoom({ searchParams }: { searchParams: Promise<{ requested?: string; error?: string }> }) {
+  const { requested, error } = await searchParams;
   const viewer = await roomViewer((await cookies()).get(INVESTOR_COOKIE)?.value);
   if (!viewer) redirect('/investors');
   await logInvestorActivity(viewer, 'data_room');
@@ -41,7 +43,18 @@ export default async function DataRoom() {
           {files.length > 0 && <ul>{files.map((d) => <li key={d.id}><a href={`/investors/diligence/file/${d.id}`} target="_blank" rel="noopener">{d.title}</a><small>{kb(d.size)}</small></li>)}</ul>}
         </section>;
       })}
-      <p className="dreq"><a className="btn gold" href={DILIGENCE_CONTACT}>Request diligence materials <span aria-hidden>→</span></a></p>
+      <form id="request" className="dreq" method="post" action="/investors/diligence/request">
+        <h2>Request materials</h2>
+        {requested ? <p className="ok" role="status">Request received. BTP will confirm what is available and follow up by email.</p> : <>
+          <fieldset><legend className="sr">Sections</legend>{DILIGENCE_CATEGORIES.map((c) => <label key={c} className="chk"><input type="checkbox" name="section" value={c} /> {c}</label>)}</fieldset>
+          {viewer.kind === 'shared' && <><label htmlFor="dr-email">Your email</label><input id="dr-email" name="email" type="email" autoComplete="email" required /><label htmlFor="dr-name">Name and firm</label><input id="dr-name" name="name" autoComplete="organization" /></>}
+          <label htmlFor="dr-note">Anything specific (optional)</label>
+          <textarea id="dr-note" name="note" rows={3} maxLength={2000} />
+          {error && ERRORS[error] && <p className="err" role="alert">{ERRORS[error]}</p>}
+          <button className="btn gold" type="submit">Request diligence materials <span aria-hidden>→</span></button>
+        </>}
+        <p className="alt">Prefer email? <a href={`mailto:${SUPPORT_EMAIL}?subject=BTP%20diligence%20materials%20request`}>{SUPPORT_EMAIL}</a></p>
+      </form>
       <p><Link href="/investors">← Back to the investor room</Link></p>
     </div>
   </Gate>;

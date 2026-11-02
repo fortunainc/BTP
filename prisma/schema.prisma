@@ -1361,11 +1361,25 @@ model DiligenceDoc {
   createdAt DateTime @default(now())
 }
 
+// Data room materials an investor asked for. Tracked in /admin/requests.
+model DiligenceRequest {
+  id         String   @id @default(cuid())
+  investorId String?
+  name       String   @default("")
+  email      String
+  company    String   @default("")
+  sections   String // comma separated data room sections
+  note       String   @default("")
+  createdAt  DateTime @default(now())
+
+  @@index([createdAt])
+}
+
 // What each investor opened, for the founder's view.
 model InvestorActivity {
   id         String   @id @default(cuid())
   investorId String
-  action     String // room, data_room, download
+  action     String // room, data_room, download, diligence_request
   docId      String?
   createdAt  DateTime @default(now())
 
