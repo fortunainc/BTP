@@ -15,7 +15,7 @@ const label = 'text-[11px] font-semibold uppercase tracking-[0.18em] text-[#e6c9
 const input = 'rounded-lg border border-[rgba(232,204,148,0.25)] bg-black/40 px-3 py-2 text-sm text-white outline-none focus:border-[#c9a66b]';
 const btn = 'rounded border border-[rgba(232,204,148,0.38)] px-3 py-1.5 text-xs uppercase tracking-[0.12em] text-[#f2eadf] hover:bg-[#C9A66B]/10';
 const when = (d: string | null) => (d ? new Date(d).toLocaleDateString() : 'Never');
-const ACTIONS: Record<string, string> = { room: 'opened the investor room', data_room: 'opened the data room', download: 'opened' };
+const ACTIONS: Record<string, string> = { room: 'opened the investor room', data_room: 'opened the data room', download: 'opened', diligence_request: 'requested data room materials' };
 
 /** Approve investors, share their personal link, manage data room files and see who looked at what. */
 export default function InvestorsAdmin() {

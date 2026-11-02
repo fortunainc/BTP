@@ -26,9 +26,9 @@ export async function PATCH(req:NextRequest) {
  let b;try {b=JSON.parse(text);}catch{return NextResponse.json({error:'Invalid request.'},{status:400,headers});}
  if(!b || typeof b.key!=='string'||!FOLLOW_UP_STATUSES.includes(b.status)||typeof b.notes!=='string'||b.notes.length>4000)return NextResponse.json({error:'Choose a status and keep notes under 4,000 characters.'},{status:400,headers});
  const [kind,id,...rest]=b.key.split(':');
- if(!id||rest.length||!['professional','founder','investor'].includes(kind))return NextResponse.json({error:'Request not found.'},{status:404,headers});
+ if(!id||rest.length||!['professional','founder','investor','diligence'].includes(kind))return NextResponse.json({error:'Request not found.'},{status:404,headers});
  try {
-  const exists=kind==='professional'?await prisma.accessRequest.findUnique({where:{id},select:{id:true}}):kind==='founder'?await prisma.companyInquiry.findUnique({where:{id},select:{id:true}}):await prisma.investor.findUnique({where:{id},select:{id:true}});
+  const exists=kind==='professional'?await prisma.accessRequest.findUnique({where:{id},select:{id:true}}):kind==='founder'?await prisma.companyInquiry.findUnique({where:{id},select:{id:true}}):kind==='diligence'?await prisma.diligenceRequest.findUnique({where:{id},select:{id:true}}):await prisma.investor.findUnique({where:{id},select:{id:true}});
   if(!exists)return NextResponse.json({error:'Request not found.'},{status:404,headers});
   await prisma.requestFollowUp.upsert({where:{key:b.key},update:{status:b.status,notes:b.notes},create:{key:b.key,status:b.status,notes:b.notes}});
   return NextResponse.json({success:true},{headers});

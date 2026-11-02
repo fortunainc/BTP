@@ -379,3 +379,12 @@
 .ir .droom section{padding:18px 0 0;margin:18px 0 0;min-height:0;border-top:1px solid rgba(232,204,148,.14)}
 .ir .droom section:first-child{border:0;padding-top:0;margin-top:0}
 @media(min-width:961px) and (max-width:1240px){.ir .fly .wheel{width:min(480px,calc(100% - 150px))}}
+.ir .droom .dreq{margin-top:26px;padding-top:20px;border-top:1px solid rgba(232,204,148,.14)}
+.ir .droom .dreq fieldset{border:0;margin:0 0 14px;padding:0;display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:4px 16px}
+.ir .droom .dreq .chk{display:flex;align-items:center;gap:10px;margin:0;padding:8px 0;font:400 15px var(--sans);letter-spacing:0;text-transform:none;color:#efe3d2;cursor:pointer}
+.ir .droom .dreq .chk input{width:18px;height:18px;margin:0;padding:0;accent-color:#c9a66b}
+.ir .droom .dreq textarea{width:100%;padding:13px 15px;border-radius:6px;border:1px solid rgba(232,204,148,.3);background:rgba(0,0,0,.4);color:#fff;font:400 15.5px/1.5 var(--sans);margin-bottom:16px;resize:vertical}
+.ir .droom .dreq .ok{color:#e8cc94;font-size:15.5px}
+.ir .droom .dreq .err{color:#e29a8f;margin:0 0 12px}
+.ir .droom .dreq .alt{font-size:13px;color:#9c8a78}
+.ir .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}

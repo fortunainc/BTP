@@ -66,7 +66,7 @@ export async function roomViewer(token?: string): Promise<RoomViewer | null> {
 }
 
 /** Records what an investor opened. Never throws. */
-export async function logInvestorActivity(viewer: RoomViewer, action: 'room' | 'data_room' | 'download', docId?: string) {
+export async function logInvestorActivity(viewer: RoomViewer, action: 'room' | 'data_room' | 'download' | 'diligence_request', docId?: string) {
   if (viewer.kind !== 'investor') return;
   try {
     await prisma.$transaction([
