@@ -3,6 +3,7 @@
 import { execFileSync } from 'node:child_process';
 
 const FILES = [
+  'prisma/migrations/20261101_request_followup/migration.sql',
   'prisma/migrations/20261028_verification_privacy/migration.sql',
   'prisma/migrations/20261028_referrals/migration.sql',
   'prisma/migrations/20261029_investor_access/migration.sql',

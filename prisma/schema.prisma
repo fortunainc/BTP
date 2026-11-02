@@ -1372,3 +1372,13 @@ model InvestorActivity {
   @@index([investorId])
   @@index([createdAt])
 }
+
+// Private founder follow-up tracking. Access approval stays in the original record.
+model RequestFollowUp {
+  key String @id
+  status String @default("new")
+  notes String @default("")
+  source String?
+  referrerId String?
+  updatedAt DateTime @updatedAt
+}

@@ -44,7 +44,7 @@ export default function middleware(req: NextRequest, event: NextFetchEvent) {
     return NextResponse.json({ error: 'Preview data access is disabled until an isolated database is configured.' }, { status: 503 });
   }
   // Waitlist pages and submissions are public and do not require a Clerk session.
-  if (req.nextUrl.pathname === '/join' || req.nextUrl.pathname.startsWith('/join/') || req.nextUrl.pathname === '/api/join') return NextResponse.next();
+  if (req.nextUrl.pathname === '/join' || req.nextUrl.pathname.startsWith('/join/') || req.nextUrl.pathname === '/api/join' || req.nextUrl.pathname === '/api/interest') return NextResponse.next();
   return clerkHandler(req, event);
 }
 
