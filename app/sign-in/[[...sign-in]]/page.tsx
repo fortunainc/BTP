@@ -166,6 +166,11 @@ export default function SignInPage() {
             )}
           </form>
 
+          <p className="mt-5 text-center text-sm leading-6 text-[#d9ccbd]">
+            <Link href="/account/security" className="text-[#e8cc94] underline underline-offset-4">Create or reset your password</Link>
+            <span className="mt-1 block">Sign in with an email code first, then choose Password in Security.</span>
+          </p>
+
           <p className="mt-6 text-center text-sm leading-6 text-[#d9ccbd]">
             New to BTP?{' '}
             <Link className="text-[#e8cc94] underline decoration-[#C9A66B] underline-offset-4" href="/join">Request early access</Link>
