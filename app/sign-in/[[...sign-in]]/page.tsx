@@ -19,19 +19,22 @@ export default function SignInPage() {
 
   async function finishSignIn() {
     const redirectTo = safeSignInDestination(new URLSearchParams(window.location.search).get('redirect_url'), window.location.origin);
+    let destination: string | null = null;
     const { error: finalizeError } = await signIn.finalize({
       navigate: async ({ session, decorateUrl }) => {
         if (session?.currentTask) {
           setError('Your account needs an additional verification step. Please contact BTP support.');
           return;
         }
-        const url = decorateUrl(redirectTo);
-        // Clerk may use an external URL for Safari cookie recovery. Normal
-        // navigation must stay client-side so session activation can finish.
-        navigateAfterSignIn(url, { replace: url => router.replace(url), assign: url => window.location.assign(url) });
+        destination = decorateUrl(redirectTo);
       },
     });
-    if (finalizeError) setError(finalizeError.longMessage || finalizeError.message || 'Could not finish signing in. Please try again.');
+    if (finalizeError) {
+      setError(finalizeError.longMessage || finalizeError.message || 'Could not finish signing in. Please try again.');
+      return;
+    }
+    // The callback runs before activation. Navigate only after finalize resolves.
+    if (destination) navigateAfterSignIn(destination, { replace: url => router.replace(url), assign: url => window.location.assign(url) });
   }
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
