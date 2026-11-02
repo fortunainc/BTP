@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useSignIn } from '@clerk/nextjs';
 import { FormEvent, useState } from 'react';
 import { safeSignInDestination, navigateAfterSignIn } from '@/lib/sign-in-navigation';
+import { prepareEmailVerification } from '@/lib/sign-in-verification';
 import { SUPPORT_EMAIL } from '@/lib/site';
 
 
@@ -40,6 +41,7 @@ export default function SignInPage() {
   const [password, setPassword] = useState('');
   const [code, setCode] = useState('');
   const [codeSent, setCodeSent] = useState(false);
+  const [deviceVerification, setDeviceVerification] = useState(false);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
 
@@ -56,6 +58,15 @@ export default function SignInPage() {
       });
       if (signInError) {
         setError(signInError.longMessage || signInError.message || 'Check your email and password and try again.');
+        return;
+      }
+
+      const verification = await prepareEmailVerification(signIn);
+      if (verification.required) {
+        setDeviceVerification(true);
+        setCodeSent(true);
+        setPassword('');
+        if (verification.error) setError(verification.error.longMessage || verification.error.message || 'Could not send the verification code. Try sending it again.');
         return;
       }
 
@@ -101,7 +112,9 @@ export default function SignInPage() {
     setBusy(true);
     setError('');
     try {
-      const { error: codeError } = await signIn.emailCode.verifyCode({ code: code.trim() });
+      const { error: codeError } = deviceVerification
+        ? await signIn.mfa.verifyEmailCode({ code: code.trim() })
+        : await signIn.emailCode.verifyCode({ code: code.trim() });
       if (codeError) {
         setError(codeError.longMessage || codeError.message || 'That code could not be verified.');
         return;
@@ -131,12 +144,12 @@ export default function SignInPage() {
 
         <div className="px-7 py-8 sm:px-9">
           <h1 className="text-4xl text-[#fff6ea]">Welcome <span className="text-[#e8cc94]">back.</span></h1>
-          <p className="mt-2 text-sm leading-6 text-[#d9ccbd]">Sign in with your password, or have a sign-in code sent to your email.</p>
+          <p className="mt-2 text-sm leading-6 text-[#d9ccbd]">{deviceVerification ? 'Confirm it’s you. Enter the verification code sent to your email to finish signing in on this device.' : 'Sign in with your password, or have a sign-in code sent to your email.'}</p>
 
           <form onSubmit={codeSent ? verifyCode : submit} className="mt-7 space-y-5">
             <label className="block text-[11px] font-semibold uppercase tracking-[0.18em] text-[#e6c98f]">
               Email
-              <input type="email" autoComplete="email" autoCapitalize="none" value={email} onChange={(event) => setEmail(event.target.value)} placeholder="you@example.com" className="mt-2 w-full normal-case tracking-normal font-normal rounded-lg border border-[rgba(232,204,148,0.25)] bg-black/40 px-4 py-3.5 text-base text-white outline-none transition placeholder:text-[#9c8a78] focus:border-[#c9a66b] focus:ring-2 focus:ring-[#C9A66B]/25" required />
+              <input type="email" readOnly={codeSent} autoComplete="email" autoCapitalize="none" value={email} onChange={(event) => setEmail(event.target.value)} placeholder="you@example.com" className="mt-2 w-full normal-case tracking-normal font-normal rounded-lg border border-[rgba(232,204,148,0.25)] bg-black/40 px-4 py-3.5 text-base text-white outline-none transition placeholder:text-[#9c8a78] focus:border-[#c9a66b] focus:ring-2 focus:ring-[#C9A66B]/25" required />
             </label>
 
             {codeSent ? (
@@ -151,6 +164,15 @@ export default function SignInPage() {
               </label>
             )}
 
+            {deviceVerification && <button type="button" disabled={busy || loading} onClick={async () => {
+              setBusy(true); setError('');
+              try {
+                const { error } = await signIn.mfa.sendEmailCode();
+                if (error) setError(error.longMessage || error.message || 'Could not resend the code. Try again.');
+              } catch (cause) { setError(clerkMessage(cause)); }
+              finally { setBusy(false); }
+            }} className="text-sm text-[#e8cc94] underline disabled:opacity-45">Send a new verification code</button>}
+
             {error ? <div role="alert" className="rounded-xl border border-[#c46b6b]/40 bg-[#c46b6b]/10 px-4 py-3 text-sm leading-5 text-[#f1b7b7]">{error}</div> : null}
 
             <button type="submit" disabled={codeSent ? loading || busy || !code.trim() : disabled} className="btn-primary w-full rounded px-4 py-4 text-sm uppercase tracking-[0.16em] disabled:cursor-not-allowed disabled:opacity-45">
@@ -162,7 +184,7 @@ export default function SignInPage() {
                 Email me a sign-in code
               </button>
             ) : (
-              <button type="button" onClick={() => { signIn.reset(); setCodeSent(false); setCode(''); setError(''); }} className="w-full text-sm font-semibold text-[#d9ccbd] underline decoration-[#C9A66B] underline-offset-4">Start over</button>
+              <button type="button" onClick={() => { signIn.reset(); setDeviceVerification(false); setCodeSent(false); setCode(''); setError(''); }} className="w-full text-sm font-semibold text-[#d9ccbd] underline decoration-[#C9A66B] underline-offset-4">Start over</button>
             )}
           </form>
 
