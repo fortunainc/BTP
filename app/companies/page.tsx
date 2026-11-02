@@ -1,6 +1,5 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import InquiryForm from './inquiry-form';
 import SectionReveal from '@/components/marketing/SectionReveal';
 import '../join/waitlist.css';
 import './companies.css';
@@ -23,13 +22,13 @@ export default function CompaniesPage() {
   return <div className="bw co">
     <SectionReveal />
     <header><Link href="/" className="bw-brand"><span>BTP</span><small>BEHIND<br />THE PROTOCOL</small></Link>
-      <nav className="co-nav" aria-label="Main"><Link href="/">For professionals</Link><a href="#inquire" className="co-pill">Discuss your product</a></nav></header>
+      <nav className="co-nav" aria-label="Main"><Link href="/">For professionals</Link><Link href="/join?audience=founder&amp;utm_source=startups" className="co-pill">Discuss your product</Link></nav></header>
     <main>
       <section className="co-hero">
         <p className="bw-kicker">BTP Product Review · For founders and product teams</p>
         <h1>Build what clinical trial teams <em>actually need.</em></h1>
         <p className="bw-lead">Get your product in front of professionals matched to the work it needs to support. Leave knowing what to improve and why.</p>
-        <div className="co-ctas"><a className="co-btn" href="#inquire">Discuss your product →</a><Link href="/join?audience=founder">Not ready yet? Join the waiting list →</Link></div>
+        <div className="co-ctas"><Link className="co-btn" href="/join?audience=founder&amp;utm_source=startups">Discuss your product →</Link></div>
       </section>
 
       <section className="co-sec" aria-labelledby="how">
@@ -65,7 +64,7 @@ export default function CompaniesPage() {
           <p>Tell us what you are building and what you need to learn. We’ll discuss reviewer fit, scope, and timing with you.</p>
           <p><b>A paid service.</b> Scope, timing, and fees agreed before work begins.</p>
           <p className="bw-small">Please do not include patient information or confidential documents.</p></div>
-        <div className="bw-card"><InquiryForm /></div>
+        <div className="bw-card"><p>A few details are all we need to get started.</p><Link className="co-btn" href="/join?audience=founder&amp;utm_source=startups">Discuss your product →</Link></div>
       </section>
     </main>
     <footer><span>Behind the Protocol · Behind The Protocol Inc. · <Link href="/privacy">Privacy</Link></span><Link href="/support">Contact BTP</Link></footer>

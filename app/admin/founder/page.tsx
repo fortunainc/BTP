@@ -41,7 +41,7 @@ export default function FounderPage() {
     <main className="min-h-screen px-4 py-10 text-white sm:px-8">
       <div className="mx-auto max-w-5xl">
         <p className="mb-2 text-[11px] font-semibold uppercase tracking-[0.24em] text-[#dcbc82]">Founder view</p>
-        <p className="my-3"><Link href="/admin/waitlist" className="text-[#e2c58e] underline">Waitlist and referrals →</Link></p>
+        <p className="my-3"><Link href="/admin/requests" className="text-[#e2c58e] underline">All requests →</Link> <Link href="/admin/waitlist" className="text-[#e2c58e] underline">Waitlist and referrals →</Link></p>
         <p className="my-3"><Link href="/admin/company-inquiries" className="text-[#e2c58e] underline">Company inquiries →</Link></p>
         <h1 className="text-4xl text-[#fff6ea]">How BTP is <span className="text-[#e8cc94]">doing.</span></h1>
         {m && <p className="mt-2 text-sm text-slate-400">Live from the database · {new Date(m.generatedAt).toLocaleString()}</p>}

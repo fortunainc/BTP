@@ -1,0 +1,8 @@
+CREATE TABLE IF NOT EXISTS "RequestFollowUp" (
+ "key" TEXT PRIMARY KEY,
+ "status" TEXT NOT NULL DEFAULT 'new',
+ "notes" TEXT NOT NULL DEFAULT '',
+ "source" TEXT,
+ "referrerId" TEXT,
+ "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
