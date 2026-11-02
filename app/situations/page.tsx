@@ -45,7 +45,7 @@ const TIME_BUCKETS = [
 ];
 
 export default function SituationsPage() {
-  const { isSignedIn } = useAuth();
+  const { isSignedIn, isLoaded } = useAuth();
   const [situations, setSituations] = useState<Situation[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -54,8 +54,9 @@ export default function SituationsPage() {
   const [polls, setPolls] = useState<Poll[] | null>(null);
 
   useEffect(() => {
+    if (!isLoaded || !isSignedIn) return;
     fetch('/api/polls').then(r => r.ok ? r.json() : null).then(d => setPolls((d?.data ?? d)?.polls ?? null)).catch(() => setPolls(null));
-  }, []);
+  }, [isLoaded, isSignedIn]);
   const [timeBucket, setTimeBucket] = useState('');
   const [showWelcome, setShowWelcome] = useState(false);
 
@@ -68,8 +69,13 @@ export default function SituationsPage() {
   }
 
   useEffect(() => {
-    fetchSituations();
-  }, [timeBucket]);
+    if (!isLoaded) return;
+    if (!isSignedIn) {
+      window.location.replace('/sign-in?redirect_url=/situations');
+      return;
+    }
+    void fetchSituations();
+  }, [timeBucket, isLoaded, isSignedIn]);
 
   async function fetchSituations() {
     try {
