@@ -45,6 +45,7 @@ export default function FounderPage() {
         <p className="my-3"><Link href="/admin/company-inquiries" className="text-[#e2c58e] underline">Company inquiries →</Link></p>
         <h1 className="text-4xl text-[#fff6ea]">How BTP is <span className="text-[#e8cc94]">doing.</span></h1>
         {m && <p className="mt-2 text-sm text-slate-400">Live from the database · {new Date(m.generatedAt).toLocaleString()}</p>}
+        <p className="mt-3 text-sm text-slate-400">Operational totals include team accounts, starter content and test activity. These are not audited customer traction figures.</p>
         {error && <p className="mt-6 text-[#f1b7b7]">{error}</p>}
         {!m && !error && <p className="mt-6 text-slate-400">Loading…</p>}
         {m && (

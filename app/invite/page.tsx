@@ -1,20 +1,24 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { useAuth } from '@clerk/nextjs';
 
 /** A verified member's personal invite link, plus how many people it has brought in. */
 export default function InvitePage() {
+  const { isLoaded, isSignedIn } = useAuth();
   const [data, setData] = useState<{ link: string; requested: number; joined: number } | null>(null);
   const [error, setError] = useState('');
   const [copied, setCopied] = useState(false);
 
   useEffect(() => {
+    if (!isLoaded) return;
+    if (!isSignedIn) { window.location.replace('/sign-in?redirect_url=/invite'); return; }
     fetch('/api/user/referral').then(async (res) => {
       if (res.status === 401) { window.location.replace('/sign-in?redirect_url=/invite'); return; }
       const body = await res.json().catch(() => ({}));
       if (res.ok) setData(body); else setError(body.error || 'Your invite link could not be loaded.');
     }).catch(() => setError('Your invite link could not be loaded.'));
-  }, []);
+  }, [isLoaded, isSignedIn]);
 
   async function copy() {
     if (!data) return;
@@ -27,6 +31,7 @@ export default function InvitePage() {
         <p className="mb-3 text-[11px] font-semibold uppercase tracking-[0.24em] text-[#dcbc82]">Invite</p>
         <h1 className="text-4xl text-[#fff6ea]">Bring in someone <span className="text-[#e8cc94]">you trust.</span></h1>
         <p className="mt-3 text-slate-400">Share your personal link with clinical research colleagues. They join the waitlist with your referral attached. BTP reviews access and sends invitations. Share only with clinical research professionals you know.</p>
+        {!data && !error && <p className="mt-6 text-slate-400">Loading your invite link…</p>}
         {error && <div role="alert" className="mt-6 rounded-lg border border-[#c46b6b]/40 bg-[#c46b6b]/10 px-4 py-3 text-[#f1b7b7]">{error}</div>}
         {data && (
           <div className="mt-8 space-y-5 rounded-2xl border border-white/[0.08] bg-gradient-to-br from-white/[0.055] to-white/[0.012] p-6">

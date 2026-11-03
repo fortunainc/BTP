@@ -16,6 +16,11 @@ const route = withAuth(handler);
 const request = (method = 'GET') => new NextRequest('https://btp.test/api/situations', { method });
 beforeEach(() => { state.clerkId = 'clerk-test'; state.member = { id: 'member-test', userRole: 'operator', verificationStatus: 'Approved', isSuspended: false }; state.allowed = true; state.fail = false; handler.mockClear(); });
 describe('authenticated API boundary', () => {
+  it('prevents caching both authenticated and denied responses', async () => {
+    expect((await route(request())).headers.get('cache-control')).toBe('private, no-store');
+    state.clerkId = null;
+    expect((await route(request())).headers.get('cache-control')).toBe('private, no-store');
+  });
   it('rejects anonymous callers before executing the handler', async () => { state.clerkId = null; expect((await route(request())).status).toBe(401); expect(handler).not.toHaveBeenCalled(); });
   it('rejects a valid Clerk session without a provisioned member', async () => { state.member = null; expect((await route(request())).status).toBe(404); });
   it.each([{ isSuspended: true }, { verificationStatus: 'Suspended' }])('denies either suspension representation %j', async patch => { Object.assign(state.member!, patch); expect((await route(request())).status).toBe(403); expect(handler).not.toHaveBeenCalled(); });

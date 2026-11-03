@@ -1,8 +1,8 @@
 /**
  * New Situation Page — ZERO-FRICTION INPUT
- * 
+ *
  * TRANSLATION ENGINE FRONTEND
- * 
+ *
  * Rules:
  * - Single text field only
  * - Prompt: "What question do you need help answering?"
@@ -12,7 +12,7 @@
  * - No multi-step forms
  * - Submission must remain <30 seconds
  * - Mobile-first design
- * 
+ *
  * Flow:
  * 1. Input → auto-redact → show sanitized version
  * 2. User reviews sanitized version: Post or Edit
@@ -56,6 +56,7 @@ interface ReflectionContent {
 
 interface SubmissionResult {
   success: boolean;
+  pendingReview?: boolean;
   id?: string;
   redactedContent?: string;
   redactionsApplied?: number;
@@ -68,19 +69,19 @@ type Step = 'input' | 'review' | 'processing' | 'confirmation';
 export default function NewSituationPage() {
   const router = useRouter();
   const { isSignedIn, isLoaded } = useAuth();
-  
+
   const [step, setStep] = useState<Step>('input');
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  
+
   // Form state — MINIMAL
   const [description, setDescription] = useState('');
   const [selectedChips, setSelectedChips] = useState<string[]>([]);
-  
+
   // Review state
   const [redactedContent, setRedactedContent] = useState('');
   const [redactionCount, setRedactionCount] = useState(0);
-  
+
   // Result state
   const [result, setResult] = useState<SubmissionResult | null>(null);
   const [onboardingComplete, setOnboardingComplete] = useState<boolean | null>(null);
@@ -200,8 +201,8 @@ export default function NewSituationPage() {
   }
 
   const toggleChip = (chipId: string) => {
-    setSelectedChips(prev => 
-      prev.includes(chipId) 
+    setSelectedChips(prev =>
+      prev.includes(chipId)
         ? prev.filter(c => c !== chipId)
         : [...prev, chipId]
     );
@@ -210,7 +211,7 @@ export default function NewSituationPage() {
   // Step 1: Submit for redaction review
   const handleReviewSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!description.trim()) {
       setError('Please enter your question');
       return;
@@ -231,7 +232,7 @@ export default function NewSituationPage() {
 
       const data = await response.json();
 
-      if (data.success) {
+      if (response.ok && typeof data.redactedContent === 'string') {
         setRedactedContent(data.redactedContent);
         setRedactionCount(data.redactionsApplied || 0);
         setStep('review');
@@ -265,7 +266,7 @@ export default function NewSituationPage() {
 
       const data = await response.json();
 
-      if (data.success) {
+      if (response.ok && data.success) {
         setResult(data);
         setStep('confirmation');
       } else {
@@ -295,13 +296,11 @@ export default function NewSituationPage() {
       <div className="min-h-screen flex flex-col justify-center items-center px-4">
         <Loader2 className="w-12 h-12 text-cyan-500 animate-spin mb-4" />
         <h2 className="text-xl font-semibold text-white mb-2">Preparing your question</h2>
-        <p className="text-slate-400 text-center mb-6">Protecting identifying details and organizing the context...</p>
+        <p className="text-slate-400 text-center mb-6">Checking identifying details and preparing your question...</p>
         <div className="text-sm text-slate-500 text-center space-y-1">
-          <p>Checking for pattern matches</p>
-          <p>Identifying workarounds others have used</p>
-          <p>Protecting your identity</p>
+          <p>Please avoid including confidential or identifying information.</p>
         </div>
-        
+
       </div>
     );
   }
@@ -315,8 +314,8 @@ export default function NewSituationPage() {
             <div className="w-16 h-16 bg-emerald-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
               <CheckCircle className="w-8 h-8 text-emerald-500" />
             </div>
-            <h1 className="text-2xl font-bold text-white mb-2">Your question is live.</h1>
-            <p className="text-slate-400">Verified BTP members can now answer it publicly without exposing their identity.</p>
+            <h1 className="text-2xl font-bold text-white mb-2">{result.pendingReview ? 'Your question is awaiting review.' : 'Your question is posted.'}</h1>
+            <p className="text-slate-400">{result.pendingReview ? 'BTP will review your question before it becomes visible to members.' : 'Approved BTP members can now read and answer it under their handles.'}</p>
           </div>
 
           {/* Anonymity Confirmation */}
@@ -324,9 +323,9 @@ export default function NewSituationPage() {
             <div className="flex items-start gap-3 mb-4">
               <Shield className="w-5 h-5 text-cyan-500 mt-0.5" />
               <div>
-                <h3 className="text-white font-medium">Your identity is protected</h3>
+                <h3 className="text-white font-medium">Your community identity</h3>
                 <p className="text-slate-400 text-sm mt-1">
-                  Identity protected in community discussions · Review redactions before posting
+                  Members see your handle and general role. Choose a handle that does not identify you. Screening cannot catch every identifying detail.
                 </p>
               </div>
             </div>
@@ -338,13 +337,14 @@ export default function NewSituationPage() {
           </div>
 
           {/* Reflection — The Translation Output */}
-          {result.reflection && (
+          {!result.pendingReview && result.reflection && (
             <div className="bg-slate-900 border border-slate-800 rounded-lg p-6 mb-6">
               <div className="flex items-center gap-2 mb-4">
                 <Eye className="w-5 h-5 text-cyan-500" />
-                <h3 className="text-white font-medium">What we're seeing</h3>
+                <h3 className="text-white font-medium">Automated summary</h3>
               </div>
-              
+
+              <p className="mb-4 text-sm text-slate-400">Generated from your question. This is not a peer answer or a validated prediction.</p>
               {/* Pattern Name — specific, causal */}
               {result.reflection.patternName && (
                 <div className="mb-4 px-3 py-2 bg-cyan-500/10 border border-cyan-500/30 rounded-md">
@@ -386,8 +386,8 @@ export default function NewSituationPage() {
               {/* Classification */}
               <div className="mb-4 px-3 py-2 bg-slate-800 rounded-md">
                 <p className={`text-sm font-medium ${
-                  result.reflection.classificationLabel.includes('escalate') 
-                    ? 'text-amber-400' 
+                  result.reflection.classificationLabel?.includes('escalate')
+                    ? 'text-amber-400'
                     : 'text-slate-300'
                 }`}>
                   {result.reflection.classificationLabel}
@@ -397,7 +397,7 @@ export default function NewSituationPage() {
               {/* Observed Workarounds — specific, real-feeling */}
               {result.reflection.observedWorkarounds && result.reflection.observedWorkarounds.length > 0 && (
                 <div className="mb-4">
-                  <span className="text-slate-500 text-sm">What operators have tried</span>
+                  <span className="text-slate-500 text-sm">Possible approaches to consider</span>
                   {result.reflection.observedWorkarounds.map((w, i) => (
                     <p key={i} className="text-white text-sm mt-1">· {w}</p>
                   ))}
@@ -413,7 +413,7 @@ export default function NewSituationPage() {
               )}
 
               {/* Connections */}
-              {result.reflection.connections.length > 0 && (
+              {result.reflection.connections?.length > 0 && (
                 <div className="mb-4">
                   <span className="text-slate-500 text-sm">What this connects to</span>
                   {result.reflection.connections.map((c, i) => (
@@ -423,9 +423,9 @@ export default function NewSituationPage() {
               )}
 
               {/* What others are seeing */}
-              {result.reflection.peerObservations.length > 0 && (
+              {result.reflection.peerObservations?.length > 0 && (
                 <div className="mb-4">
-                  <span className="text-slate-500 text-sm">What others are seeing</span>
+                  <span className="text-slate-500 text-sm">Possible related challenges</span>
                   {result.reflection.peerObservations.map((o, i) => (
                     <p key={i} className="text-white text-sm mt-1">· {o}</p>
                   ))}
@@ -433,9 +433,9 @@ export default function NewSituationPage() {
               )}
 
               {/* What people tried */}
-              {result.reflection.attemptedApproaches.length > 0 && (
+              {result.reflection.attemptedApproaches?.length > 0 && (
                 <div className="mb-4">
-                  <span className="text-slate-500 text-sm">What people tried</span>
+                  <span className="text-slate-500 text-sm">Possible approaches</span>
                   {result.reflection.attemptedApproaches.map((a, i) => (
                     <p key={i} className="text-white text-sm mt-1">· {a}</p>
                   ))}
@@ -443,9 +443,9 @@ export default function NewSituationPage() {
               )}
 
               {/* What didn't hold up */}
-              {result.reflection.failedApproaches.length > 0 && (
+              {result.reflection.failedApproaches?.length > 0 && (
                 <div className="mb-4">
-                  <span className="text-slate-500 text-sm">What didn't hold up</span>
+                  <span className="text-slate-500 text-sm">Possible limitations</span>
                   {result.reflection.failedApproaches.map((f, i) => (
                     <p key={i} className="text-white text-sm mt-1">· {f}</p>
                   ))}
@@ -460,10 +460,9 @@ export default function NewSituationPage() {
           <div className="bg-cyan-500/10 border border-cyan-500/30 rounded-lg p-6 mb-6">
             <h3 className="text-cyan-400 font-medium mb-2">What happens next</h3>
             <p className="text-sm text-slate-300 mb-3">
-              Your question is visible to approved members. You will see responses here as peers answer;
-              during the early beta, responses may take time.
+              {result.pendingReview ? 'Your question is not yet visible to other members. You can return to the community while BTP reviews it.' : 'Your question is visible to approved members. Responses will appear as peers answer; during the early beta, replies may take time.'}
             </p>
-            {result.reflection?.patternName && (
+            {!result.pendingReview && result.reflection?.patternName && (
               <p className="text-xs text-cyan-400/80 italic mb-3">
                 Early indication: this may relate to {result.reflection.patternName.toLowerCase()} patterns
               </p>
@@ -522,7 +521,7 @@ export default function NewSituationPage() {
             <div className="flex items-start gap-3">
               <AlertTriangle className="w-5 h-5 text-amber-400 mt-0.5 flex-shrink-0" />
               <p className="text-sm text-amber-200">
-                Do not include patient identifiers, protocol IDs, sponsor names, site names, or investigator names. 
+                Do not include patient identifiers, protocol IDs, sponsor names, site names, or investigator names.
                 Edit your original text if any remain.
               </p>
             </div>
@@ -572,7 +571,7 @@ export default function NewSituationPage() {
           Ask what you <span className="text-[#e8cc94]">can&apos;t ask at work.</span>
         </h1>
         <p className="text-slate-400 text-sm mb-6">
-          Your question shows only your verified role, never your name or employer. You review it before anyone sees it. No names, sponsors, sites, protocol IDs or patient details.
+          Your question shows your handle and general role, not your account name or employer. You review it before anyone sees it. No names, sponsors, sites, protocol IDs or patient details.
         </p>
 
         {/* Main Form — SINGLE TEXT FIELD */}
@@ -622,7 +621,7 @@ export default function NewSituationPage() {
           {/* Anonymity reminder */}
           <div className="flex items-center gap-2 text-xs text-slate-600">
             <Shield className="w-3.5 h-3.5" />
-            <span>Names, emails, phone numbers and protocol numbers are removed automatically. Check your text too.</span>
+            <span>Questions are screened for identifying details. Review the suggested changes before posting.</span>
           </div>
 
           {/* SUBMIT — Single button */}

@@ -148,7 +148,7 @@ export function withAuth(
   handler: (request: NextRequest, user: any) => Promise<NextResponse>,
   config: APIAuthConfig = {}
 ) {
-  return async (request: NextRequest): Promise<NextResponse> => {
+  const execute = async (request: NextRequest): Promise<NextResponse> => {
     try {
       // Apply rate limiting if configured
       if (config.rateLimit) {
@@ -230,6 +230,11 @@ export function withAuth(
         { status: 500 }
       );
     }
+  };
+  return async (request: NextRequest): Promise<NextResponse> => {
+    const response = await execute(request);
+    if (config.requireAuth !== false) response.headers.set('Cache-Control', 'private, no-store');
+    return response;
   };
 }
 

@@ -48,6 +48,7 @@ export const POST = withAuth(async (req: NextRequest, user) => {
     const hasPIIRisk = redactionCount > 0;
 
     return createApiResponse({
+      success: true,
       // The sanitized version the user will review (frontend reads data.redactedContent)
       redactedContent,
       
