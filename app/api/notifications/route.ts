@@ -1,3 +1,4 @@
+import { enabledNotificationClasses } from '@/lib/notification-preferences';
 import { isApprovedMember, isAdminMember } from '@/lib/access-policy';
 /**
  * Notifications API - Return Engine
@@ -43,6 +44,8 @@ export const GET = withAuth(async (request, user) => {
       const offset = Math.max(parseInt(searchParams.get('offset') || '0', 10) || 0, 0);
       const classFilter = searchParams.get('class');
 
+      const preferences = await prisma.userNotificationSettings.findUnique({ where: { userId: user.id } });
+      const enabledClasses = enabledNotificationClasses(preferences);
       // Build where clause.
       // Private alpha: scheduled check-ins should not appear until their scheduled window.
       const deliverableWindow = {
@@ -56,6 +59,7 @@ export const GET = withAuth(async (request, user) => {
         userId: user.id,
         dismissed: false,
         ...deliverableWindow,
+        notificationClass: { in: enabledClasses },
       };
 
       if (unreadOnly) {
@@ -63,7 +67,7 @@ export const GET = withAuth(async (request, user) => {
       }
 
       if (classFilter) {
-        where.notificationClass = classFilter;
+        where.notificationClass = { in: enabledClasses.filter(value => value === classFilter) };
       }
 
       // Get notifications and counts
@@ -77,11 +81,11 @@ export const GET = withAuth(async (request, user) => {
           take: limit,
           skip: offset,
         }),
-        prisma.notification.count({ where: { userId: user.id, dismissed: false, ...deliverableWindow } }),
-        prisma.notification.count({ where: { userId: user.id, read: false, dismissed: false, ...deliverableWindow } }),
+        prisma.notification.count({ where: { userId: user.id, dismissed: false, ...deliverableWindow, notificationClass: { in: enabledClasses } } }),
+        prisma.notification.count({ where: { userId: user.id, read: false, dismissed: false, ...deliverableWindow, notificationClass: { in: enabledClasses } } }),
         prisma.notification.groupBy({
           by: ['notificationClass'],
-          where: { userId: user.id, read: false, dismissed: false, ...deliverableWindow },
+          where: { userId: user.id, read: false, dismissed: false, ...deliverableWindow, notificationClass: { in: enabledClasses } },
           _count: { id: true },
         }),
       ]);

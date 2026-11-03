@@ -349,7 +349,7 @@ export default function SituationDetailPage({ params }: { params: Promise<{ id: 
                     placeholder="Share what you would do, why, and any important limitations. Do not include names, employers, protocol IDs, or patient details."
                   />
                   <div className="mt-2 flex items-center justify-between">
-                    <span className="text-xs text-slate-500">Shown with your verified role only, never your name or employer · {answerText.length}/2000</span>
+                    <span className="text-xs text-slate-500">Shown with your handle and general role, not your account details · {answerText.length}/2000</span>
                     <button
                       onClick={handleSubmitAnswer}
                       disabled={submitting || !answerText.trim()}

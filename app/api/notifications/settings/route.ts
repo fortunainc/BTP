@@ -88,6 +88,12 @@ export const PUT = withAuth(async (req, user) => {
         }
       }
 
+      for (const [key, value] of Object.entries(updateData)) {
+        if (key.endsWith('Enabled') && typeof value !== 'boolean') {
+          return createErrorResponse(`${key} must be true or false`, 400);
+        }
+      }
+
       // Validate quiet hours
       if (
         updateData.quietHoursStart !== undefined &&
