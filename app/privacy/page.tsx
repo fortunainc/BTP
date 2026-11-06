@@ -5,7 +5,8 @@ import { SUPPORT_EMAIL } from '@/lib/site';
 export const metadata: Metadata = { title: 'BTP | Privacy and trust', description: 'How BTP verifies members, protects identity in discussions, and uses data.' };
 
 const collected = [
-  'Waitlist email, professional role, optional paid review interest, signup source and member referral. BTP uses these to manage access and contact you about your stated interests.',
+  'Waitlist email, professional role, optional paid review interest, signup source and referral attribution. BTP uses these to manage access and contact you about your stated interests.',
+  'Your experience questionnaire stays private to BTP and helps match relevant paid review opportunities if you opt in. Referral signup and questionnaire completion counts determine waitlist priority. Referrers see counts, not your email or answers. Membership approval is separate.',
   'Waitlist interest is not consent to research or commercial reuse. Contact support to correct or remove your request.',
   'Account email and sign in identifiers',
   'Your private verification method and status',
@@ -64,7 +65,7 @@ export default function PrivacyPage() {
         <section className="space-y-4 border-t border-[#D8C7B8] pt-8 text-sm leading-6 text-[#715E5B]">
           <p>BTP does not promise absolute anonymity. Content details, employer monitoring, legal process, or a security incident could create a risk of re-identification. We reduce that risk through general labels, access controls, redaction, and private moderation.</p>
           <p>To request access, correction, export, or deletion of your account data, email <a className="font-semibold underline" href={`mailto:${SUPPORT_EMAIL}`}>{SUPPORT_EMAIL}</a>.</p>
-          <p>Last updated: October 30, 2026.</p>
+          <p>Last updated: November 5, 2026.</p>
         </section>
       </div>
     </main>

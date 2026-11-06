@@ -12,6 +12,7 @@ import { FOUNDER_WAITLIST_ROLE } from '@/lib/waitlist-options';
 const payload={audience:'professional',email:' Person@Example.com ',role:'Coordinator',contactConsent:true};
 function req(body:unknown,path='/api/interest',method='POST',origin='https://btp.test'){return new NextRequest('https://btp.test'+path,{method,headers:{origin,'content-type':'application/json'},body:JSON.stringify(body)});}
 beforeEach(()=>{
+ vi.stubEnv('WAITLIST_GROWTH_ENABLED','false');
  vi.resetAllMocks();m.limit.mockResolvedValue({allowed:true,retryAfter:60});m.auth.mockResolvedValue({success:true});
  m.db.$transaction.mockImplementation(fn=>fn(m.db));
  for(const model of [m.db.accessRequest,m.db.companyInquiry,m.db.investor]){model.upsert.mockResolvedValue({id:'r1'});model.findMany.mockResolvedValue([]);}

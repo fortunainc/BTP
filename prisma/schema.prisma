@@ -1299,6 +1299,23 @@ model AccountDeletionRequest {
 
 // People who asked to join through a member's invite link (or BTP directly).
 model AccessRequest {
+  referralCode String? @unique
+  waitlistReferrerId String?
+  waitlistReferrer AccessRequest? @relation("WaitlistReferrals", fields: [waitlistReferrerId], references: [id], onDelete: SetNull)
+  waitlistReferrals AccessRequest[] @relation("WaitlistReferrals")
+  emailConfirmedAt DateTime?
+  referralExcludedAt DateTime?
+  referralExclusionReason String?
+  experienceProfile Json?
+  experienceCompletedAt DateTime?
+  experienceUpdatedAt DateTime?
+  welcomeClaimedAt DateTime?
+  welcomeSentAt DateTime?
+  waitlistTokens WaitlistToken[]
+  referralEvents WaitlistReferralEvent[]
+
+  @@index([waitlistReferrerId])
+
   role String?
   paidReviewInterest Boolean @default(false)
   source String @default("direct")
@@ -1395,4 +1412,26 @@ model RequestFollowUp {
   source String?
   referrerId String?
   updatedAt DateTime @updatedAt
+}
+
+model WaitlistToken {
+  id String @id @default(cuid())
+  requestId String
+  request AccessRequest @relation(fields: [requestId], references: [id], onDelete: Cascade)
+  tokenHash String @unique
+  purpose String
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+  @@index([requestId, purpose])
+  @@index([expiresAt])
+}
+model WaitlistReferralEvent {
+  id String @id @default(cuid())
+  requestId String
+  request AccessRequest @relation(fields: [requestId], references: [id], onDelete: Cascade)
+  actorId String
+  action String
+  reason String
+  createdAt DateTime @default(now())
+  @@index([requestId])
 }
