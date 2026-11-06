@@ -4,7 +4,7 @@ import HomeReveal from '@/components/marketing/HomeReveal';
 import { HOME_HTML } from '@/components/marketing/home-markup';
 import './home.css';
 
-export const metadata: Metadata = { verification: { google: 'Z85_jWDrV20eKAhf-CewHfEgnOzLl39VeYZxF7p9L4w' }, alternates: { canonical: '/' }, title: 'BTP | Clinical trial experience, connected.', description: 'A private, verified community for coordinators, CRAs and clinical research teams. Access reviewed by BTP.' };
+export const metadata: Metadata = { verification: { google: 'Z85_jWDrV20eKAhf-CewHfEgnOzLl39VeYZxF7p9L4w', other: { 'msvalidate.01': '266440768EC647164F26D19C9A279366' } }, alternates: { canonical: '/' }, title: 'BTP | Clinical trial experience, connected.', description: 'A private, verified community for coordinators, CRAs and clinical research teams. Access reviewed by BTP.' };
 
 const serif = Newsreader({ subsets: ['latin'], axes: ['opsz'], variable: '--font-newsreader', display: 'swap' });
 const sans = Inter({ subsets: ['latin'], variable: '--font-inter', display: 'swap' });
