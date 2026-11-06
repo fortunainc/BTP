@@ -14,17 +14,18 @@ export default function WaitlistForm() {
  const initial = params.get('audience');
  const [audience, setAudience] = useState<Audience>(initial === 'founder' || initial === 'investor' ? initial : 'professional');
  const [busy, setBusy] = useState(false), [error, setError] = useState(''), [done, setDone] = useState(false);
+ const [checkEmail,setCheckEmail]=useState(false);
  const c = copy[audience];
  async function submit(e: FormEvent<HTMLFormElement>) {
   e.preventDefault(); setBusy(true); setError(''); const f = new FormData(e.currentTarget);
   try {
    const res = await fetch('/api/interest', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ audience, email: f.get('email'), name: f.get('name'), company: f.get('company'), request: f.get('request'), role: f.get('role'), website: f.get('website'), code: params.get('ref') || '', source: params.get('utm_source') || 'direct', paidReviewInterest: f.get('paid') === 'on', contactConsent: f.get('consent') === 'on' }) });
-   const data = await res.json(); if (!res.ok) throw new Error(data.error || 'Please try again.'); setDone(true);
+   const data = await res.json(); if (!res.ok) throw new Error(data.error || 'Please try again.'); if(data.next === '/join/experience'){window.location.assign(data.next);return;} setDone(true); setCheckEmail(data.checkEmail === true);
   } catch(e) { setError(e instanceof Error ? e.message : 'Please try again.'); } finally { setBusy(false); }
  }
  return <div className="bw"><header><Link href="/" className="bw-brand"><span>BTP</span><small>BEHIND<br/>THE PROTOCOL</small></Link><Link href="/sign-in">Member sign in ↗</Link></header>
  <main className="bw-grid"><section><p className="bw-kicker">{c.kicker}</p><h1>{c.title}</h1><p className="bw-lead">{c.intro}</p><p className="bw-small">{audience === 'professional' ? 'Membership is free. BTP reviews every request. Professional verification or a referral from a verified professional is required before access.' : 'No account needed. A few details, then we’ll be in touch.'}</p></section>
- <section className="bw-card" aria-labelledby="join-title">{done ? <div role="status"><p className="bw-kicker">Request received</p><h2 id="join-title">You’re on our list.</h2><p>{c.success}</p><p className="bw-small">Already submitted? Your earlier details stay saved. Need to update them? <a href="mailto:sasha@behindtheprotocol.ai">Contact Sasha</a>.</p><button onClick={() => { setDone(false); setError(''); }}>Have another interest?</button><Link href="/">Back to BTP →</Link></div> : <>
+ <section className="bw-card" aria-labelledby="join-title">{done ? <div role="status"><p className="bw-kicker">Request received</p><h2 id="join-title">You’re on our list.</h2><p>{checkEmail ? 'Check your email for your private link to finish your profile and get your referral link.' : c.success}</p><p className="bw-small">Already submitted? Your earlier details stay saved. Need to update them? <a href="mailto:sasha@behindtheprotocol.ai">Contact Sasha</a>.</p><button onClick={() => { setDone(false); setError(''); }}>Have another interest?</button><Link href="/">Back to BTP →</Link></div> : <>
  <h2 id="join-title">Let’s connect.</h2><form onSubmit={submit}>
  <label htmlFor="audience">What brings you to BTP?</label><select id="audience" disabled={busy} value={audience} onChange={e => {setAudience(e.target.value as Audience);setError('');}}><option value="professional">Join the community</option><option value="founder">Get feedback on my product</option><option value="investor">Explore investing</option></select>
  {audience !== 'professional' && <><label htmlFor="name">Your name</label><input id="name" name="name" autoComplete="name" maxLength={120} required/></>}

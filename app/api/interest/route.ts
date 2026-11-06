@@ -5,6 +5,8 @@ import { activeReferrer } from '@/lib/waitlist';
 import { FOUNDER_WAITLIST_ROLE } from '@/lib/waitlist-options';
 import { parseSignup } from '@/lib/signup';
 import { checkWriteRateLimit } from '@/lib/write-rate-limit';
+import { growthEnabled } from '@/lib/waitlist-growth';
+import { growthSignup } from '@/lib/waitlist-growth-signup';
 export const runtime = 'nodejs';
 const headers = { 'Cache-Control': 'private, no-store' };
 export async function POST(req: NextRequest) {
@@ -15,12 +17,14 @@ export async function POST(req: NextRequest) {
   if (!body || typeof body !== 'object' || Array.isArray(body)) return NextResponse.json({ error: 'Please check the form.' }, { status: 400, headers });
   if (body.website) return NextResponse.json({ success: true }, { headers });
   const data = parseSignup(body);
+  if (data && data.audience !== 'professional' && data.code.startsWith('wl_')) data.code='';
   if (!data) return NextResponse.json({ error: 'Complete the required details and agree to be contacted.' }, { status: 400, headers });
   try {
     const ip = req.headers.get('x-forwarded-for')?.split(',')[0].trim() || 'unknown';
     const key = createHash('sha256').update('signup:' + ip).digest('hex');
     const budget = await checkWriteRateLimit(key, '/api/interest');
     if (!budget.allowed) return NextResponse.json({ error: 'Please try again in a minute.' }, { status: 429, headers: { ...headers, 'Retry-After': String(budget.retryAfter) } });
+    if(growthEnabled() && data.audience==='professional')return await growthSignup(req,data);
     const referrer = data.code ? await activeReferrer(data.code) : null;
     if (data.code && !referrer) return NextResponse.json({ error: 'This referral link is no longer active. Join directly at /join instead.' }, { status: 400, headers });
     await prisma.$transaction(async tx => {
