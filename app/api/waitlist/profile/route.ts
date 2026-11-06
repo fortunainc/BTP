@@ -1,3 +1,4 @@
+import { acquisitionConversion } from '@/lib/acquisition-server';
 import { NextRequest,NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { experienceSchema } from '@/lib/experience-profile';
@@ -19,5 +20,6 @@ export async function PUT(req:NextRequest){
  let json;try{json=JSON.parse(raw)}catch{return NextResponse.json({error:'Invalid profile.'},{status:400})}
  const profile=experienceSchema.safeParse(json);if(!profile.success)return NextResponse.json({error:'Complete the required experience fields. Choose up to five expertise areas.'},{status:400,headers:growthHeaders});
  await prisma.accessRequest.update({where:{id:row.id},data:{experienceProfile:profile.data,experienceCompletedAt:row.experienceCompletedAt??new Date(),experienceUpdatedAt:new Date(),paidReviewInterest:profile.data.paidReviewInterest}});
- return NextResponse.json({success:true},{headers:growthHeaders});
+ const conversion=!row.experienceCompletedAt && await acquisitionConversion('experience_completed','professional:'+row.id,req.headers,{});
+ return NextResponse.json({success:true,conversion},{headers:growthHeaders});
 }

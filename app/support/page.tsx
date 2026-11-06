@@ -2,7 +2,7 @@ import Link from 'next/link';
 import { SUPPORT_EMAIL } from '@/lib/site';
 
 
-export const metadata = {
+export const metadata = { alternates: { canonical: '/support' },
   title: 'BTP | Support',
   description: 'Help with BTP access, accounts, technical problems, safety concerns and account deletion.',
 };

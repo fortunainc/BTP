@@ -4,6 +4,7 @@ import "./globals.css";
 import { ClerkProvider } from '@clerk/nextjs';
 import { AuthProvider } from "@/components/AuthContext";
 import { SITE_URL } from '@/lib/site';
+import MarketingAnalytics from '@/components/MarketingAnalytics';
 
 // Clerk-backed member and founder surfaces require request-time auth context.
 export const dynamic = "force-dynamic";
@@ -18,7 +19,7 @@ export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   openGraph: {
     title: "BTP | Clinical trial experience, connected.",
-    description: "Practical peer experience and private help for clinical research professionals. Invitation-only beta.",
+    description: "Practical peer experience and private help for clinical research professionals. Access reviewed by BTP.",
     siteName: "Behind the Protocol",
     type: "website",
   },
@@ -37,7 +38,7 @@ export default function RootLayout({
     return (
       <html lang="en" className={`dark ${newsreader.variable} ${cormorant.variable}`}>
         <body className={`${inter.className} bg-slate-950 text-slate-100 antialiased`}>
-          {children}
+          {children}<MarketingAnalytics />
         </body>
       </html>
     );
@@ -55,7 +56,7 @@ export default function RootLayout({
       <AuthProvider>
         <html lang="en" className={`dark ${newsreader.variable} ${cormorant.variable}`}>
           <body className={`${inter.className} bg-slate-950 text-slate-100 antialiased`}>
-            {children}
+            {children}<MarketingAnalytics />
           </body>
         </html>
       </AuthProvider>

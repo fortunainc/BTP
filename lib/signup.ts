@@ -18,6 +18,6 @@ export function parseSignup(body: Record<string, unknown>) {
   if (audience !== 'professional' && !name) return null;
   if (audience === 'founder' && (!company || !request)) return null;
   if (code && !/^[A-Za-z0-9_-]{4,20}$/.test(code)) return null;
-  const source = typeof body.source === 'string' && /^[a-zA-Z0-9_ -]{1,60}$/.test(body.source) ? body.source : 'direct';
-  return { audience: audience as Audience, email, name, company, request, role, code, source, paidReviewInterest: audience === 'professional' && body.paidReviewInterest === true };
+  const source = typeof body.source === 'string' && /^[a-zA-Z0-9_. -]{1,80}$/.test(body.source) ? body.source : 'direct';
+  return { attribution: body.attribution, audience: audience as Audience, email, name, company, request, role, code, source, paidReviewInterest: audience === 'professional' && body.paidReviewInterest === true };
 }

@@ -1,3 +1,4 @@
+import { externalReferrer } from '@/lib/acquisition';
 import { createHash } from 'node:crypto';
 import { prisma } from '@/lib/prisma';
 
@@ -8,9 +9,9 @@ const BOT = /bot|crawl|spider|slurp|preview|facebookexternalhit|embedly|vercel-s
  * Counts a visit without cookies or stored IP addresses. The visitor id is a hash of IP, browser and the date,
  * so it counts unique visitors per day but cannot follow anyone across days. Never throws.
  */
-export async function recordTraffic(type: TrafficEvent, headers: Headers, path?: string): Promise<void> {
+export async function recordTraffic(type: TrafficEvent, headers: Headers, path?: string, source?: string): Promise<void> {
   try {
-    if (process.env.VERCEL_ENV === 'preview') return;
+    if (process.env.VERCEL_ENV === 'preview' || headers.get('cookie')?.split(';').some(c=>c.trim()==='btp_internal=1')) return;
     const ua = headers.get('user-agent') ?? '';
     if (!ua || BOT.test(ua)) return;
     const day = new Date().toISOString().slice(0, 10);
@@ -18,14 +19,14 @@ export async function recordTraffic(type: TrafficEvent, headers: Headers, path?:
     const salt = process.env.IDENTITY_HASH_SECRET || process.env.CLERK_SECRET_KEY || '';
     const visitor = createHash('sha256').update(`btp-traffic-v1:${salt}:${day}:${ip}:${ua}`).digest('hex').slice(0, 24);
     let referrer: string | null = null;
-    try { const r = headers.get('referer'); referrer = r ? new URL(r).hostname : null; } catch { referrer = null; }
+    referrer = source ? externalReferrer('https://' + source) ?? null : null;
     await prisma.analyticsEvent.create({
       data: {
         anonymousUserId: `VIS-${visitor}`,
         eventType: type,
         eventCategory: 'traffic',
         createdAtBucket: day,
-        metadataJson: { path: path ?? null, referrer },
+        metadataJson: { path: path ?? null, referrer, version: 2 },
       },
     });
   } catch (error) {
@@ -47,7 +48,7 @@ export async function trafficSummary(days = 30) {
     if (r.eventType === 'site_visit') {
       d.visits++; d.visitors.add(r.anonymousUserId);
       const ref = (r.metadataJson as { referrer?: string | null } | null)?.referrer;
-      if (ref && !ref.includes('btp-rho-seven')) referrers.set(ref, (referrers.get(ref) ?? 0) + 1);
+      if (ref && externalReferrer('https://' + ref)) referrers.set(ref, (referrers.get(ref) ?? 0) + 1);
     }
     if (r.eventType === 'investor_room_login') d.logins++;
     if (r.eventType === 'investor_room_failed') d.failed++;
@@ -57,4 +58,12 @@ export async function trafficSummary(days = 30) {
   const daily = [...byDay.values()].sort((a, b) => b.date.localeCompare(a.date)).map(({ visitors, ...d }) => ({ ...d, uniqueVisitors: visitors.size }));
   const totals = daily.reduce((t, d) => ({ visits: t.visits + d.visits, uniqueVisitors: t.uniqueVisitors + d.uniqueVisitors, logins: t.logins + d.logins, failed: t.failed + d.failed, roomViews: t.roomViews + d.roomViews }), { visits: 0, uniqueVisitors: 0, logins: 0, failed: 0, roomViews: 0 });
   return { days, totals, daily, topReferrers: [...referrers.entries()].sort((a, b) => b[1] - a[1]).slice(0, 8).map(([source, visits]) => ({ source, visits })) };
+}
+
+/** New acquisition events only. Legacy traffic is never backfilled as growth. */
+export async function acquisitionSummary(days=30) {
+ const rows=await prisma.analyticsEvent.findMany({where:{eventCategory:'acquisition',createdAtBucket:{gte:new Date(Date.now()-days*86400000).toISOString().slice(0,10)}},select:{eventType:true,metadataJson:true}});
+ const counts:Record<string,number>={}; const channels:Record<string,number>={};
+ for(const row of rows){counts[row.eventType]=(counts[row.eventType]||0)+1; if(row.eventType!=='experience_completed'){const source=(row.metadataJson as {source?:string})?.source||'direct';channels[source]=(channels[source]||0)+1;}}
+ return {counts,channels};
 }
