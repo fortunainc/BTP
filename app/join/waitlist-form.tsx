@@ -3,6 +3,8 @@ import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { FormEvent, useState } from 'react';
 import { WAITLIST_ROLES } from '@/lib/waitlist-options';
+import { getAttribution } from '@/lib/acquisition';
+import { marketingEvent } from '@/lib/marketing-analytics';
 import type { Audience } from '@/lib/signup';
 const copy = {
  professional: { kicker: 'For clinical research professionals', title: 'Bring your experience into the room.', intro: 'Ask candid questions. Get practical answers from people who understand the work.', action: 'Request early access', success: 'BTP will contact you about access and any verification needed.' },
@@ -19,8 +21,8 @@ export default function WaitlistForm() {
  async function submit(e: FormEvent<HTMLFormElement>) {
   e.preventDefault(); setBusy(true); setError(''); const f = new FormData(e.currentTarget);
   try {
-   const res = await fetch('/api/interest', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ audience, email: f.get('email'), name: f.get('name'), company: f.get('company'), request: f.get('request'), role: f.get('role'), website: f.get('website'), code: params.get('ref') || '', source: params.get('utm_source') || 'direct', paidReviewInterest: f.get('paid') === 'on', contactConsent: f.get('consent') === 'on' }) });
-   const data = await res.json(); if (!res.ok) throw new Error(data.error || 'Please try again.'); if(data.next === '/join/experience'){window.location.assign(data.next);return;} setDone(true); setCheckEmail(data.checkEmail === true);
+   const res = await fetch('/api/interest', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ audience, email: f.get('email'), name: f.get('name'), company: f.get('company'), request: f.get('request'), role: f.get('role'), website: f.get('website'), code: params.get('ref') || '', source: getAttribution().source, attribution: getAttribution(), paidReviewInterest: f.get('paid') === 'on', contactConsent: f.get('consent') === 'on' }) });
+   const data = await res.json(); if (!res.ok) throw new Error(data.error || 'Please try again.'); if(data.conversion === true) await marketingEvent(audience === 'professional' ? 'community_signup' : audience === 'founder' ? 'founder_request' : 'investor_request', audience); if(data.next === '/join/experience'){window.location.assign(data.next);return;} setDone(true); setCheckEmail(data.checkEmail === true);
   } catch(e) { setError(e instanceof Error ? e.message : 'Please try again.'); } finally { setBusy(false); }
  }
  return <div className="bw"><header><Link href="/" className="bw-brand"><span>BTP</span><small>BEHIND<br/>THE PROTOCOL</small></Link><Link href="/sign-in">Member sign in ↗</Link></header>

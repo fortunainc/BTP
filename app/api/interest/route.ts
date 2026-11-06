@@ -1,3 +1,4 @@
+import { acquisitionConversion } from '@/lib/acquisition-server';
 import { NextRequest, NextResponse } from 'next/server';
 import { createHash } from 'node:crypto';
 import { prisma } from '@/lib/prisma';
@@ -27,7 +28,9 @@ export async function POST(req: NextRequest) {
     if(growthEnabled() && data.audience==='professional')return await growthSignup(req,data);
     const referrer = data.code ? await activeReferrer(data.code) : null;
     if (data.code && !referrer) return NextResponse.json({ error: 'This referral link is no longer active. Join directly at /join instead.' }, { status: 400, headers });
-    await prisma.$transaction(async tx => {
+    const submittedAt = new Date();
+    const saved = await prisma.$transaction(async tx => {
+      let createdAt: Date | undefined;
       let recordKey: string;
       if (data.audience === 'professional') {
         const old = await tx.accessRequest.findUnique({ where: { email: data.email } });
@@ -40,19 +43,21 @@ export async function POST(req: NextRequest) {
           recordKey = 'professional:' + old.id;
         } else {
           const row = await tx.accessRequest.upsert({ where: { email: data.email }, update: {}, create: { email: data.email, role: data.role, paidReviewInterest: data.paidReviewInterest, source: referrer ? 'member referral' : data.source, referrerId: referrer?.id ?? null } });
-          recordKey = 'professional:' + row.id;
+          recordKey = 'professional:' + row.id; createdAt = row.createdAt;
         }
       } else if (data.audience === 'founder') {
         // Identical retries are idempotent; a different product/request remains a separate inquiry.
         const id = 'signup-' + createHash('sha256').update(JSON.stringify([data.email, data.company, data.request])).digest('hex');
         const row = await tx.companyInquiry.upsert({ where: { id }, update: {}, create: { id, name: data.name, email: data.email, company: data.company, website: '', product: data.request, goals: '', access: 'not_yet', source: data.source } });
-        recordKey = 'founder:' + row.id;
+        recordKey = 'founder:' + row.id; createdAt = row.createdAt;
       } else {
         const row = await tx.investor.upsert({ where: { email: data.email }, update: {}, create: { email: data.email, name: data.name, company: data.company || null, status: 'pending' } });
-        recordKey = 'investor:' + row.id;
+        recordKey = 'investor:' + row.id; createdAt = row.createdAt;
       }
       await tx.requestFollowUp.upsert({ where: { key: recordKey }, update: {}, create: { key: recordKey, source: data.source, referrerId: referrer?.id ?? null } });
+      return { key: recordKey, isNew: !!createdAt && createdAt >= submittedAt };
     });
-    return NextResponse.json({ success: true }, { headers });
+    const conversion = saved.isNew && await acquisitionConversion(data.audience === 'professional' ? 'community_signup' : data.audience === 'founder' ? 'founder_request' : 'investor_request', saved.key, req.headers, data.attribution);
+    return NextResponse.json({ success: true, conversion }, { headers });
   } catch { return NextResponse.json({ error: 'We could not save your request. Your details are still here. Please try again.' }, { status: 503, headers }); }
 }

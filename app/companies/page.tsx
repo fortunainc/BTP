@@ -4,7 +4,7 @@ import SectionReveal from '@/components/marketing/SectionReveal';
 import '../join/waitlist.css';
 import './companies.css';
 
-export const metadata: Metadata = {
+export const metadata: Metadata = { alternates: { canonical: '/companies' },
   title: 'For startups | Behind the Protocol',
   description: 'Product reviews from verified clinical research professionals matched to the work your product supports.',
 };
@@ -19,7 +19,7 @@ const COVERS = ['What works well', 'Where users struggle or run into extra work'
 const idx = (i: number) => ({ ['--i' as string]: i }) as React.CSSProperties;
 
 export default function CompaniesPage() {
-  return <div className="bw co">
+  return <div className="bw co"><script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify({ '@context':'https://schema.org', '@type':'Service', name:'Clinical trial product reviews', url:'https://behindtheprotocol.ai/companies', provider:{'@type':'Organization',name:'Behind The Protocol Inc.',url:'https://behindtheprotocol.ai'}, description:'Product reviews from verified clinical research professionals matched to the work your product supports.' }) }} />
     <SectionReveal />
     <header><Link href="/" className="bw-brand"><span>BTP</span><small>BEHIND<br />THE PROTOCOL</small></Link>
       <nav className="co-nav" aria-label="Main"><Link href="/">For professionals</Link><Link href="/join?audience=founder&amp;utm_source=startups" className="co-pill">Discuss your product</Link></nav></header>

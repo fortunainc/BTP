@@ -7,7 +7,6 @@ import { logInvestorActivity, roomViewer } from '@/lib/investor-access';
 import envelope from '@/data/investor-brief.encrypted.json';
 import { headers } from 'next/headers';
 import { recordTraffic } from '@/lib/traffic';
-import TrafficBeacon from '@/components/TrafficBeacon';
 import { CONTACT, Gate, shell } from './ui';
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
@@ -22,7 +21,7 @@ export default async function Investors({searchParams}: {searchParams:Promise<{e
   if (!viewer) {
     const params = await searchParams;
     return <Gate>
-      <TrafficBeacon path="/investors" />
+
       <div className="eyebrow">By invitation</div>
       <h1><span className="ln l1">Inside</span><span className="ln l2"><span className="g">BTP.</span></span></h1>
       <p className="sub">The business behind the community. Explore the first commercial offer, the revenue model, and the opportunity to build on what clinical research professionals know.</p>

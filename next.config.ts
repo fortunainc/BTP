@@ -3,7 +3,7 @@ import { withSentryConfig } from "@sentry/nextjs";
 
 const nextConfig: NextConfig = {
   async headers() {
-    return [{ source: '/investors/:path*', headers: [
+    return [...['/admin/:path*','/situations/:path*','/join/experience','/join/progress','/join/return','/sign-in/:path*','/sign-up/:path*','/onboarding/:path*','/account/:path*','/reset-password/:path*','/notifications/:path*','/help','/invite','/vouch/:path*','/insights/:path*'].map(source => ({ source, headers: [{ key: 'X-Robots-Tag', value: 'noindex, nofollow, noarchive' }] })), { source: '/investors/:path*', headers: [
       { key: 'Cache-Control', value: 'private, no-store, max-age=0' },
       { key: 'X-Robots-Tag', value: 'noindex, nofollow, noarchive' },
       // same-origin: no referrer leaves the site, but browsers still send Origin on the login form POST.

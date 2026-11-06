@@ -1,3 +1,4 @@
+import { acquisitionConversion } from '@/lib/acquisition-server';
 import { Prisma } from '@prisma/client';
 import { randomUUID } from 'node:crypto';
 import { NextRequest, NextResponse } from 'next/server';
@@ -36,5 +37,6 @@ export async function growthSignup(req:NextRequest,data:NonNullable<ReturnType<t
  await ensureReferralCode(row.id);
  const session=await issueToken(row.id,'session');
  const emailSent=await sendReturnEmail(row.id);
- return attachSession(NextResponse.json({success:true,next:'/join/experience',emailSent},{headers:growthHeaders}),session);
+ const conversion=await acquisitionConversion('community_signup','professional:'+row.id,req.headers,data.attribution);
+ return attachSession(NextResponse.json({success:true,conversion,next:'/join/experience',emailSent},{headers:growthHeaders}),session);
 }

@@ -2,9 +2,10 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { SUPPORT_EMAIL } from '@/lib/site';
 
-export const metadata: Metadata = { title: 'BTP | Privacy and trust', description: 'How BTP verifies members, protects identity in discussions, and uses data.' };
+export const metadata: Metadata = { alternates: { canonical: '/privacy' }, title: 'BTP | Privacy and trust', description: 'How BTP verifies members, protects identity in discussions, and uses data.' };
 
 const collected = [
+  'Public website analytics use PostHog in cookieless mode to measure page visits, referral sources, campaign tags and completed signup steps. We do not send names, emails, questionnaire answers, private community content or investor room content to this analytics service. Session recording is disabled. Campaign attribution may be held in your browser for the current tab session. Internal browsers are excluded using a preference cookie.',
   'Waitlist email, professional role, optional paid review interest, signup source and referral attribution. BTP uses these to manage access and contact you about your stated interests.',
   'Your experience questionnaire stays private to BTP and helps match relevant paid review opportunities if you opt in. Referral signup and questionnaire completion counts determine waitlist priority. Referrers see counts, not your email or answers. Membership approval is separate.',
   'Waitlist interest is not consent to research or commercial reuse. Contact support to correct or remove your request.',
