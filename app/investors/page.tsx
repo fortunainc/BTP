@@ -40,7 +40,7 @@ export default async function Investors({searchParams}: {searchParams:Promise<{e
               <form method="post" action="/investors/access"><label htmlFor="password">Access password</label><input id="password" name="password" type="password" autoComplete="current-password" required maxLength={256} /><button className="btn gold" type="submit">Enter investor room <span aria-hidden>→</span></button></form>
             </details>
           </>}
-        <p>BTP reviews access requests. Approved investors receive a personal link.</p>
+        {!params.sent && <p>BTP reviews access requests. Approved investors receive a personal link.</p>}
         <p>A shared password opens the same briefing without a personal link. Please do not forward links or briefing material. Questions? <a href={CONTACT}>Contact BTP</a>.</p>
       </div>
     </Gate>;
